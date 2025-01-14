@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ articulo['titulo'] }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</head>
+<body>
+    <!-- Sobreposición para el fondo -->
+    <div class="overlay"></div>
+
+    <!-- Menú de navegación -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="logo ocultar-logo">
+                <a href="#"><img src="{{ url_for('static', filename='img/logo-preto-png.png') }}" alt="Logo"></a>
+            </div>
+            <div class="menu-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+        {% include 'fixed/menu.html' %}
+    </header>
+
+    <!-- Sección del detalle del blog -->
+    <section class="detalle-blog">
+        <!-- Imagen de la capa -->
+        <div class="blog-capa">
+            <img src="{{ url_for('static', filename='img/blog/' ~ imagen_folder ~ '/capa.jpg') }}" alt="{{ articulo['titulo'] }}">
+        </div>
+
+        <!-- Título del artículo -->
+        <h1>{{ articulo['titulo'] }}</h1>
+
+        <!-- Información del autor, fecha y tiempo de lectura -->
+        <p class="autor">{{ articulo['autor'] }} - {{ tiempo_lectura }} min de leitura</p>
+        <p class="data">{{ data }}</p>
+
+        <!-- Contenido del blog (texto e imágenes intercaladas) -->
+        <div class="blog-content">
+            {% for item in articulo['contenido'] %}
+                {% if item.tipo == 'parrafo' %}
+                    <p>{{ item.valor|safe }}</p> <!-- Renderiza contenido HTML dentro de los párrafos -->
+                {% elif item.tipo == 'imagen' %}
+                    <img src="{{ url_for('static', filename='img/blog/' ~ imagen_folder ~ '/' ~ item.valor) }}" alt="{{ articulo['titulo'] }}">
+                {% endif %}
+            {% endfor %}
+        </div>
+    </section>
+
+    {% include 'fixed/footer.html' %}
+</body>
+</html>

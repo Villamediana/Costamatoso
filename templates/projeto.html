@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <title>{{ nome_categoria }} - Costamatoso</title>
+    <!-- Vincular ao CSS usando Flask -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- Etiqueta meta para dispositivos móveis -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Vincular a Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Puedes cambiar 'Roboto' por 'Open Sans' si lo prefieres -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+    <!-- Vincular al CSS usando Flask -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <!-- ... otras etiquetas ... -->
+</head>
+<body>
+    <!-- Sobreposição para o fundo -->
+    <div class="overlay"></div>
+
+    <!-- Menú de navegação -->
+    <header class="header-white">
+        <nav class="navbar">
+            <div class="logo ocultar-logo">
+                <a href="{{ url_for('index') }}">
+                    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo">
+                </a>
+            </div>
+            <div class="menu-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+        <!-- Menú desplegable -->
+        {% include 'fixed/menu.html' %}
+    </header>
+
+    <!-- Seção de imagem de cabeçalho -->
+    <section class="seccion imagem-cabecalho">
+        <div class="cabecalho">
+            <img src="{{ url_for('static', filename='img/2.jpg') }}" alt="{{ nome_categoria }}">
+            <div class="overlay-cabecalho"></div>
+            <div class="texto-cabecalho">
+                <h1>{{ nome_categoria }}</h1>
+            </div>
+        </div>
+    </section>
+
+    <!-- Sección de galería -->
+    <section class="seccion galeria">
+        <!-- Contêiner de imágenes -->
+        <div class="container-galeria">
+            {% for projeto in projetos %}
+                <div class="imagem-galeria">
+                    <a href="{{ url_for('detalhe_projeto', nome_categoria=nome_categoria, nome_projeto=projeto.nome) }}">
+                        <img src="{{ projeto.capa_url }}" alt="{{ projeto.nome }}" class="imagem-animada">
+                        <div class="info-imagem">
+                            <div class="nome-obra">
+                                {{ projeto.nome }}
+                            </div>
+                            <div class="medidas-obra">
+                                <i class="fas fa-ruler-combined"></i> {{ projeto.medidas }}
+                            </div>
+                        </div>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+    
+
+    <!-- Footer -->
+    {% include 'fixed/footer.html' %}
+
+
+    <!-- Vincular ao arquivo JavaScript usando Flask -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

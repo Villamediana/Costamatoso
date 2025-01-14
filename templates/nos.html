@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Sobre Nós - Costamatoso</title>
+    <!-- Etiqueta meta para dispositivos móveis -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Vincular ao CSS usando Flask -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Sobreposição para o fundo -->
+    <div class="overlay"></div>
+
+    <!-- Menú de navegação -->
+    <header class="header-white">
+        <nav class="navbar">
+            <div class="logo ocultar-logo">
+                <a href="{{ url_for('index') }}">
+                    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo">
+                </a>
+            </div>
+            <div class="menu-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+        <!-- Menú desplegable -->
+        {% include 'fixed/menu.html' %}
+    </header>
+
+    <!-- Seção de imagem de cabeçalho -->
+    <section class="seccion imagem-cabecalho">
+        <div class="cabecalho">
+            <img src="{{ url_for('static', filename='img/time.jpg') }}" alt="Sobre nós">
+            <div class="overlay-cabecalho"></div>
+            <div class="texto-cabecalho">
+                <h1>Sobre nós</h1>
+            </div>
+        </div>
+    </section>
+
+    <section class="seccion conteudo">
+        <div class="container">
+            <h2 class="titulo-animado">{{ second_section.title }}</h2>
+            <p class="texto-animado" data-texto="{{ second_section.text }}"></p>
+        </div>
+    </section>
+
+        <!-- Seção de capa personalizada para sobre nós -->
+        <section class="seccion-sobre-nos">
+            <div class="capa-imagem-sobre-nos" style="background-image: url('{{ url_for('static', filename='img/time2.jpg') }}');">
+            </div>
+        </section>
+    
+        <section class="seccion conteudo">
+            <div class="container">
+                <h2 class="titulo-animado">{{ third_section.title }}</h2>
+                <p class="texto-animado" data-texto="{{ third_section.text }}"></p>
+            </div>
+        </section>
+
+    {% include 'fixed/footer.html' %}
+
+
+    <!-- Vincular ao arquivo JavaScript usando Flask -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

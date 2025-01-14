@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ "Editar Blog" if blog else "Criar Blog" }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Arial, sans-serif;
+            background-color: #f4f7f6;
+        }
+
+        input[type="file"] {
+            display: block;
+            width: 100%;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: white;
+            color: #34495e;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="file"]:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            font-weight: 400;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #34495e;
+        }
+
+        input[type="text"], input[type="date"] {
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 15px;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus, input[type="date"]:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+
+        #toolbar {
+            border-radius: 6px 6px 0 0;
+        }
+
+        #editor {
+            height: 400px;
+            border: 1px solid #ddd;
+            border-radius: 0 0 6px 6px;
+            background-color: #fff;
+        }
+
+        .save-btn {
+            display: block;
+            margin: 30px auto;
+            padding: 15px 30px;
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .save-btn:hover {
+            background-color: #3498db;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="editor-container">
+    
+        <a href="{{ url_for('dashboard') }}" class="menu-toggle">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+
+    
+        <h1>{{ "Editar Blog" if blog else "Criar Blog" }}</h1>
+        <form id="blogForm" action="/creation_blog" method="POST" enctype="multipart/form-data">
+            <!-- Título -->
+            <input type="text" id="titulo" name="titulo" placeholder="Título do Blog" value="{{ blog['titulo'] if blog else '' }}" required>
+
+            <!-- Fecha -->
+            <input type="date" id="fecha" name="fecha" value="{{ blog['data'] if blog else '' }}" required>
+
+            <!-- Imagen de Capa -->
+            <label for="imagen" style="font-weight: bold; color: #34495e;">Imagem de Capa</label>
+            {% if blog and blog['capa'] %}
+                <img src="/static/img/blog/{{ folder_name }}/{{ blog['capa'] }}" alt="Imagem de Capa" style="max-width: 100px; margin-bottom: 10px;">
+            {% endif %}
+            <input type="file" id="imagen" name="imagen" accept="image/*" {% if not blog %}required{% endif %}>
+
+            <!-- Autor -->
+            <input type="text" id="autor" name="autor" placeholder="Autor" value="{{ blog['autor'] if blog else '' }}" required>
+
+            <!-- Editor -->
+            <div id="toolbar"></div>
+            <div id="editor"></div>
+
+            <!-- Contenido en campo oculto -->
+            <input type="hidden" id="contenido" name="contenido">
+
+            <!-- Botón de guardar -->
+            <button class="save-btn" type="submit">Salvar Blog</button>
+
+            <!-- Botón para eliminar blog (solo visible al editar un blog existente) -->
+{% if blog %}
+<button class="save-btn" style="background-color: #e74c3c;" onclick="deleteBlog()">Eliminar Blog</button>
+{% endif %}
+
+
+        </form>
+    </div>
+    
+
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <script>
+        // Configuración de la barra de herramientas de Quill
+        const toolbarOptions = [
+            ['bold', 'italic', 'underline', 'blockquote'],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+            ['image']
+        ];
+
+        const editor = new Quill('#editor', {
+            theme: 'snow',
+            modules: {
+                toolbar: {
+                    container: toolbarOptions,
+                    handlers: {
+                        image: function () {
+                            const input = document.createElement('input');
+                            input.setAttribute('type', 'file');
+                            input.setAttribute('accept', 'image/*');
+                            input.click();
+
+                            input.onchange = async () => {
+                                const file = input.files[0];
+                                if (file) {
+                                    const formData = new FormData();
+                                    formData.append('image', file);
+
+                                    // Obtener el nombre de la carpeta del blog
+                                    const blogFolder = document.querySelector('#titulo').value.replace(/ /g, '_').toLowerCase();
+                                    formData.append('blog_folder', blogFolder);
+
+                                    try {
+                                        const response = await fetch('/upload_image', {
+                                            method: 'POST',
+                                            body: formData
+                                        });
+
+                                        if (response.ok) {
+                                            const { url } = await response.json();
+                                            const range = editor.getSelection();
+                                            editor.insertEmbed(range.index, 'image', url);
+                                        } else {
+                                            alert('Error al cargar la imagen');
+                                        }
+                                    } catch (error) {
+                                        console.error('Error al cargar la imagen:', error);
+                                        alert('Error al cargar la imagen.');
+                                    }
+                                }
+                            };
+                        }
+                    }
+                }
+            }
+        });
+        
+
+        // Cargar contenido existente en el editor
+        const contenido = `{{ blog['contenido_html']|safe if blog else '' }}`;
+        if (contenido) {
+            editor.root.innerHTML = contenido;
+        }
+
+        // Validación del formulario
+        const form = document.querySelector("#blogForm");
+        form.addEventListener("submit", function (e) {
+            const contenidoField = document.querySelector("#contenido");
+            contenidoField.value = editor.root.innerHTML.trim();
+        });
+
+        function deleteBlog() {
+        if (confirm('¿Estás seguro de que deseas eliminar este blog?')) {
+            fetch('{{ url_for("delete_blog", folder_name=folder_name) }}', {
+                method: 'POST',
+            })
+            .then(response => {
+                if (response.ok) {
+                    alert('Blog eliminado con éxito.');
+                    window.location.href = '{{ url_for("dashboard") }}';
+                } else {
+                    alert('Error al eliminar el blog.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al eliminar el blog.');
+            });
+        }
+    };
+    </script>
+
+</body>
+</html>

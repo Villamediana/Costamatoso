@@ -1,0 +1,1220 @@
+/* Estilos gerais e reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Calibri Light', 'Segoe UI', sans-serif;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0,0,0,0.5) transparent;
+}
+
+body::-webkit-scrollbar {
+    width: 8px;
+}
+
+body::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+body::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.5);
+    border-radius: 4px;
+    border: none;
+}
+
+/* Sobreposição para o fundo */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s;
+    z-index: 998;
+}
+
+.overlay.active {
+    background: transparent;
+    opacity: 1;
+    visibility: visible;
+}
+
+        /* Estilo do Preloader */
+        #preloader {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            background-color: rgba(192, 192, 192, 1);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 1s ease;
+        }
+        #preloader .progress-circle {
+            position: relative;
+            width: 120px;
+            height: 120px;
+        }
+        #preloader .progress-circle svg {
+            width: 100%;
+            height: 100%;
+        }
+        #preloader .progress-circle circle {
+            fill: none;
+            stroke-width: 4; /* Linha mais fina */
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+        #preloader .progress-circle .bg {
+            stroke: rgba(255, 255, 255, 0.2);
+        }
+        #preloader .progress-circle .progress {
+            stroke: #FFFFFF;
+            stroke-dasharray: 314;
+            stroke-dashoffset: 314;
+            animation: loadCircle 3s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+        }
+        @keyframes loadCircle {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+        #preloader img {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 50px;
+            height: auto;
+            opacity: 1; /* Logo visível desde o começo */
+        }
+
+        /* Banner de Cookies */
+        .cookie-banner {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            max-width: 600px;
+            background-color: rgba(0, 0, 0, 0.85);
+            color: #fff;
+            padding: 10px 20px;
+            text-align: center;
+            z-index: 1000;
+            border-radius: 10px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .cookie-banner p {
+            margin: 0;
+            font-size: 1em;
+        }
+        .cookie-banner button {
+            background-color: #fff;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .cookie-banner button:hover {
+            background-color: #e6e6e6;
+        }
+
+/* Menu de navegação */
+header {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: transparent;
+    z-index: 1000;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 20px;
+}
+
+.logo img {
+    height: 90px;
+    transition: opacity 0.5s ease; /* Transición suave para el cambio de opacidad */
+}
+
+.ocultar-logo {
+    opacity: 0;
+    transition: opacity 0.5s ease; /* Puedes ajustar la duración y el tipo de transición */
+}
+
+.nav-links {
+    position: fixed;
+    top: 0;
+    right: -50%;
+    width: 50%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    flex-direction: column;
+    padding-top: 60px;
+    transition: right 0.3s;
+    z-index: 999;
+    list-style: none;
+    display: flex;
+    align-items: flex-start;
+    padding-left: 30px;
+}
+
+.nav-links li {
+    margin: 2px 0;
+    width: 100%;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: white;
+    font-size: 18px;
+    transition: color 0.3s;
+    width: 100%;
+    display: block;
+    padding: 8px 0;
+    position: relative;
+}
+
+/* Estilos para o submenu */
+.has-submenu > a {
+    padding-right: 20px;
+}
+
+.has-submenu > a::after {
+    content: '▾'; /* Flecha hacia abajo por defecto */
+    position: relative;
+    top: 0;
+    transform: none;
+    font-size: 12px;
+    margin-left: 2px; /* Ajustar espacio entre texto y flecha */
+    transition: transform 0.3s ease; /* Transición suave */
+}
+
+/* Cuando el submenú está activo (abierto), cambia a flecha hacia arriba */
+.has-submenu.submenu-active > a::after {
+    content: '▴'; /* Flecha hacia arriba */
+}
+
+
+.submenu {
+    list-style: none;
+    padding-left: 20px;
+    display: none;
+}
+
+.submenu li {
+    margin: 5px 0;
+}
+
+.submenu a {
+    font-size: 16px;
+}
+
+.nav-links .submenu-active .submenu {
+    display: block;
+}
+
+.nav-links a:hover {
+    color: #ddd;
+}
+
+/* Ícone de hamburguer */
+.menu-icon {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    z-index: 1001;
+}
+/* Estilos para el menú hamburguesa cuando el header tiene la clase 'header-white' */
+.header-white .menu-icon span {
+    background-color: white; /* Cambia el color a blanco */
+}
+.menu-icon span {
+    height: 2px;
+    width: 30px;
+    background: black;
+    margin-bottom: 5px;
+    border-radius: 3px;
+    transition: transform 0.3s, opacity 0.3s;
+}
+
+.menu-icon.active span {
+    background: white;
+}
+
+.menu-icon.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.menu-icon.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.menu-icon.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+}
+
+.nav-links.active {
+    right: 0;
+}
+
+/* Seção de slideshow */
+.seccion {
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Slideshow */
+.slideshow {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+}
+
+.slideshow .slide {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    background-position: 0% center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    animation: slideAnimation 30s infinite;
+    animation-timing-function: ease-in-out;
+}
+
+.slideshow .slide:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.slideshow .slide:nth-child(2) {
+    animation-delay: 6s;
+}
+
+.slideshow .slide:nth-child(3) {
+    animation-delay: 12s;
+}
+
+.slideshow .slide:nth-child(4) {
+    animation-delay: 18s;
+}
+
+.slideshow .slide:nth-child(5) {
+    animation-delay: 24s;
+}
+
+@keyframes slideAnimation {
+    0% {
+        opacity: 0;
+        background-position: 0% center;
+    }
+    3% {
+        opacity: 1;
+        background-position: 0% center;
+    }
+    23% {
+        opacity: 1;
+        background-position: 100% center;
+    }
+    26% {
+        opacity: 0;
+        background-position: 100% center;
+    }
+    100% {
+        opacity: 0;
+        background-position: 100% center;
+    }
+}
+
+
+/* Estilos para a imagem de cabeçalho */
+.imagem-cabecalho .cabecalho {
+    position: relative;
+    width: 100%;
+    height: 170px;
+    overflow: hidden;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+.cabecalho img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 15s ease-in-out; /* Controlar la duración y suavidad del zoom */
+    transform: scale(1); /* Escala inicial */
+}
+
+/* Efecto de zoom in */
+.cabecalho.zoom-in img {
+    transform: scale(1.2); /* Zoom a un 5% más grande */
+}
+
+/* Efecto de zoom out */
+.cabecalho.zoom-out img {
+    transform: scale(1); /* Regresar a la escala original */
+}
+
+.imagem-cabecalho .overlay-cabecalho {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.4);
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+.imagem-cabecalho .texto-cabecalho {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    text-align: center;
+    margin-top: 10px;
+}
+
+.imagem-cabecalho .texto-cabecalho h1 {
+    font-size: 36px;
+    margin: 0;
+    font-family: 'Calibri Light', 'Segoe UI', sans-serif;
+    font-weight: 300; /* Para utilizar la variante 'Light' */
+}
+
+.imagem-cabecalho .texto-cabecalho span {
+    font-size: 14px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 500;
+}
+
+.imagem-cabecalho .info-cabecalho {
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.info-projeto{
+    margin-top: 20px;
+    font-size: 10px;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dos columnas */
+    gap: 5px; /* Espacio entre columnas */
+    justify-items: center; /* Alinea horizontalmente cada celda */
+    align-items: center; /* Alinea verticalmente cada celda */
+    margin: 20px auto; /* Espacio entre el contenido y centrado */
+}
+
+.info-grid div {
+    display: flex;
+    align-items: center; /* Centra verticalmente íconos y texto */
+}
+
+.info-grid svg {
+    width: 16px; /* Ajusta el tamaño del ícono */
+    height: 16px;
+    margin-right: 8px; /* Espacio entre el ícono y el texto */
+    fill: #ffffff; /* Asegura que el color de los íconos sea blanco */
+}
+
+
+/* Estilos para a galeria */
+.galeria {
+    padding: 10px 20px;
+}
+
+.container-galeria {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.imagem-galeria {
+    position: relative;
+    border-radius: 10px;
+    overflow: hidden;
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    height: 0;
+    padding-bottom: 100%;
+}
+
+.imagem-galeria img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.imagem-galeria img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.imagem-galeria:hover img {
+    transform: scale(1.05);
+}
+
+
+/* Estilos iniciales para las imágenes animadas */
+.imagem-animada {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+/* Clase que se aplica cuando la imagen entra en vista */
+.imagem-animada.aparecer {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+.imagem-galeria .info-imagem {
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10px;
+}
+
+.nome-obra,
+.medidas-obra {
+    background-color: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 5px 10px;
+    font-size: 12px;
+    border-radius: 5px;
+}
+
+.medidas-obra {
+    display: flex;
+    align-items: center;
+}
+
+.medidas-obra i {
+    margin-right: 5px;
+    font-size: 14px;
+}
+
+.imagem-galeria:hover img {
+    transform: scale(1.05);
+}
+
+.imagem-galeria::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0);
+    transition: background 0.3s ease;
+}
+
+.imagem-galeria:hover::before {
+    background: rgba(0, 0, 0, 0.4);
+}
+
+/* Estilos da galeria tipo mosaico (Pinterest) */
+.galeria-mosaico {
+    padding: 20px;
+}
+
+.container-mosaico {
+    column-count: 3;
+    column-gap: 10px;
+}
+
+.item-mosaico {
+    margin-bottom: 10px;
+    break-inside: avoid;
+}
+
+.item-mosaico img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 10px;
+    transition: transform 0.3s ease;
+}
+
+.item-mosaico img:hover {
+    transform: scale(1.05);
+}
+
+/* Ajustes para dispositivos móveis */
+@media (max-width: 768px) {
+    .container-mosaico {
+        column-count: 2;
+    }
+
+    .imagem-cabecalho .texto-cabecalho h1 {
+        font-size: 24px;
+    }
+
+    .imagem-cabecalho .info-cabecalho {
+        font-size: 12px;
+    }
+}
+
+/* Seção de conteúdo */
+.seccion.conteudo {
+    background-color: white;
+    padding: 70px 30px;
+}
+
+.seccion.conteudo .container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.seccion.imagem {
+    height: 100vh;
+}
+
+/* Estilos para el título animado */
+.titulo-animado {
+    font-size: 20px;
+    font-weight: normal;
+    margin-bottom: 30px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 1s ease-out, transform 1s ease-out;
+    text-align: center; /* Puedes cambiar esto si prefieres otro alineamiento */
+}
+
+.titulo-animado.aparecer {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.texto-animado {
+    font-size: 16px;
+    text-align: justify;
+    line-height: 1.1;
+}
+
+/* Estilos para las líneas de texto */
+.texto-animado .linha {
+    display: block;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    white-space: pre-wrap;
+}
+
+.texto-animado .linha.aparecer {
+    opacity: 1;
+    transform: translateY(0);
+}
+/* Footer */
+/* Footer */
+.footer {
+    background-color: rgba(0, 0, 0, 0.7); /* Negro con mucha transparencia */
+    padding: 20px 0;
+    border-radius: 20px 20px 0 0;
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.footer-nav {
+    display: inline-block;
+    font-size: 12px; /* Letra pequeña */
+    color: white;
+}
+
+.footer-nav a {
+    color: white;
+    text-decoration: none;
+    margin: 0 5px;
+    transition: transform 0.3s ease;
+}
+
+.footer-nav a:hover {
+    transform: scale(1.1);
+}
+
+.footer-nav .separator {
+    margin: 0 5px;
+    color: white;
+    vertical-align: middle;
+}
+
+.footer-line {
+    width: 80px;
+    height: 1px;
+    background-color: white;
+    margin: 10px auto;
+}
+
+.footer-logo img {
+    height: 60px;
+    margin-top: 0px;
+}
+
+/* Estilos para la galería en columnas */
+.container-mosaico {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* Tres columnas como base */
+    gap: 10px; /* Espacio entre imágenes */
+    margin: 10px; /* Margen alrededor de la galería */
+}
+
+.item-mosaico {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px; /* Bordes redondeados */
+}
+
+.item-mosaico img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Asegurar que las imágenes cubran el contenedor */
+    transition: transform 0.3s ease;
+}
+
+/* Seleccionar la tercera columna de cada fila */
+.item-mosaico:nth-child(3n) {
+    grid-row: span 2; /* Hacer que las imágenes de la tercera columna ocupen más espacio vertical */
+}
+
+/* Ajuste a dos columnas en pantallas medianas (entre 768px y 1024px) */
+@media (max-width: 600px) {
+    .container-mosaico {
+        grid-template-columns: repeat(2, 1fr); /* Ajuste a dos columnas en pantallas medianas */
+    }
+
+    .item-mosaico:nth-child(2n) {
+        grid-row: span 2; /* Hacer que la segunda columna sea vertical en pantallas de 2 columnas */
+    }
+}
+
+/* Para pantallas pequeñas (mínimo de 2 columnas) */
+@media (max-width: 300px) {
+    .container-mosaico {
+        grid-template-columns: repeat(2, 1fr); /* Mantener siempre dos columnas en pantallas pequeñas */
+    }
+
+    .item-mosaico:nth-child(2n) {
+        grid-row: span 2; /* Mantener la segunda columna con imágenes verticales */
+    }
+
+    .item-mosaico:nth-child(odd) {
+        grid-row: span 1; /* Las imágenes de la primera columna no deben ser verticales */
+    }
+}
+
+/* Para pantallas muy pequeñas (una columna si es necesario) */
+@media (max-width: 200px) {
+    .container-mosaico {
+        grid-template-columns: repeat(1, 1fr); /* Mantener siempre dos columnas en pantallas pequeñas */
+    }
+}
+
+/* Efecto de zoom al pasar el mouse */
+.item-mosaico:hover img {
+    transform: scale(1.05);
+}
+
+/* Estilos del Lightbox */
+.lightbox {
+    display: none; /* Por defecto, oculto */
+    position: fixed;
+    z-index: 1000;
+    padding-top: 60px;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+
+}
+
+.lightbox-content {
+    margin: auto;
+    display: block;
+    width: 95%; /* Ajustado para hacer la imagen más grande */
+    max-width: 100%;
+    max-height: 95%;
+    object-fit: contain;
+}
+
+
+.close {
+    position: absolute;
+    top: 20px;
+    right: 35px;
+    color: white;
+    font-size: 40px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* Botones de navegación */
+.prev, .next {
+    cursor: pointer;
+    position: absolute;
+    top: 50%;
+    width: auto;
+    padding: 16px;
+    margin-top: -22px;
+    color: white;
+    font-weight: bold;
+    font-size: 30px;
+    transition: 0.6s ease;
+    border-radius: 0 3px 3px 0;
+    user-select: none;
+}
+
+.prev {
+    left: 10px;
+    border-radius: 3px 0 0 3px;
+}
+
+.next {
+    right: 10px;
+    border-radius: 3px 0 0 3px;
+}
+
+.prev:hover, .next:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+
+/* Sección "Descubra mais projetos" */
+.descubra-projetos {
+    padding: 40px 20px; /* Padding para los lados (20px) y arriba/abajo (40px) */
+}
+
+.descubra-projetos h2 {
+    text-align: left;
+    font-size: 1.4em; /* Tamaño de fuente un poco más pequeño */
+    margin-bottom: 10px;
+    font-family: 'Calibri Light', 'Segoe UI', sans-serif;
+    font-weight: 300;
+}
+
+.linea-horizontal {
+    width: 50px;
+    height: 2px;
+    background-color: #333;
+    margin-bottom: 20px;
+}
+
+/* Contenedor de los proyectos relacionados en 2 columnas */
+.projetos-relacionados {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Dos columnas */
+    gap: 20px; /* Espacio entre columnas */
+    align-items: start; /* Alineación de las imágenes en la parte superior */
+}
+
+/* Estilo de cada proyecto relacionado */
+.projeto-relacionado {
+    text-decoration: none;
+    color: inherit;
+    font-family: 'Calibri Light', 'Segoe UI', sans-serif;
+    display: block; /* Asegura que el proyecto sea un bloque completo */
+}
+
+/* Caja que contiene la imagen y el título */
+.projeto-caja {
+    position: relative;
+    width: 100%;
+}
+
+.projeto-caja img {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+}
+
+/* Cajita para el título dentro de la imagen */
+.titulo-caja {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 5px 10px;
+    border-radius: 5px;
+}
+
+.titulo-caja p {
+    margin: 0;
+    color: #fff;
+    font-size: 0.9em; /* Tamaño de texto reducido */
+    font-family: 'Calibri Light', 'Segoe UI', sans-serif;
+    font-weight: normal; /* Cambiado para un estilo más ligero */
+}
+
+/* Ajuste para pantallas pequeñas */
+@media (max-width: 300px) {
+    .projetos-relacionados {
+        grid-template-columns: 1fr; /* Una sola columna en pantallas pequeñas */
+    }
+}
+
+
+/* Contato */
+/* Sección de contacto */
+.seccion-contato {
+    background-image: url('{{ url_for("static", filename="img/1.jpg") }}'); /* Asegúrate de cambiar a la imagen correcta */
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.contato-container {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 40px;
+    text-align: center;
+    max-width: 600px;
+    margin: 20px;
+    border-radius: 10px;
+}
+
+.contato-container h1 {
+    font-size: 32px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.contato-container p {
+    font-size: 16px;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.contato-redes a {
+    display: inline-block;
+    margin: 0 10px;
+}
+
+.contato-redes img {
+    width: 24px;
+    height: 24px;
+}
+
+.form-contato {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-contato input, .form-contato select {
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+    width: 100%;
+}
+
+.form-contato button {
+    background-color: #d3d3d3;
+    border: none;
+    padding: 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    color: #333;
+}
+
+.contato-trabalhe {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #666;
+}
+
+/* Estilo para los enlaces activos */
+.nav-links a.active {
+    text-decoration: none;
+    color: white;  /* Cambia esto al color que prefieras */
+}
+
+/* Si quieres subrayado con un borde inferior personalizado */
+.nav-links a.active {
+    border-bottom: 1px solid white;  /* O el color que prefieras */
+    padding-bottom: 5px;  /* Ajusta el padding para alinear el borde */
+}
+
+
+
+
+
+
+/* Sección del blog */
+.seccion-blog {
+    padding: 40px 20px; /* Padding para los bordes laterales */
+    text-align: center;
+}
+
+.blog-cabecalho h1 {
+    font-size: 1.4em; /* Reducido el tamaño del título del blog */
+    font-weight: 800;
+    margin-bottom: 30px; /* Ajustado el margen inferior */
+}
+
+/* Contenedor para los artículos del blog */
+.container-articulos {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 20px;
+}
+
+/* Estilos de los artículos */
+.articulo-blog {
+    width: 70%; /* Mantiene el ancho del artículo */
+    margin-bottom: 30px; /* Reducido el margen entre artículos */
+    overflow: hidden;
+    border-radius: 10px;
+    padding: 0 10px; /* Padding interno para que el contenido no toque los bordes */
+}
+
+.articulo-blog img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    display: block;
+    transition: transform 0.3s ease-in-out;
+    max-height: 350px; /* Aumentado el tamaño vertical de las imágenes */
+}
+
+.articulo-blog:hover img {
+    transform: scale(1.03); /* Ligero zoom al pasar el cursor */
+}
+
+/* Contenedor del contenido del artículo */
+.contenido-articulo {
+    margin-top: 15px; /* Ajustado el margen superior */
+    text-align: center;
+}
+
+.contenido-articulo h2 {
+    font-size: 1em; /* Reducido el tamaño del título del artículo */
+    margin-bottom: 3px;
+    text-decoration: none;
+    font-weight: bold;
+    color: black;
+}
+
+/* Quitar subrayado de enlaces dentro del contenido del artículo */
+.articulo-blog a {
+    text-decoration: none;
+}
+
+.contenido-articulo p {
+    font-size: 0.8em; /* Reducido el tamaño del texto de la descripción */
+    text-decoration: none;
+    color: black;
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+    .articulo-blog {
+        width: 90%; /* Ancho mayor en dispositivos móviles */
+        padding: 0 10px; /* Agregado padding lateral en móviles */
+    }
+
+    .articulo-blog img {
+        max-height: 300px; /* Ajuste de la altura de la imagen en móviles */
+    }
+
+    .container-articulos {
+        padding: 0 15px;
+    }
+}
+
+
+
+/* Sección del blog */
+.detalle-blog {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    text-align: center;
+}
+
+.blog-capa img {
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+    margin-bottom: 20px;
+}
+
+/* Título del artículo */
+.detalle-blog h1 {
+    font-size: 2.2em;
+    font-weight: 300;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+/* Información del autor y tiempo de lectura */
+.detalle-blog .autor {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.detalle-blog .data {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+/* Contenido del artículo */
+.blog-content p {
+    font-size: 1.1em;
+    line-height: 1.6;
+    text-align: left;
+    margin-bottom: 15px;
+}
+
+/* Estilos para las imágenes dentro del contenido */
+.blog-content img {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+    margin: 20px 0;
+    border-radius: 10px;
+}
+
+/* Estilos de imagen y párrafos en móviles */
+@media (max-width: 768px) {
+    .detalle-blog h1 {
+        font-size: 1.8em;
+    }
+    .blog-content p {
+        font-size: 1em;
+    }
+    .blog-capa img {
+        max-height: 300px;
+    }
+}
+
+
+
+/* Estilos específicos para la página "Sobre Nós" */
+
+/* Sección de capa */
+.capa-imagem-sobre-nos {
+    position: relative;
+    width: 100%;
+    height: 50vh; /* Ajusta la altura como prefieras */
+    background-size: cover;
+    background-position: center;
+}
+
+/* Listas numeradas y no numeradas */
+.blog-content ol,
+.blog-content ul {
+    margin-left: 20px; /* Margen izquierdo para alinear correctamente */
+    padding-left: 20px; /* Espaciado dentro de la lista */
+    list-style-position: outside; /* Asegura que los números/viñetas estén fuera */
+}
+
+/* Estilo para los elementos de la lista */
+.blog-content ol li,
+.blog-content ul li {
+    text-align: left; /* Asegura que el texto esté alineado a la izquierda */
+    margin-bottom: 5px; /* Espacio entre los elementos de la lista */
+}
+
+
+.overlay-capa-sobre-nos {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5); /* Oscurece la imagen para mejor legibilidad del texto */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.overlay-capa-sobre-nos h1 {
+    color: white;
+    font-size: 3em;
+    text-align: center;
+    font-weight: 300;
+}
+
+/* Sección de contenido */
+.seccion-sobre-nos.conteudo-sobre-nos {
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.container-sobre-nos {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.titulo-animado-sobre-nos {
+    font-size: 2em;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.texto-animado-sobre-nos {
+    font-size: 1.2em;
+    color: #555;
+}

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</head>
+<body>
+        <!-- Sobreposición para el fondo -->
+        <div class="overlay"></div>
+    <!-- Menú de navegación -->
+    <header class="header">
+        <nav class="navbar">
+            <div class="logo ocultar-logo">
+                <a href="#"><img src="{{ url_for('static', filename='img/logo-preto-png.png') }}" alt="Logo"></a>
+            </div>
+            <div class="menu-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+        <!-- Menú desplegable -->
+        {% include 'fixed/menu.html' %}
+    </header>
+
+    <!-- Título de la sección del Blog -->
+    <section class="seccion-blog">
+        <div class="blog-cabecalho">
+            <h1>BLOG</h1>
+        </div>
+        <div class="container-articulos">
+            <!-- Reutilizamos el estilo de las imágenes con título -->
+            {% for articulo in articulos %}
+            <div class="articulo-blog">
+                <a href="{{ url_for('detalle_blog', nombre_articulo=articulo['nombre']) }}">
+                    <img src="{{ url_for('static', filename=articulo['capa']) }}" alt="{{ articulo['titulo'] }}">
+                    <div class="contenido-articulo">
+                        <h2>{{ articulo['titulo'] }}</h2>
+                        <p>{{ articulo['descricao'] }}</p>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+</body>
+</html>

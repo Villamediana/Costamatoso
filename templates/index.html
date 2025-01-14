@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Costamatoso</title>
+    <!-- Etiqueta meta para dispositivos móveis -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Vincular ao CSS usando Flask -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Preloader -->
+    <div id="preloader">
+        <div class="progress-circle">
+            <svg>
+                <circle class="bg" cx="60" cy="60" r="50"></circle>
+                <circle class="progress" cx="60" cy="60" r="50"></circle>
+            </svg>
+        </div>
+        <img src="{{ url_for('static', filename='img/logo-preto-png.png') }}" alt="Logo">
+    </div>
+
+    <!-- Sobreposição para o fundo -->
+    <div class="overlay"></div>
+
+    <!-- Menú de navegação -->
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <a href="{{ url_for('index') }}"><img src="{{ url_for('static', filename='img/logo-preto-png.png') }}" alt="Logo"></a>
+            </div>
+            <div class="menu-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+        <!-- Menú desplegable -->
+        {% include 'fixed/menu.html' %}
+    </header>
+
+    <!-- Seção de slideshow -->
+    <section class="seccion imagem">
+        <!-- Contêiner para as imagens do slideshow -->
+        <div class="slideshow">
+            {% for image in slider_images %}
+                <div class="slide" style="background-image: url('{{ url_for('static', filename=image) }}');"></div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <section class="seccion conteudo">
+        <div class="container">
+            <h2 class="titulo-animado">{{ second_section.title }}</h2>
+            <p class="texto-animado" data-texto="{{ second_section.text }}"></p>
+        </div>
+    </section>
+    
+    <!-- Banner de Cookies -->
+    <div class="cookie-banner" id="cookie-banner">
+        <p>Usamos cookies para melhorar sua experiência.</p>
+        <button id="accept-cookies">Aceitar</button>
+    </div>
+
+    {% include 'fixed/footer.html' %}
+
+    <!-- Vincular ao arquivo JavaScript usando Flask -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script>
+        // Script para o preloader
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                var preloader = document.getElementById('preloader');
+                preloader.style.opacity = '0';
+                setTimeout(function() {
+                    preloader.style.display = 'none';
+                }, 1000); // Transição suave antes de remover o preloader
+            }, 3000); // Garante que o preloader apareça por pelo menos 3 segundos
+        });
+
+        // Script para o banner de cookies
+        document.addEventListener('DOMContentLoaded', function() {
+            var cookieBanner = document.getElementById('cookie-banner');
+            var cookiesAccepted = localStorage.getItem('cookiesAccepted');
+            if (!cookiesAccepted || cookiesAccepted !== 'true') {
+                cookieBanner.style.display = 'flex';
+            }
+        });
+
+        document.getElementById('accept-cookies').addEventListener('click', function() {
+            localStorage.setItem('cookiesAccepted', 'true');
+            document.getElementById('cookie-banner').style.display = 'none';
+        });
+    </script>
+</body>
+</html>

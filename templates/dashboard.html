@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard - Editar Slider y Secciones</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+    <!-- Quill Styles -->
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+.message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    max-width: 300px;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+    text-align: center;
+    z-index: 1000;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.message.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.message.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+    </style>
+</head>
+<body>
+    <!-- Mensajes Flash -->
+    {% if request.args.get('status') and request.args.get('message') %}
+        <div class="message {{ request.args.get('status') }}">
+            {{ request.args.get('message') }}
+        </div>
+    {% endif %}
+
+    <!-- Botón menú hamburguesa -->
+    <button class="menu-toggle">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar de navegación -->
+    <aside class="sidebar">
+        <div class="logo">
+            <a href="{{ url_for('index') }}">
+            Admin
+            </a>
+        </div>
+        <nav class="menu">
+            <ul>
+                <li><a href="#" data-section="slider-section" class="active">Editar Slider</a></li>
+                <li><a href="#" data-section="quem-somos-section">Quem somos (Home)</a></li>
+                <li><a href="#" data-section="sobre-nos-section">Quem somos (Aba)</a></li>
+                <li><a href="#" data-section="blog-section">Editar Blog</a></li>
+                <li><a href="#" data-section="file-browser-section">Navegar Projetos</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- Contenido Principal -->
+    <main class="main-content">
+        <!-- Sección Slider -->
+        <section id="slider-section" class="active-section">
+            <h1>Editar Imágenes del Slider</h1>
+            <form action="{{ url_for('dashboard') }}" method="POST" enctype="multipart/form-data">
+                <div class="slider-container">
+                    {% for i, image in slider_images %}
+                        <div class="slider-item">
+                            <img src="{{ url_for('static', filename=image) }}" alt="Slider {{ i+1 }}" class="slider-preview">
+                            <label class="file-upload-btn" for="slider_image_{{ i }}">Escolher arquivo</label>
+                            <input type="file" name="slider_image_{{ i }}" id="slider_image_{{ i }}">
+                        </div>
+                    {% endfor %}
+                </div>
+                <button type="submit" class="btn">Actualizar Slider</button>
+            </form>
+        </section>
+
+        <!-- Sección Quem Somos (Home) -->
+        <section id="quem-somos-section" class="hidden-section">
+            <h1>Editar Quem Somos (Home Page)</h1>
+            <form action="{{ url_for('dashboard') }}" method="POST" enctype="multipart/form-data">
+                <div class="section-item">
+                    <label for="second_section_title">Título</label>
+                    <input type="text" name="second_section_title" id="second_section_title" value="{{ second_section.title }}" required>
+                    
+                    <label for="second_section_text">Texto</label>
+                    <textarea name="second_section_text" id="second_section_text" rows="4" required>{{ second_section.text }}</textarea>
+                    
+                    <img src="{{ url_for('static', filename=second_section.image) }}" alt="Second Section" class="section-preview">
+                    <label class="file-upload-btn" for="second_section_image">Escolher imagem</label>
+                    <input type="file" name="second_section_image" id="second_section_image">
+                </div>
+                <button type="submit" class="btn">Actualizar</button>
+            </form>
+        </section>
+
+        <!-- Sección Quem Somos (Aba) -->
+        <section id="sobre-nos-section" class="hidden-section">
+            <h1>Editar Quem Somos (Aba)</h1>
+            <form action="{{ url_for('dashboard') }}" method="POST" enctype="multipart/form-data">
+                <div class="section-item">
+                    <label for="third_section_text">Texto</label>
+                    <textarea name="third_section_text" id="third_section_text" rows="4" required>{{ third_section.text }}</textarea>
+                    
+                    <img src="{{ url_for('static', filename=third_section.image) }}" alt="Third Section" class="section-preview">
+                    <label class="file-upload-btn" for="third_section_image">Escolher imagem</label>
+                    <input type="file" name="third_section_image" id="third_section_image">
+                </div>
+                <button type="submit" class="btn">Actualizar</button>
+            </form>
+        </section>
+
+        <!-- Sección Blog -->
+        <section id="blog-section" class="hidden-section">
+            <h1>Editar Blogs</h1>
+            <a href="{{ url_for('create_blog') }}" id="new-blog-btn" class="floating-btn {% if request.path == url_for('create_blog') %}active{% endif %}">
+                +
+            </a>
+
+            <!-- Barra de búsqueda -->
+            <input type="text" id="search-bar" placeholder="Buscar blogs..." class="search-bar">
+
+            <!-- Lista de Blogs -->
+            <div class="slider-container" id="blog-container">
+                {% for blog in blogs %}
+                    <div class="slider-item">
+                        <img src="{{ url_for('static', filename='img/blog/' ~ blog.folder ~ '/capa.jpg') }}" alt="Capa Blog {{ blog.titulo }}" class="slider-preview">
+                        <div class="blog-info">
+                            <h3>{{ blog.titulo }}</h3>
+                            <p>{{ blog.autor }} - {{ blog.data }}</p>
+                            <button class="edit-blog-btn" onclick="window.location.href='{{ url_for('edit_blog', folder_name=blog.folder) }}'">Editar</button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Sección Proyectos -->
+        <section id="file-browser-section" class="hidden-section">
+            <h1>Editar proyectos</h1>
+            <div class="breadcrumb">
+                <span id="current-path">/projetos</span>
+                <span class="file-actions">
+                    <!-- Botón para crear nueva carpeta -->
+                    <button id="create-folder-btn" title="Crear carpeta">
+                        <i class="fas fa-folder-plus"></i>
+                    </button>
+                    <!-- Botón para subir archivos -->
+                    <button id="upload-file-btn" title="Subir archivo">
+                        <i class="fas fa-upload"></i>
+                    </button>
+                </span>
+            </div>
+            <div class="file-container">
+                <ul id="file-list"></ul>
+            </div>
+        </section>
+        
+    </main>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

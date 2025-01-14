@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Depoimentos - Costamatoso</title>
+    <!-- Etiqueta meta para dispositivos móveis -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Vincular ao CSS usando Flask -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* Barra de progresso */
+        .progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 3px;
+            background-color: #a9a9a9; /* Cor da barra igual à barra de rolagem */
+            z-index: 1000;
+            border-radius: 5px;
+            transition: width 0.25s ease-out;
+        }
+
+        /* Espaço adicional antes do footer */
+        .seccion-sobre-nos {
+            margin-bottom: 50px; /* Adicionado espaço antes do footer */
+        }
+    </style>
+</head>
+<body>
+    <!-- Barra de progresso -->
+    <div class="progress-bar" id="progress-bar"></div>
+
+    <!-- Sobreposição para o fundo -->
+    <div class="overlay"></div>
+
+    <!-- Menú de navegação -->
+    <header class="header-white">
+        <nav class="navbar">
+            <div class="logo ocultar-logo">
+                <a href="{{ url_for('index') }}">
+                    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo">
+                </a>
+            </div>
+            <div class="menu-icon">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+        <!-- Menú desplegable -->
+        {% include 'fixed/menu.html' %}
+    </header>
+
+    <!-- Seção de imagem de cabeçalho -->
+    <section class="seccion imagem-cabecalho">
+        <div class="cabecalho">
+            <img src="{{ url_for('static', filename='img/capa-depoimentos.jpg') }}" alt="Depoimentos">
+            <div class="overlay-cabecalho"></div>
+            <div class="texto-cabecalho">
+                <h1>Depoimentos</h1>
+            </div>
+        </div>
+    </section>
+
+    <!--SECCAO DE DEPOIMENTOS-->
+
+        <!-- DEPOIMENTO -->
+        <section class="seccion conteudo">
+            <div class="container">
+                <h2 class="titulo-animado">Camanducaia, Socorro (2022)</h2>
+                <p class="texto-animado" data-texto="A Costa Matoso é uma empresa muito especial... Cada projeto parece ser único e ter a personalidade do cliente. A gente vê muitos projetos por aí e geralmente são muitos parecidos, e o de vocês não. A criatividade e o talento do time é admirável. Em relação ao meu projeto, parecia que vocês me conheciam há muito tempo... Em poucas reuniões, vocês conseguiram entender o que eu queria e colocaram no papel, além de executarem como planejado! Sobre a obra, cada etapa bem planejada e executada... Os profissionais parceiros são excelentes e o trabalho de cada um foi impecável! A energia de vocês também é um diferencial e parece que todos trabalham realmente no que gostam! Parabéns à todos do time Costa Matoso!"></p>
+            </div>
+        </section>
+        <section class="seccion-sobre-nos">
+            <div class="capa-imagem-sobre-nos" style="background-image: url('{{ url_for('static', filename='img/depoimentos/Camanducaia, Socorro (2022).jpg') }}');">
+            </div>
+        </section>
+        <!-- FIM DEPOIMENTO -->
+
+        <!-- DEPOIMENTO -->
+        <section class="seccion conteudo">
+            <div class="container">
+                <h2 class="titulo-animado">Residencial Palma Real, Socorro (2022)</h2>
+                <p class="texto-animado" data-texto="Estamos satisfeitos com os serviços prestados pela Costa Matoso. Sempre tivemos facilidade de comunicação com a equipe. Empresa séria e confiável!"></p>
+            </div>
+        </section>
+        <section class="seccion-sobre-nos">
+            <div class="capa-imagem-sobre-nos" style="background-image: url('{{ url_for('static', filename='img/depoimentos/Residencial Palma Real, Socorro (2022).jpg') }}');">
+            </div>
+        </section>
+        <!-- FIM DEPOIMENTO -->
+
+        <!-- DEPOIMENTO -->
+        <section class="seccion conteudo">
+            <div class="container">
+                <h2 class="titulo-animado">Edifício Geraldo Pedro da Silva, Centro, Socorro (2022)</h2>
+                <p class="texto-animado" data-texto="João, amei! Ficou Lindo! Gostaria muito que meu pai estivesse aqui, para viver este momento comigo. Agradeço à todos vocês! (In memorian)"></p>
+            </div>
+        </section>
+        <section class="seccion-sobre-nos">
+            <div class="capa-imagem-sobre-nos" style="background-image: url('{{ url_for('static', filename='img/depoimentos/Edifício Geraldo Pedro da Silva, Centro, Socorro (2022).jpg') }}');">
+            </div>
+        </section>
+        <!-- FIM DEPOIMENTO -->
+
+        <!-- DEPOIMENTO -->
+        <section class="seccion conteudo">
+            <div class="container">
+                <h2 class="titulo-animado">Residencial Sítio dos Ipês, Socorro (2022)</h2>
+                <p class="texto-animado" data-texto="João e Pedro, desde o primeiro contato percebemos a atenção, empatia e respeito conosco. Vocês nos surpreenderam e superaram nossas expectativas quando apresentaram o projeto da casa! Quando iniciaram a obra e agora, já na fase de acabamento, têm sido atenciosos, pacientes e sempre transparentes em tudo que fazem, gerando confiança e tranquilidade para nós, que estamos construindo pela primeira vez! Nosso agradecimento à vocês e à toda equipe da Costa Matoso!"></p>
+            </div>
+        </section>
+        <section class="seccion-sobre-nos">
+            <div class="capa-imagem-sobre-nos" style="background-image: url('{{ url_for('static', filename='img/depoimentos/Residencial Sítio dos Ipês, Socorro (2022).jpg') }}');">
+            </div>
+        </section>
+        <!-- FIM DEPOIMENTO -->
+
+        <!-- DEPOIMENTO -->
+        <section class="seccion conteudo">
+            <div class="container">
+                <h2 class="titulo-animado">Residencial Palma Real, Socorro (2021)</h2>
+                <p class="texto-animado" data-texto="Desde o primeiro contato, percebemos a atenção, empatia e respeito conosco. Vocês surpreenderam e superaram as nossas expectativas quando apresentaram o projeto da casa! Quando iniciaram a obra e, depois, na fase de acabamento, foram atenciosos, pacientes e sempre transparentes em tudo que fazem, gerando confiança e tranquilidade para nós, que estávamos construindo pela primeira vez! Nosso agradecimento à vocês e toda a equipe da Costa Matoso!"></p>
+            </div>
+        </section>
+        <section class="seccion-sobre-nos">
+            <div class="capa-imagem-sobre-nos" style="background-image: url('{{ url_for('static', filename='img/depoimentos/Residencial Palma Real, Socorro (2021).jpg') }}');">
+            </div>
+        </section>
+        <!-- FIM DEPOIMENTO -->
+
+        <!-- DEPOIMENTO -->
+        <section class="seccion conteudo">
+            <div class="container">
+                <h2 class="titulo-animado">Residencial Sítio dos Ipês, Socorro (2021)</h2>
+                <p class="texto-animado" data-texto="Não poderíamos ter escolhido equipe melhor! Desde o primeiro contato nos sentimos literalmente em casa com vocês! Abertos para ouvir, prontos para resolver o que quer que seja, incentivadores de sonhos e parceiros. Fizemos laços que serão para sempre mantidos. Nossa casa estará sempre aberta para vocês!"></p>
+            </div>
+        </section>
+        <section class="seccion-sobre-nos">
+            <div class="capa-imagem-sobre-nos" style="background-image: url('{{ url_for('static', filename='img/depoimentos/Residencial Sítio dos Ipês, Socorro (2021).jpg') }}');">
+            </div>
+        </section>
+        <!-- FIM DEPOIMENTO -->
+
+        <!-- DEPOIMENTO -->
+        <section class="seccion conteudo">
+            <div class="container">
+                <h2 class="titulo-animado">Residencial L’Acqua Pompéia, Socorro (2021)</h2>
+                <p class="texto-animado" data-texto="Sou cliente e só tenho elogios a vocês. Parabéns e cada vez mais sucesso."></p>
+            </div>
+        </section>
+        <section class="seccion-sobre-nos">
+            <div class="capa-imagem-sobre-nos" style="background-image: url('{{ url_for('static', filename='img/depoimentos/Residencial L’Acqua Pompéia, Socorro (2021).jpg') }}');">
+            </div>
+        </section>
+        <!-- FIM DEPOIMENTO -->
+
+        <!-- DEPOIMENTO -->
+        <section class="seccion conteudo">
+            <div class="container">
+                <h2 class="titulo-animado">Residencial Palma Real, Socorro (2020)</h2>
+                <p class="texto-animado" data-texto="Hoje tenho a minha casa pronta e acho que valeu muito ter contratado a Costa Matoso. Quero destacar a dedicação da equipe toda, a atenção e responsabilidade. É uma empresa jovem e com certeza vai firmar cada vez mais seu nome nesse mercado, sempre baseado na responsabilidade, idoneidade e clareza: Qualidades raras hoje em dia. Estão de parabéns!"></p>
+            </div>
+        </section>
+        <section class="seccion-sobre-nos">
+            <div class="capa-imagem-sobre-nos" style="background-image: url('{{ url_for('static', filename='img/depoimentos/Residencial Palma Real, Socorro (2020).jpg') }}');">
+            </div>
+        </section>
+        <!-- FIM DEPOIMENTO -->
+
+        <!-- DEPOIMENTO -->
+        <section class="seccion conteudo">
+            <div class="container">
+                <h2 class="titulo-animado">Jaboticabal, Socorro (2018)</h2>
+                <p class="texto-animado" data-texto="Nos simplesmente amamos o projeto. Tudo ficou maravilhoso, a casa é espaçosa, tem muita claridade e a entrega foi emocionante. Lindo trabalho de vocês. Muito obrigado em nome de toda nossa familia!"></p>
+            </div>
+        </section>
+        <section class="seccion-sobre-nos">
+            <div class="capa-imagem-sobre-nos" style="background-image: url('{{ url_for('static', filename='img/depoimentos/Jaboticabal, Socorro (2018).jpg') }}');">
+            </div>
+        </section>
+        <!-- FIM DEPOIMENTO -->
+
+        <!-- DEPOIMENTO -->
+        <section class="seccion conteudo">
+            <div class="container">
+                <h2 class="titulo-animado">Pompéia, Socorro (2018)</h2>
+                <p class="texto-animado" data-texto="Projeto muito bonito! Todos que nos visitam elogiam a casa. Estamos muito contentes!"></p>
+            </div>
+        </section>
+        <section class="seccion-sobre-nos">
+            <div class="capa-imagem-sobre-nos" style="background-image: url('{{ url_for('static', filename='img/depoimentos/Pompéia, Socorro (2018).jpg') }}');">
+            </div>
+        </section>
+        <!-- FIM DEPOIMENTO -->
+
+    <!--FIM SECCAO DE DEPOIMENTOS-->
+
+    {% include 'fixed/footer.html' %}
+
+    <!-- Vincular ao arquivo JavaScript usando Flask -->
+    <script>
+        // Atualizar a barra de progresso com base no scroll
+        const progressBar = document.getElementById('progress-bar');
+        window.addEventListener('scroll', () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.body.scrollHeight - window.innerHeight;
+            const scrollPercent = (scrollTop / docHeight) * 100;
+            progressBar.style.width = scrollPercent + '%';
+        });
+    </script>
+
+        <!-- Vincular ao arquivo JavaScript usando Flask -->
+        <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

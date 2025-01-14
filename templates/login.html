@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Acesso Restrito</title>
+    <!-- Sua folha de estilo global -->
+    <style>
+      .login-container {
+    min-height: 100vh;           /* Ocupa a tela inteira na vertical */
+    display: flex;              
+    flex-direction: column;      
+    justify-content: center;     
+    align-items: center;         
+    background-color: #f1f1f1;   /* Ou transparente, se preferir */
+    padding: 20px;
+}
+
+.login-container h1 {
+    margin-bottom: 20px;
+    font-weight: 400; /* Um pouco mais leve */
+}
+
+.login-container form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 300px;  /* Largura máxima do form */
+}
+
+.login-input {
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 16px;
+}
+
+.login-button {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    background-color: #007bff; /* Azul, por exemplo */
+    color: #fff;
+    transition: background-color 0.3s ease;
+}
+
+.login-button:hover {
+    background-color: #0056b3; /* Tom de azul um pouco mais escuro */
+}
+
+    </style>
+    
+</head>
+<body>
+
+    <div class="login-container">
+        <h1>Insira a chave de acesso</h1>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul>
+            {% for message in messages %}
+              <li style="color:red;">{{ message }}</li>
+            {% endfor %}
+            </ul>
+          {% endif %}
+        {% endwith %}
+
+        <form method="POST" action="{{ url_for('login') }}">
+            <input type="password" name="password" placeholder="Digite a senha..." class="login-input">
+            <button type="submit" class="login-button">Entrar</button>
+        </form>
+    </div>
+
+</body>
+</html>
