@@ -289,18 +289,27 @@ header {
 }
 
 /* Seção de slideshow */
+/* Sección principal */
 .seccion {
-    width: 100%;
+    width: 100%; /* Ocupa todo el ancho */
+    height: 100vh; /* Alto igual al viewport */
     position: relative;
-    overflow: hidden;
+    overflow: hidden; /* Oculta contenido fuera del área visible */
+    display: flex; /* Flexbox para centrar contenido */
+    flex-direction: column; /* Organización vertical */
+    justify-content: center; /* Centra contenido verticalmente */
+    align-items: center; /* Centra contenido horizontalmente */
 }
 
 /* Slideshow */
 .slideshow {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    overflow: hidden;
+    width: 100%; /* Ocupa todo el ancho */
+    height: 100%; /* Ajusta el alto al contenedor padre */
+    position: absolute; /* Asegura que esté dentro de la sección */
+    top: 0;
+    left: 0;
+    z-index: -1; /* Envía el slideshow detrás del contenido */
+    overflow: hidden; /* Oculta contenido extra */
 }
 
 .slideshow .slide {
@@ -1316,14 +1325,14 @@ header {
   }
 
 
-/* Estilo del footer */
 .slider-footer {
-    position: relative; /* Cambiado de absolute a relative */
-    bottom: 0; /* Garantiza que esté en la parte inferior */
-    text-align: center; /* Centra el contenido del footer */
-    color: white;
-    padding-bottom: 20px; /* Espaciado inferior */
+    width: 100%; /* Asegura que ocupe el ancho completo */
+    text-align: center; /* Centra los elementos horizontalmente */
+    color: white; /* Color del texto */
+    padding: 10px 0; /* Espaciado interno vertical */
+    box-sizing: border-box; /* Garantiza que padding no desborde */
 }
+
 
 /* Texto */
 .slider-footer p {
