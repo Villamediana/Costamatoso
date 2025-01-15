@@ -212,16 +212,16 @@ if (textosAnimados.length > 0) {
     window.addEventListener('resize', updateSlider);
 
     // Inicializar Hammer.js para el slider
-    const hammer = new Hammer(slider);
+    const hammer_slid = new Hammer(slider);
 
-    hammer.on('swipeleft', () => {
+    hammer_slid.on('swipeleft', () => {
         slider.scrollBy({
             left: 300,
             behavior: 'smooth'
         });
     });
 
-    hammer.on('swiperight', () => {
+    hammer_slid.on('swiperight', () => {
         slider.scrollBy({
             left: -300,
             behavior: 'smooth'
@@ -289,16 +289,17 @@ document.querySelector('.close').addEventListener('click', () => {
     document.getElementById('lightbox').style.display = 'none';
 });
 
+
 // Manejar el swipe con Hammer.js
 const lightbox = document.getElementById('lightbox');
-const hammer = new Hammer(lightbox);
+const hammer_light = new Hammer(lightbox);
 
-hammer.on('swipeleft', () => {
+hammer_light.on('swipeleft', () => {
     currentImageIndex = (currentImageIndex === images.length - 1) ? 0 : currentImageIndex + 1;
     showLightboxImage(currentImageIndex);
 });
 
-hammer.on('swiperight', () => {
+hammer_light.on('swiperight', () => {
     currentImageIndex = (currentImageIndex === 0) ? images.length - 1 : currentImageIndex - 1;
     showLightboxImage(currentImageIndex);
 });
