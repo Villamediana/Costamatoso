@@ -1343,11 +1343,10 @@ header {
 
 
 .slider-line {
-    width: 100px;
+    width: 150px;
     height: 1px;
     background-color: white;
     margin: 10px auto;
-    margin-bottom: 10px;
 }
 
 .slider-button {
