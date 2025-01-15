@@ -348,11 +348,13 @@ const hammer_light = new Hammer(lightbox);
 
 hammer_light.on('swipeleft', () => {
     currentImageIndex = (currentImageIndex === images.length - 1) ? 0 : currentImageIndex + 1;
+    resetZoom(); // Restablecer el zoom
     showLightboxImage(currentImageIndex);
 });
 
 hammer_light.on('swiperight', () => {
     currentImageIndex = (currentImageIndex === 0) ? images.length - 1 : currentImageIndex - 1;
+    resetZoom(); // Restablecer el zoom
     showLightboxImage(currentImageIndex);
 });
 
@@ -361,23 +363,22 @@ hammer_light.on('swiperight', () => {
 const lightboxPrev = document.getElementById('lightbox-prev');
 const lightboxNext = document.getElementById('lightbox-next');
 
-// Al hacer clic en la flecha de "anterior"
 lightboxPrev.addEventListener('click', () => {
-    // Si estamos en la primera imagen y vamos "atrás", pasamos a la última
     currentImageIndex = (currentImageIndex === 0) 
         ? images.length - 1 
         : currentImageIndex - 1;
+    resetZoom(); // Restablecer el zoom
     showLightboxImage(currentImageIndex);
 });
 
-// Al hacer clic en la flecha de "siguiente"
 lightboxNext.addEventListener('click', () => {
-    // Si estamos en la última imagen y vamos "adelante", pasamos a la primera
     currentImageIndex = (currentImageIndex === images.length - 1) 
         ? 0 
         : currentImageIndex + 1;
+    resetZoom(); // Restablecer el zoom
     showLightboxImage(currentImageIndex);
 });
+
 
 
 
@@ -451,13 +452,17 @@ hammer_wrapper.on('pinchstart', (ev) => {
     centerY = touch.y;
 });
 
-hammer_wrapper.on('doubletap', () => {
-    currentScale = 1;
+hammer_wrapper.on('doubletap', resetZoom);
+
+function resetZoom() {
+    currentScale = 1; // Restablecer la escala
     currentX = 0;
     currentY = 0;
+    startX = 0;
+    startY = 0;
 
     image.style.transform = 'translate(0, 0) scale(1)';
-});
+}
 
 
 function clamp(value, min, max) {
