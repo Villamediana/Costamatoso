@@ -1316,23 +1316,25 @@ header {
   }
 
 
+/* Estilo del footer */
 .slider-footer {
-    position: absolute;
-    bottom: 20px; /* Ajusta la distancia desde el fondo */
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
+    position: relative; /* Cambiado de absolute a relative */
+    bottom: 0; /* Garantiza que esté en la parte inferior */
+    text-align: center; /* Centra el contenido del footer */
     color: white;
+    padding-bottom: 20px; /* Espaciado inferior */
 }
 
+/* Texto */
 .slider-footer p {
     font-size: 1.2rem;
     margin-bottom: 10px;
 }
 
+
 .slider-line {
     width: 50px;
-    height: 2px;
+    height: 1px;
     background-color: white;
     margin: 10px auto;
 }
