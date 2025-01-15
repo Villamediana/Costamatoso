@@ -302,3 +302,129 @@ hammer.on('swiperight', () => {
     currentImageIndex = (currentImageIndex === 0) ? images.length - 1 : currentImageIndex - 1;
     showLightboxImage(currentImageIndex);
 });
+
+
+// Seleccionar los elementos de flecha
+const lightboxPrev = document.getElementById('lightbox-prev');
+const lightboxNext = document.getElementById('lightbox-next');
+
+// Al hacer clic en la flecha de "anterior"
+lightboxPrev.addEventListener('click', () => {
+    // Si estamos en la primera imagen y vamos "atrás", pasamos a la última
+    currentImageIndex = (currentImageIndex === 0) 
+        ? images.length - 1 
+        : currentImageIndex - 1;
+    showLightboxImage(currentImageIndex);
+});
+
+// Al hacer clic en la flecha de "siguiente"
+lightboxNext.addEventListener('click', () => {
+    // Si estamos en la última imagen y vamos "adelante", pasamos a la primera
+    currentImageIndex = (currentImageIndex === images.length - 1) 
+        ? 0 
+        : currentImageIndex + 1;
+    showLightboxImage(currentImageIndex);
+});
+
+
+
+
+// Suponiendo que ya tienes el lightbox abierto y la imagen lista
+// 1. Inicializa Hammer sobre el contenedor o la imagen
+const lightboxWrapper = document.getElementById('lightbox-wrapper');
+const image = document.getElementById('lightbox-image');
+
+// Habilitar reconocimiento de pinch
+hammer.get('pinch').set({ enable: true });
+
+// Variables para almacenar la escala actual y la posición
+let currentScale = 1;
+
+// Evento de movimiento durante el pinch
+hammer.on('pinchmove', (ev) => {
+  // La escala en tiempo real = la escala actual * lo que el usuario estira/encoge
+  let newScale = currentScale * ev.scale;
+  image.style.transform = `scale(${newScale})`;
+});
+
+// Evento cuando se suelta el pinch
+hammer.on('pinchend', (ev) => {
+  // Al finalizar, actualizamos la escala actual
+  currentScale = currentScale * ev.scale;
+});
+
+// Si deseas permitir doble toque para resetear:
+hammer.on('doubletap', () => {
+  currentScale = 1;
+  image.style.transform = 'scale(1)';
+});
+
+
+// Seleccionas todas las imágenes donde quieres el efecto
+const imagenes = document.querySelectorAll('.zoom-touch');
+
+imagenes.forEach(img => {
+  img.addEventListener('touchstart', function(e) {
+    // Evitar que el navegador interprete el gesto como scroll inmediatamente
+    // (aunque esto puede dificultar el desplazamiento). Prueba con o sin esto:
+    // e.preventDefault();
+
+    // Si quieres calcular dónde tocó el usuario dentro de la imagen:
+    const touch = e.touches[0];
+    const rect  = img.getBoundingClientRect();
+    const x     = touch.clientX - rect.left; 
+    const y     = touch.clientY - rect.top;
+
+    // Podrías cambiar el "transform-origin" para que el zoom salga desde ese punto
+    img.style.transformOrigin = `${x}px ${y}px`;
+
+    // Agrega la clase que hace zoom
+    img.classList.add('zoomed');
+  });
+
+  img.addEventListener('touchend', function() {
+    // Quita el zoom al soltar el dedo
+    img.classList.remove('zoomed');
+  });
+
+  // Si quieres quitar el zoom también si el dedo se desplaza fuera de la imagen
+  img.addEventListener('touchmove', function(e) {
+    // Puedes detectar si el dedo sigue dentro o no
+    // (aunque puede ser complejo si el usuario está scrolleando)
+    const touch = e.touches[0];
+    const rect  = img.getBoundingClientRect();
+
+    // Verifica si sigue dentro de los límites de la imagen
+    if (
+      touch.clientX < rect.left ||
+      touch.clientX > rect.right ||
+      touch.clientY < rect.top ||
+      touch.clientY > rect.bottom
+    ) {
+      // Quita el zoom si se salió del área
+      img.classList.remove('zoomed');
+    }
+  });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const btnLeft = document.querySelector('.btn-left');
+    const btnRight = document.querySelector('.btn-right');
+    const items = document.querySelector('.items-relacionados');
+  
+    // Al hacer clic en la flecha izq, movemos -300px
+    btnLeft.addEventListener('click', () => {
+      items.scrollBy({
+        left: -300,
+        behavior: 'smooth'
+      });
+    });
+  
+    // Al hacer clic en la flecha der, movemos +300px
+    btnRight.addEventListener('click', () => {
+      items.scrollBy({
+        left: 300,
+        behavior: 'smooth'
+      });
+    });
+  });

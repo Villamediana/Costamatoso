@@ -64,13 +64,14 @@
         </div>
     </section>
 
-<!-- Contenedor del lightbox -->
+<!-- Lightbox -->
 <div id="lightbox" class="lightbox">
-    <span class="close">&times;</span>
-    <img class="lightbox-content" id="lightbox-image">
-</div>
-
-
+    <span class="close" id="close-btn">&times;</span>
+    <span class="lightbox-arrow lightbox-arrow-left" id="lightbox-prev">&#10094;</span>
+    <img class="lightbox-content" id="lightbox-image" src="">
+    <span class="lightbox-arrow lightbox-arrow-right" id="lightbox-next">&#10095;</span>
+  </div>
+  
 
     <!-- Sección de galería de imágenes -->
     <section class="seccion galeria-imagenes">
@@ -78,7 +79,7 @@
             {% for imagen in imagens %}
                 <div class="item-mosaico {{ imagen.clase }}">
                     <!-- Hacemos que al hacer clic se abra en el lightbox -->
-                    <img src="{{ imagen.url }}" alt="{{ nome_projeto }}" onclick="openLightbox('{{ imagen.url }}')">
+                    <img src="{{ imagen.url }}" class="zoom-touch" alt="{{ nome_projeto }}" onclick="openLightbox('{{ imagen.url }}')">
                 </div>
             {% endfor %}
         </div>
@@ -86,21 +87,33 @@
 
 
     <section class="seccion descubra-projetos">
-        <div class="linea-horizontal"></div> <!-- Agregamos la línea -->
+        <div class="linea-horizontal"></div>
         <h2>Descubra mais projetos</h2>
-        <div class="projetos-relacionados">
+        
+        <div class="slider-relacionados">  
+          <button class="btn-relacionados btn-left">&#10094;</button>
+          
+          <!-- Contenedor con overflow-x -->
+          <div class="items-relacionados">
             {% for projeto in projetos_relacionados %}
+              <div class="item-relacionado">
                 <a href="{{ url_for('detalhe_projeto', nome_categoria=nome_categoria, nome_projeto=projeto['nome']) }}" class="projeto-relacionado">
-                    <div class="projeto-caja">
-                        <img src="{{ url_for('static', filename=projeto['capa']) }}" alt="{{ projeto['nome'] }}">
-                        <div class="titulo-caja">
-                            <p>{{ projeto['nome'] }}</p>
-                        </div>
+                  <div class="projeto-caja">
+                    <img src="{{ url_for('static', filename=projeto['capa']) }}" alt="{{ projeto['nome'] }}">
+                    <div class="titulo-caja">
+                      <p>{{ projeto['nome'] }}</p>
                     </div>
+                  </div>
                 </a>
+              </div>
             {% endfor %}
+          </div>
+          
+          <button class="btn-relacionados btn-right">&#10095;</button>
         </div>
-    </section>
+      </section>
+      
+    
         
     
 
@@ -111,5 +124,6 @@
 
     <!-- Vincular al archivo JavaScript usando Flask -->
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+        
 </body>
 </html>

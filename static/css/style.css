@@ -1,4 +1,3 @@
-/* Estilos gerais e reset */
 * {
     margin: 0;
     padding: 0;
@@ -6,7 +5,17 @@
 }
 
 body {
-    font-family: 'Calibri Light', 'Segoe UI', sans-serif;
+    font-family: 'Calibri Light', 'Segoe UI', sans-serif; /* Usa Calibri Light con fallback */
+    font-weight: 300; /* Ligero */
+    font-style: normal; /* Normal (no cursiva) */
+}
+
+h1, h2, h3 {
+    font-family: 'Calibri Light', 'Segoe UI', sans-serif; /* Mantén coherencia en encabezados */
+    font-weight: 300;
+}
+
+body {
     scrollbar-width: thin;
     scrollbar-color: rgba(0,0,0,0.5) transparent;
 }
@@ -401,7 +410,6 @@ header {
 .imagem-cabecalho .texto-cabecalho h1 {
     font-size: 36px;
     margin: 0;
-    font-family: 'Calibri Light', 'Segoe UI', sans-serif;
     font-weight: 300; /* Para utilizar la variante 'Light' */
 }
 
@@ -409,7 +417,6 @@ header {
     font-size: 14px;
     letter-spacing: 1px;
     text-transform: uppercase;
-    font-family: 'Roboto', sans-serif;
     font-weight: 500;
 }
 
@@ -557,6 +564,14 @@ header {
 .galeria-mosaico {
     padding: 20px;
 }
+
+.zoom-touch {
+    transition: transform 0.2s ease;
+    transform-origin: center center; /* Luego se puede cambiar dinámicamente vía JS */
+  }
+  .zoom-touch.zoomed {
+    transform: scale(1.2);
+  }
 
 .container-mosaico {
     column-count: 3;
@@ -782,22 +797,6 @@ header {
 }
 
 
-.close {
-    position: absolute;
-    top: 20px;
-    right: 35px;
-    color: white;
-    font-size: 40px;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.close:hover,
-.close:focus {
-    color: black;
-    text-decoration: none;
-    cursor: pointer;
-}
 
 /* Botones de navegación */
 .prev, .next {
@@ -839,7 +838,6 @@ header {
     text-align: left;
     font-size: 1.4em; /* Tamaño de fuente un poco más pequeño */
     margin-bottom: 10px;
-    font-family: 'Calibri Light', 'Segoe UI', sans-serif;
     font-weight: 300;
 }
 
@@ -862,7 +860,6 @@ header {
 .projeto-relacionado {
     text-decoration: none;
     color: inherit;
-    font-family: 'Calibri Light', 'Segoe UI', sans-serif;
     display: block; /* Asegura que el proyecto sea un bloque completo */
 }
 
@@ -892,7 +889,6 @@ header {
     margin: 0;
     color: #fff;
     font-size: 0.9em; /* Tamaño de texto reducido */
-    font-family: 'Calibri Light', 'Segoe UI', sans-serif;
     font-weight: normal; /* Cambiado para un estilo más ligero */
 }
 
@@ -1218,3 +1214,150 @@ header {
     font-size: 1.2em;
     color: #555;
 }
+
+.lightbox {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    /* ... el resto de estilos (fondo semi-transparente, etc.) ... */
+  }
+  
+  /* Contenedor relativo que envuelve img y flechas */
+  .lightbox-content-wrapper {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    /* Centramos la “caja” en pantalla */
+    transform: translate(-50%, -50%);
+    /* Opcional: limitar tamaño para que no desborde la pantalla */
+    max-width: 95%;
+    max-height: 95%;
+    /* Para alinear imagen y flechas uno al lado del otro si gustas,
+       o mantenerlos superpuestos (lo normal en un lightbox) */
+    display: inline-block; 
+  }
+  
+  /* La imagen ocupa el espacio disponible */
+  .lightbox-content {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    /* Si tenías margin:auto, quítalo para que el wrapper lo controle */
+  }
+  
+  /* Flechas */
+  .lightbox-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 2rem;
+    color: #fff;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    user-select: none;
+    z-index: 1001;
+    transition: background 0.3s;
+  }
+  
+  .lightbox-arrow-left {
+    left: 10px; /* Ajusta según gusto */
+  }
+  
+  .lightbox-arrow-right {
+    right: 10px; /* Ajusta según gusto */
+  }
+  
+  /* Botón de cierre */
+  .close {
+    position: absolute;
+    top: 20px;
+    right: 35px;
+    font-size: 40px;
+    font-weight: bold;
+    color: #fff;
+    cursor: pointer;
+    z-index: 1002; /* Para que quede sobre la imagen/flechas */
+  }
+
+  
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+
+.lightbox-content-wrapper {
+    position: relative;
+    max-width: 90vw;
+    max-height: 90vh;
+    overflow: hidden; /* Para que, al hacer zoom, la imagen no se salga visualmente (opcional). */
+  }
+  
+  .lightbox-content {
+    width: 100%;
+    height: auto;
+    object-fit: contain; 
+    touch-action: none; /* Importante para que Hammer.js pueda manejar los gestos táctiles. */
+  }
+
+
+/* Contenedor principal del slider */
+.slider-relacionados {
+    position: relative;
+    max-width: 900px;    /* Ajusta a tu gusto */
+    margin: 0 auto;      /* Centrado */
+    overflow: hidden;    /* Para que no sobresalga nada */
+  }
+  
+  /* Contenedor que hace scroll horizontal */
+  .items-relacionados {
+    display: flex;            /* Pone los items en fila */
+    gap: 20px;                /* Separación entre tarjetas */
+    overflow-x: auto;         /* Scroll horizontal */
+    scroll-behavior: smooth;  /* Que se deslice suave al hacer scrollBy */
+    padding: 10px;            /* Un padding para que no queden pegados */
+  }
+
+  .item-relacionado img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9; /* Por ejemplo, 16:9 */
+    object-fit: cover;
+    border-radius: 8px;
+  }
+  
+  
+  /* Cada "tarjeta" */
+  .item-relacionado {
+    flex: 0 0 auto;      /* Para que no se “encojan” y pasen a la siguiente fila */
+    width: 200px;        /* Ajusta a tu gusto */
+    border-radius: 8px;
+  }
+  
+  /* Flechas / Botones de navegación */
+  .btn-relacionados {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 2rem;
+    background: rgba(0,0,0,0);
+    color: #fff;
+    border: none;
+    z-index: 10;
+    cursor: pointer;
+  }
+  
+  .btn-left {
+    left: 10px;
+  }
+  
+  .btn-right {
+    right: 10px;
+  }
+  

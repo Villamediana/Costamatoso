@@ -56,11 +56,10 @@
         </div>
     </section>
     
-    <!-- Banner de Cookies -->
-    <div class="cookie-banner" id="cookie-banner">
+<!--    <div id="cookie-banner" style="display:none; background:#ccc; padding:10px;">
         <p>Usamos cookies para melhorar sua experiência.</p>
         <button id="accept-cookies">Aceitar</button>
-    </div>
+    </div>-->
 
     {% include 'fixed/footer.html' %}
 
@@ -78,12 +77,11 @@
             }, 3000); // Garante que o preloader apareça por pelo menos 3 segundos
         });
 
-        // Script para o banner de cookies
         document.addEventListener('DOMContentLoaded', function() {
             var cookieBanner = document.getElementById('cookie-banner');
             var cookiesAccepted = localStorage.getItem('cookiesAccepted');
             if (!cookiesAccepted || cookiesAccepted !== 'true') {
-                cookieBanner.style.display = 'flex';
+                cookieBanner.style.display = 'block';
             }
         });
 

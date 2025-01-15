@@ -199,42 +199,39 @@ def detalhe_projeto(nome_categoria, nome_projeto):
     # Obtener las carpetas de proyectos dentro de la categoría actual, excluyendo el proyecto actual
     categoria_path = os.path.join(app.static_folder, 'img', 'projetos', nome_categoria)
     proyectos_relacionados = []
-    
+        # Dentro de detalhe_projeto()
     if os.path.exists(categoria_path):
-        # Listar las carpetas dentro de la categoría
         proyectos_en_categoria = [
             p for p in os.listdir(categoria_path)
             if os.path.isdir(os.path.join(categoria_path, p))
         ]
-        
-        # Ordenar los proyectos
-        proyectos_en_categoria.sort()
+        proyectos_en_categoria.sort()  # Orden alfabético, si así lo deseas
 
-        # Encontrar el índice del proyecto actual
         try:
             idx_actual = proyectos_en_categoria.index(nome_projeto)
-
-            # Obtener el proyecto anterior si existe
-            if idx_actual > 0:
-                proyecto_anterior = proyectos_en_categoria[idx_actual - 1]
-                capa_anterior = f'img/projetos/{nome_categoria}/{proyecto_anterior}/capa.jpg'
+            
+            # Rango para mostrar (del -5 al +5 sin incluir actual)
+            # Por ejemplo, si idx_actual = 10, queremos [5..9] y [11..15]
+            start_index = max(0, idx_actual - 5)  # no menos de 0
+            end_index = min(len(proyectos_en_categoria), idx_actual + 6)  # +6 porque el slice es [start, end)
+            
+            # Tomamos una sublista de proyectos_en_categoria
+            relacionados = proyectos_en_categoria[start_index:idx_actual] + proyectos_en_categoria[idx_actual+1:end_index]
+            
+            # Esto podría tener hasta 10 proyectos (5 atrás y 5 adelante), 
+            # pero puede que no haya tantos si estás muy al inicio o muy al final.
+            # Ahora construimos la lista 'projetos_relacionados' con la misma lógica de 'capa'.
+            for nome_relacionado in relacionados:
+                capa_relacionada = f'img/projetos/{nome_categoria}/{nome_relacionado}/capa.jpg'
                 proyectos_relacionados.append({
-                    'nome': proyecto_anterior,
-                    'capa': capa_anterior
-                })
-
-            # Obtener el proyecto siguiente si existe
-            if idx_actual < len(proyectos_en_categoria) - 1:
-                proyecto_siguiente = proyectos_en_categoria[idx_actual + 1]
-                capa_siguiente = f'img/projetos/{nome_categoria}/{proyecto_siguiente}/capa.jpg'
-                proyectos_relacionados.append({
-                    'nome': proyecto_siguiente,
-                    'capa': capa_siguiente
+                    'nome': nome_relacionado,
+                    'capa': capa_relacionada
                 })
 
         except ValueError:
-            # Si el proyecto actual no está en la lista (lo que no debería ocurrir)
+            # El proyecto actual no está en la lista
             pass
+
 
     # Obtener los ítems del submenú nuevamente para pasarlos a la plantilla
     projetos_path = os.path.join(app.static_folder, 'img', 'projetos')
