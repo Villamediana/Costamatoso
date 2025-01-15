@@ -383,7 +383,7 @@ lightboxNext.addEventListener('click', () => {
 
 
 // Seleccionar los elementos del Lightbox
-const lightboxWrapper = document.getElementById('lightbox');
+const lightboxWrapper = document.getElementById('lightbox-content-wrapper');
 const image = document.getElementById('lightbox-image');
 
 // Inicializar Hammer.js en el wrapper del Lightbox
