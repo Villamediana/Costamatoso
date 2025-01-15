@@ -405,7 +405,7 @@ let centerX = 0;      // Centro del pinch en X
 let centerY = 0;      // Centro del pinch en Y
 
 // Evento: Movimiento durante el pinch (zoom)
-hammer.on('pinchmove', (ev) => {
+hammer_wrapper.on('pinchmove', (ev) => {
     // Calcular la nueva escala, limitándola entre minScale y maxScale
     let newScale = Math.max(minScale, Math.min(currentScale * ev.scale, maxScale));
 
@@ -420,14 +420,14 @@ hammer.on('pinchmove', (ev) => {
 });
 
 // Evento: Al soltar el pinch (finalizar zoom)
-hammer.on('pinchend', (ev) => {
+hammer_wrapper.on('pinchend', (ev) => {
     currentScale = Math.max(minScale, Math.min(currentScale * ev.scale, maxScale));
     startX = currentX;
     startY = currentY;
 });
 
 // Evento: Pan (desplazamiento) durante el zoom
-hammer.on('panmove', (ev) => {
+hammer_wrapper.on('panmove', (ev) => {
     if (currentScale > 1) {
         // Calcular nuevas posiciones según el desplazamiento
         currentX = startX + ev.deltaX;
@@ -438,20 +438,20 @@ hammer.on('panmove', (ev) => {
 });
 
 // Evento: Al finalizar el pan
-hammer.on('panend', () => {
+hammer_wrapper.on('panend', () => {
     startX = currentX;
     startY = currentY;
 });
 
 // Evento: Iniciar el pinch para capturar el punto inicial
-hammer.on('pinchstart', (ev) => {
+hammer_wrapper.on('pinchstart', (ev) => {
     const touch = ev.center;
     centerX = touch.x;
     centerY = touch.y;
 });
 
 // Evento: Doble toque para resetear el zoom
-hammer.on('doubletap', () => {
+hammer_wrapper.on('doubletap', () => {
     currentScale = 1;  // Resetear escala
     currentX = 0;
     currentY = 0;
