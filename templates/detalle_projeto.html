@@ -79,7 +79,7 @@
             {% for imagen in imagens %}
                 <div class="item-mosaico {{ imagen.clase }}">
                     <!-- Hacemos que al hacer clic se abra en el lightbox -->
-                    <img src="{{ imagen.url }}" class="zoom-touch" alt="{{ nome_projeto }}" onclick="openLightbox('{{ imagen.url }}')">
+                    <img src="{{ imagen.url }}" loading="lazy" class="zoom-touch" alt="{{ nome_projeto }}" onclick="openLightbox('{{ imagen.url }}')">
                 </div>
             {% endfor %}
         </div>

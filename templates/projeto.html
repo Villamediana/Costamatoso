@@ -55,7 +55,7 @@
             {% for projeto in projetos %}
                 <div class="imagem-galeria">
                     <a href="{{ url_for('detalhe_projeto', nome_categoria=nome_categoria, nome_projeto=projeto.nome) }}">
-                        <img src="{{ projeto.capa_url }}" alt="{{ projeto.nome }}" class="imagem-animada">
+                        <img src="{{ projeto.capa_url }}" loading="lazy" alt="{{ projeto.nome }}" class="imagem-animada">
                         <div class="info-imagem">
                             <div class="nome-obra">
                                 {{ projeto.nome }}
