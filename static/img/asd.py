@@ -21,9 +21,9 @@ def main():
 
     peso_total_mb = peso_total / (1024 * 1024)
 
-    # Estimamos que bajando la calidad a 75 en JPG, o usando optimize en PNG,
-    # obtendremos una reducción aproximada del 55% (ajusta según estimación).
-    estimacion_final_mb = peso_total_mb * 0.45
+    # Estimamos que bajando la calidad a 85 en JPG, o usando optimize en PNG,
+    # obtendremos una reducción aproximada del 40% (ajusta a tu gusto).
+    estimacion_final_mb = peso_total_mb * 0.6
 
     print(f"Se han encontrado {len(imagenes)} imagen(es).")
     print(f"Peso total aproximado: {peso_total_mb:.2f} MB.")
@@ -49,8 +49,8 @@ def main():
                     if extension in [".jpg", ".jpeg"]:
                         # Convertimos a RGB por si la imagen no viene en RGB
                         img = img.convert("RGB")
-                        # Re-encode a JPG con calidad=75
-                        img.save(nombre_temporal, "JPEG", optimize=True, quality=75)
+                        # Re-encode a JPG con calidad=85
+                        img.save(nombre_temporal, "JPEG", optimize=True, quality=85)
                     elif extension == ".png":
                         # Si la imagen tiene canal alfa, mantenemos "RGBA"
                         if img.mode in ("RGBA", "LA"):
