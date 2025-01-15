@@ -14,7 +14,7 @@ app.config['MAIL_DEFAULT_SENDER'] = ('Nombre del Remitente', 'tu_email@gmail.com
 app.config['MAIL_MAX_EMAILS'] = None
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100 MB
 app.secret_key = '3HpAUadGVgxO' 
-app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 31536000  # 365 días
+#app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 31536000  # 365 días
 
 
 mail = Mail(app)
