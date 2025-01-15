@@ -791,12 +791,6 @@ header {
     transform: scale(1.05);
 }
 
-#lightbox-image {
-    transform-origin: center center; /* Asegura el centro como referencia */
-    transition: transform 0.2s ease; /* Para transiciones suaves */
-}
-
-
 /* Estilos del Lightbox */
 .lightbox {
     display: none; /* Por defecto, oculto */
