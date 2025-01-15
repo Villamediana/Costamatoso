@@ -1322,7 +1322,7 @@ header {
     color: white; /* Color del texto */
     padding: 10px 0; /* Espaciado interno vertical */
     box-sizing: border-box; /* Garantiza que padding no desborde */
-    margin-bottom: 10px;
+    margin-bottom: 30px;
 }
 
 
