@@ -296,25 +296,24 @@ header {
     overflow: hidden;
 }
 
-/* Slideshow */
 .slideshow {
     width: 100%;
     height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     position: relative;
-    overflow: hidden;
 }
 
-.slideshow .slide {
-    position: absolute;
+.slide {
     width: 100%;
     height: 100%;
-    opacity: 0;
-    background-position: 0% center;
-    background-repeat: no-repeat;
-    background-size: cover;
-    animation: slideAnimation 30s infinite;
-    animation-timing-function: ease-in-out;
+    background-size: cover; /* Ajusta la imagen para cubrir el área */
+    background-position: center;
+    flex-shrink: 0; /* Evita que se reduzca en tamaños pequeños */
 }
+
 
 .slideshow .slide:nth-child(1) {
     animation-delay: 0s;
@@ -632,15 +631,17 @@ header {
 }
 
 .seccion.imagem {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden; /* Asegúrate de que no haya desbordamientos */
-    margin: 0; /* Elimina posibles márgenes */
-    padding: 0; /* Elimina posibles rellenos */
+    height: 100vh; /* Ocupa el 100% del alto de la ventana */
+    display: flex; /* Usado para centrar contenido */
+    flex-direction: column; /* Organización en columna */
+    justify-content: center; /* Centra verticalmente */
+    align-items: center; /* Centra horizontalmente */
+    overflow: hidden; /* Esconde contenido que exceda los límites */
+    margin: 0; /* Elimina márgenes externos */
+    padding: 0; /* Elimina rellenos internos */
+    position: relative; /* Necesario para posicionar elementos hijos con absolute */
 }
+
 
 
 /* Estilos para el título animado */
