@@ -330,6 +330,85 @@ lightboxNext.addEventListener('click', () => {
 
 
 
+// Seleccionar los elementos del Lightbox
+const lightboxWrapper = document.getElementById('lightbox-wrapper');
+const image = document.getElementById('lightbox-image');
+
+// Inicializar Hammer.js en el wrapper del Lightbox
+const hammer_wrapper = new Hammer(lightboxWrapper);
+
+// Habilitar reconocimiento de pinch y pan
+hammer_wrapper.get('pinch').set({ enable: true });
+hammer_wrapper.get('pan').set({ direction: Hammer.DIRECTION_ALL });
+
+// Variables para manejar el estado del zoom y desplazamiento
+let currentScale = 1; // Escala actual
+let maxScale = 4;     // Escala máxima permitida
+let minScale = 1;     // Escala mínima permitida
+let currentX = 0;     // Posición X actual
+let currentY = 0;     // Posición Y actual
+let startX = 0;       // Posición X inicial
+let startY = 0;       // Posición Y inicial
+let centerX = 0;      // Centro del pinch en X
+let centerY = 0;      // Centro del pinch en Y
+
+// Evento: Movimiento durante el pinch (zoom)
+hammer.on('pinchmove', (ev) => {
+    // Calcular la nueva escala, limitándola entre minScale y maxScale
+    let newScale = Math.max(minScale, Math.min(currentScale * ev.scale, maxScale));
+
+    // Ajustar la posición según el punto de enfoque
+    let deltaX = (1 - ev.scale) * (centerX - lightboxWrapper.offsetWidth / 2);
+    let deltaY = (1 - ev.scale) * (centerY - lightboxWrapper.offsetHeight / 2);
+
+    currentX = startX + deltaX;
+    currentY = startY + deltaY;
+
+    image.style.transform = `scale(${newScale}) translate(${currentX}px, ${currentY}px)`;
+});
+
+// Evento: Al soltar el pinch (finalizar zoom)
+hammer.on('pinchend', (ev) => {
+    currentScale = Math.max(minScale, Math.min(currentScale * ev.scale, maxScale));
+    startX = currentX;
+    startY = currentY;
+});
+
+// Evento: Pan (desplazamiento) durante el zoom
+hammer.on('panmove', (ev) => {
+    if (currentScale > 1) {
+        // Calcular nuevas posiciones según el desplazamiento
+        currentX = startX + ev.deltaX;
+        currentY = startY + ev.deltaY;
+
+        image.style.transform = `scale(${currentScale}) translate(${currentX}px, ${currentY}px)`;
+    }
+});
+
+// Evento: Al finalizar el pan
+hammer.on('panend', () => {
+    startX = currentX;
+    startY = currentY;
+});
+
+// Evento: Iniciar el pinch para capturar el punto inicial
+hammer.on('pinchstart', (ev) => {
+    const touch = ev.center;
+    centerX = touch.x;
+    centerY = touch.y;
+});
+
+// Evento: Doble toque para resetear el zoom
+hammer.on('doubletap', () => {
+    currentScale = 1;  // Resetear escala
+    currentX = 0;
+    currentY = 0;
+    startX = 0;
+    startY = 0;
+
+    image.style.transform = 'scale(1) translate(0, 0)';
+});
+
 
 
 // Seleccionas todas las imágenes donde quieres el efecto
