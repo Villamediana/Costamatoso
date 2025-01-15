@@ -75,19 +75,20 @@
 
     <!-- Sección de galería de imágenes -->
     <section class="seccion galeria-imagenes">
-    <div class="container-mosaico">
-        {% for imagen in imagens %}
-            <div class="item-mosaico {{ imagen.clase }}">
-                <!-- Imagen con carga progresiva (lazy loading con blur) -->
-                <img src="{{ url_for('static', filename='img/placeholder.webp') }}" 
-                     data-src="{{ imagen.url }}" 
-                     class="lazy-image" 
-                     alt="{{ nome_projeto }}" 
-                     onclick="openLightbox('{{ imagen.url }}')">
-            </div>
-        {% endfor %}
-    </div>
-</section>
+        <div class="container-mosaico">
+            {% for imagen in imagens %}
+                <div class="item-mosaico {{ imagen.clase }}">
+                    <!-- Imagen con carga progresiva (lazy loading con blur) -->
+                    <img src="{{ url_for('static', filename='img/placeholder.webp') }}" 
+                         data-src="{{ imagen.url }}" 
+                         class="lazy-image" 
+                         alt="{{ nome_projeto }}" 
+                         onclick="openLightbox('{{ imagen.url }}')">
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+    
 
 
 
