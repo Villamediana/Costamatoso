@@ -404,20 +404,21 @@ let startY = 0;       // Posición Y inicial
 let centerX = 0;      // Centro del pinch en X
 let centerY = 0;      // Centro del pinch en Y
 
-// Evento: Movimiento durante el pinch (zoom)
 hammer_wrapper.on('pinchmove', (ev) => {
-    // Calcular la nueva escala, limitándola entre minScale y maxScale
     let newScale = Math.max(minScale, Math.min(currentScale * ev.scale, maxScale));
 
-    // Ajustar la posición según el punto de enfoque
-    let deltaX = (1 - ev.scale) * (centerX - lightboxWrapper.offsetWidth / 2);
-    let deltaY = (1 - ev.scale) * (centerY - lightboxWrapper.offsetHeight / 2);
+    const rect = lightboxWrapper.getBoundingClientRect();
 
-    currentX = startX + deltaX;
-    currentY = startY + deltaY;
+    // Calcula los límites para mantener el zoom centrado
+    const maxX = (image.offsetWidth * newScale - rect.width) / 2;
+    const maxY = (image.offsetHeight * newScale - rect.height) / 2;
 
-    image.style.transform = `scale(${newScale}) translate(${currentX}px, ${currentY}px)`;
+    currentX = clamp(startX + (ev.deltaX || 0), -maxX, maxX);
+    currentY = clamp(startY + (ev.deltaY || 0), -maxY, maxY);
+
+    image.style.transform = `translate(${currentX}px, ${currentY}px) scale(${newScale})`;
 });
+
 
 // Evento: Al soltar el pinch (finalizar zoom)
 hammer_wrapper.on('pinchend', (ev) => {
@@ -450,15 +451,32 @@ hammer_wrapper.on('pinchstart', (ev) => {
     centerY = touch.y;
 });
 
-// Evento: Doble toque para resetear el zoom
 hammer_wrapper.on('doubletap', () => {
-    currentScale = 1;  // Resetear escala
+    currentScale = 1;
     currentX = 0;
     currentY = 0;
-    startX = 0;
-    startY = 0;
 
-    image.style.transform = 'scale(1) translate(0, 0)';
+    image.style.transform = 'translate(0, 0) scale(1)';
+});
+
+
+function clamp(value, min, max) {
+    return Math.max(min, Math.min(value, max));
+}
+
+hammer_wrapper.on('panmove', (ev) => {
+    if (currentScale > 1) {
+        const rect = lightboxWrapper.getBoundingClientRect();
+
+        // Calcula los límites de movimiento permitidos
+        const maxX = (image.offsetWidth * currentScale - rect.width) / 2;
+        const maxY = (image.offsetHeight * currentScale - rect.height) / 2;
+
+        currentX = clamp(startX + ev.deltaX, -maxX, maxX);
+        currentY = clamp(startY + ev.deltaY, -maxY, maxY);
+
+        image.style.transform = `translate(${currentX}px, ${currentY}px) scale(${currentScale})`;
+    }
 });
 
 
