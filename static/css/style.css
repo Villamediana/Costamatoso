@@ -633,7 +633,15 @@ header {
 
 .seccion.imagem {
     height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Asegúrate de que no haya desbordamientos */
+    margin: 0; /* Elimina posibles márgenes */
+    padding: 0; /* Elimina posibles rellenos */
 }
+
 
 /* Estilos para el título animado */
 .titulo-animado {
