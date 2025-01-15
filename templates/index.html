@@ -24,10 +24,10 @@
     <div class="overlay"></div>
 
     <!-- Menú de navegação -->
-    <header>
+    <header class="header-white">
         <nav class="navbar">
             <div class="logo">
-                <a href="{{ url_for('index') }}"><img src="{{ url_for('static', filename='img/logo-preto-png.png') }}" alt="Logo"></a>
+                <a href="{{ url_for('index') }}"><img src="{{ url_for('static', filename='img/Logo_branco_novo.png') }}" alt="Logo"></a>
             </div>
             <div class="menu-icon">
                 <span></span>
@@ -46,6 +46,12 @@
             {% for image in slider_images %}
                 <div class="slide" style="background-image: url('{{ url_for('static', filename=image) }}');"></div>
             {% endfor %}
+        </div>
+
+        <div class="slider-footer">
+            <p>Grandes projetos começam com grandes escolhas.</p>
+            <hr class="slider-line">
+            <a href="{{ url_for('categoria', nome_categoria='Arquitetônicos') }}" class="slider-button">EXPLORE!</a>
         </div>
     </section>
 

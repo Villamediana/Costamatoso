@@ -74,9 +74,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-// Código para animar el texto línea por línea y el título al hacer scroll
-const textosAnimados = document.querySelectorAll('.texto-animado');
-const titulosAnimados = document.querySelectorAll('.titulo-animado'); // Seleccionar todos los títulos
+    // Código para animar el texto línea por línea y el título al hacer scroll
+    const textosAnimados = document.querySelectorAll('.texto-animado');
+    const titulosAnimados = document.querySelectorAll('.titulo-animado'); // Seleccionar todos los títulos
 
 // Animar títulos
 if (titulosAnimados.length > 0) {
@@ -252,8 +252,35 @@ if (textosAnimados.length > 0) {
             behavior: 'smooth'
         });
     });
-    
+
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+    const btnLeft = document.querySelector('.btn-left');
+    const btnRight = document.querySelector('.btn-right');
+    const items = document.querySelector('.items-relacionados');
+  
+    if (btnLeft && btnRight && items) {
+        // Mover hacia la izquierda
+        btnLeft.addEventListener('click', () => {
+            items.scrollBy({
+                left: -300, // Desplazar 300px hacia la izquierda
+                behavior: 'smooth' // Animación suave
+            });
+        });
+      
+        // Mover hacia la derecha
+        btnRight.addEventListener('click', () => {
+            items.scrollBy({
+                left: 300, // Desplazar 300px hacia la derecha
+                behavior: 'smooth' // Animación suave
+            });
+        });
+    } else {
+        console.error('Elementos del slider no encontrados');
+    }
+});
+
 
 // Función para dividir el texto en líneas basadas en el ancho del párrafo
 function dividirEnLineas(texto, elemento) {
@@ -356,7 +383,7 @@ lightboxNext.addEventListener('click', () => {
 
 
 // Seleccionar los elementos del Lightbox
-const lightboxWrapper = document.getElementById('lightbox-wrapper');
+const lightboxWrapper = document.getElementById('lightbox');
 const image = document.getElementById('lightbox-image');
 
 // Inicializar Hammer.js en el wrapper del Lightbox
@@ -482,25 +509,3 @@ imagenes.forEach(img => {
     }
   });
 });
-
-document.addEventListener('DOMContentLoaded', () => {
-    const btnLeft = document.querySelector('.btn-left');
-    const btnRight = document.querySelector('.btn-right');
-    const items = document.querySelector('.items-relacionados');
-  
-    // Al hacer clic en la flecha izq, movemos -300px
-    btnLeft.addEventListener('click', () => {
-      items.scrollBy({
-        left: -300,
-        behavior: 'smooth'
-      });
-    });
-  
-    // Al hacer clic en la flecha der, movemos +300px
-    btnRight.addEventListener('click', () => {
-      items.scrollBy({
-        left: 300,
-        behavior: 'smooth'
-      });
-    });
-  });
