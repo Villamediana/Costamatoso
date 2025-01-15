@@ -39,7 +39,7 @@
         {% include 'fixed/menu.html' %}
     </header>
 
-    <!-- Sección de slideshow -->
+    <!-- Seção de slideshow -->
     <section class="seccion imagem">
         <!-- Contêiner para as imagens do slideshow -->
         <div class="slideshow">
@@ -55,13 +55,17 @@
         </div>
     </section>
 
-    <!-- Otras secciones -->
     <section class="seccion conteudo">
         <div class="container">
             <h2 class="titulo-animado">{{ second_section.title }}</h2>
             <p class="texto-animado" data-texto="{{ second_section.text }}"></p>
         </div>
     </section>
+    
+<!--    <div id="cookie-banner" style="display:none; background:#ccc; padding:10px;">
+        <p>Usamos cookies para melhorar sua experiência.</p>
+        <button id="accept-cookies">Aceitar</button>
+    </div>-->
 
     {% include 'fixed/footer.html' %}
 
@@ -75,7 +79,7 @@
                 preloader.style.opacity = '0';
                 setTimeout(function() {
                     preloader.style.display = 'none';
-                }, 1000); // Transición suave antes de remover o preloader
+                }, 1000); // Transição suave antes de remover o preloader
             }, 3000); // Garante que o preloader apareça por pelo menos 3 segundos
         });
 
