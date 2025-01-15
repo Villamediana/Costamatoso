@@ -49,6 +49,31 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    const lazyImages = document.querySelectorAll('.lazy-image');
+
+    if ('IntersectionObserver' in window) {
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const img = entry.target;
+                    img.src = img.dataset.src; // Cambia el atributo src con data-src
+                    img.onload = () => img.classList.add('loaded'); // Agrega la clase 'loaded' cuando termine de cargar
+                    observer.unobserve(img); // Deja de observar esta imagen
+                }
+            });
+        });
+    
+        lazyImages.forEach(img => {
+            observer.observe(img); // Observar cada imagen con 'lazy-image'
+        });
+    } else {
+        // Fallback para navegadores antiguos sin IntersectionObserver
+        lazyImages.forEach(img => {
+            img.src = img.dataset.src;
+            img.onload = () => img.classList.add('loaded');
+        });
+    }
+
 // Código para animar el texto línea por línea y el título al hacer scroll
 const textosAnimados = document.querySelectorAll('.texto-animado');
 const titulosAnimados = document.querySelectorAll('.titulo-animado'); // Seleccionar todos los títulos

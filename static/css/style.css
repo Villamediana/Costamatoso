@@ -1360,4 +1360,15 @@ header {
   .btn-right {
     right: 10px;
   }
-  
+
+
+  .lazy-image {
+    filter: blur(10px);
+    transition: filter 0.3s ease, opacity 0.3s ease;
+    opacity: 0.7; /* Aparecerá parcialmente visible */
+}
+
+.lazy-image.loaded {
+    filter: blur(0);
+    opacity: 1;
+}
