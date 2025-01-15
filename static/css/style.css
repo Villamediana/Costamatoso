@@ -1326,7 +1326,7 @@ header {
 
 
 .slider-footer {
-    width: 95%; /* Asegura que ocupe el ancho completo */
+    width: 100%; /* Asegura que ocupe el ancho completo */
     text-align: center; /* Centra los elementos horizontalmente */
     color: white; /* Color del texto */
     padding: 10px 0; /* Espaciado interno vertical */
