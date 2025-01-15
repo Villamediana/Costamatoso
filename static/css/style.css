@@ -1325,13 +1325,18 @@ header {
   }
 
 
-.slider-footer {
-    width: 100%; /* Asegura que ocupe el ancho completo */
-    text-align: center; /* Centra los elementos horizontalmente */
-    color: white; /* Color del texto */
-    padding: 10px 0; /* Espaciado interno vertical */
-    box-sizing: border-box; /* Garantiza que padding no desborde */
+  .slider-footer {
+    position: absolute; /* Asegura que esté posicionado dentro de la primera sección */
+    bottom: 0; /* Lo fija en la parte inferior de la sección */
+    width: 100%; /* Ocupa el ancho completo de la sección */
+    text-align: center;
+    color: white;
+    padding: 10px 0;
+    box-sizing: border-box;
+    margin-bottom: 0; /* Elimina el margen inferior */
+    background-color: rgba(0, 0, 0, 0.5); /* Opcional: añade un fondo semitransparente */
 }
+
 
 
 /* Texto */
