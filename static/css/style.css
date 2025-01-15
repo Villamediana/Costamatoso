@@ -1364,11 +1364,39 @@ header {
 
   .lazy-image {
     filter: blur(10px);
+    opacity: 0.7;
     transition: filter 0.3s ease, opacity 0.3s ease;
-    opacity: 0.7; /* Aparecerá parcialmente visible */
+    position: relative;
+    background: #f0f0f0; /* Color base del placeholder */
 }
 
-.lazy-image.loaded {
-    filter: blur(0);
-    opacity: 1;
+/* Indicador de carga (spinner) */
+.lazy-image::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 30px;
+    height: 30px;
+    border: 3px solid rgba(255, 255, 255, 0.5);
+    border-top: 3px solid #333;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    transform: translate(-50%, -50%);
+    z-index: 2;
+}
+
+/* Quitar el spinner cuando la imagen esté cargada */
+.lazy-image.loaded::after {
+    display: none;
+}
+
+/* Animación del spinner */
+@keyframes spin {
+    0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+    }
+    100% {
+        transform: translate(-50%, -50%) rotate(360deg);
+    }
 }
