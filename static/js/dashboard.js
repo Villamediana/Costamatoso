@@ -73,6 +73,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     });
 
                     // Listar archivos con íconos
+                    // Listar archivos con íconos
                     data.files.forEach(file => {
                         let icon = 'fa-file'; // Icono por defecto para archivo
                         const fileExtension = file.name.split('.').pop().toLowerCase();
@@ -83,11 +84,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         const li = document.createElement('li');
                         li.innerHTML = `
-                            <span class="file-icon"><i class="fas ${icon}"></i></span> 
-                            <span>${file.name}</span>
-                            <button class="delete-btn" data-path="${file.path}" data-type="file"><i class="fas fa-trash"></i></button>
-                            <button class="rename-btn" data-path="${file.path}" data-type="file"><i class="fas fa-edit"></i></button>
-                        `;
+        <span class="file-icon"><i class="fas ${icon}"></i></span> 
+        <span>${file.name}</span>
+        <button class="delete-btn" data-path="${file.path}" data-type="file"><i class="fas fa-trash"></i></button>
+        <button class="rename-btn" data-path="${file.path}" data-type="file"><i class="fas fa-edit"></i></button>
+        ${file.name === "info.json" ? `
+            <button class="edit-json-btn" data-path="${file.path}">
+                <i class="fas fa-pen"></i> Editar
+            </button>` : ''}
+    `;
                         fileList.appendChild(li);
                     });
 
@@ -95,6 +100,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     setupDeleteButtons();
                     setupRenameButtons();
                     setupFolderNavigation();
+                    setupEditButtons(); // Asegúrate de llamar la función para los botones de editar
+
                 }
             })
             .catch(error => {
@@ -109,7 +116,6 @@ document.addEventListener("DOMContentLoaded", function () {
         currentPath.innerHTML = '';
 
         parts.forEach((part, index) => {
-            // Monta o path passo a passo
             if (index === 0) {
                 accumulatedPath = part;
             } else {
@@ -160,7 +166,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     fetch(`/delete_item?path=${encodeURIComponent(path)}`, { method: "POST" })
                         .then(response => {
                             if (response.ok) {
-                                // Após deletar, recarrega a lista
                                 loadFiles(currentPath.dataset.currentPath);
                             } else {
                                 alert("Error al eliminar el elemento.");
@@ -185,87 +190,74 @@ document.addEventListener("DOMContentLoaded", function () {
                     fetch(`/rename_item?path=${encodeURIComponent(path)}&new_name=${encodeURIComponent(newName)}`, {
                         method: "POST"
                     })
-                    .then(response => {
-                        if (response.ok) {
-                            // Após renomear, recarrega a lista
-                            loadFiles(currentPath.dataset.currentPath);
-                        } else {
-                            alert("Error al renombrar el item.");
-                        }
-                    });
+                        .then(response => {
+                            if (response.ok) {
+                                loadFiles(currentPath.dataset.currentPath);
+                            } else {
+                                alert("Error al renombrar el item.");
+                            }
+                        });
                 }
             });
         });
     }
 
-    document.getElementById("create-folder-btn").addEventListener("click", async function () {
-        const folderName = prompt("Introduce el nombre de la nueva carpeta:");
-        if (!folderName) return;
+    // Configurar botones de edición de JSON
+    function setupEditButtons() {
+        document.querySelectorAll(".edit-json-btn").forEach(button => {
+            button.addEventListener("click", async function () {
+                const path = this.dataset.path;
     
-        const current = currentPath.dataset.currentPath; 
-        // Ex.: "img/projetos", "img/projetos/categoriaX", etc.
+                try {
+                    const response = await fetch(`/edit_file?path=${encodeURIComponent(path)}`);
+                    if (!response.ok) {
+                        throw new Error("No se pudo cargar el archivo.");
+                    }
+                    const content = await response.text();
     
-        // Conta quantos níveis há DEPOIS de "img/projetos"
-        let subLevel = current.replace("img/projetos", "").split("/").filter(Boolean).length;
+                    // Crear popup dinámico
+                    const popup = document.createElement("div");
+                    popup.className = "popup";
+                    popup.innerHTML = `
+                        <div class="popup-content">
+                            <h3>Editar Archivo JSON</h3>
+                            <textarea>${content}</textarea>
+                            <button class="save-json-btn">Guardar</button>
+                            <button class="close-popup-btn">Cerrar</button>
+                        </div>
+                    `;
+                    document.body.appendChild(popup);
     
-        if (subLevel >= 1) {
-            // Já estamos dentro de "img/projetos/alguma_coisa"
-            // Precisamos apenas pedir informações obrigatórias e criar o info.json
+                    // Configurar eventos del popup
+                    popup.querySelector(".close-popup-btn").addEventListener("click", () => {
+                        popup.remove();
+                    });
     
-            const medidas  = prompt("Medidas (ex: 120 m²):");
-            if (!medidas) return;
-            const ano      = prompt("Ano (ex: 2022):");
-            if (!ano) return;
-            const endereco = prompt("Endereço (ex: Socorro, SP):");
-            if (!endereco) return;
-            const tipo     = prompt("Tipo (ex: Residencial):");
-            if (!tipo) return;
+                    popup.querySelector(".save-json-btn").addEventListener("click", async () => {
+                        const newContent = popup.querySelector("textarea").value;
+                        const saveResponse = await fetch(`/edit_file?path=${encodeURIComponent(path)}`, {
+                            method: "POST",
+                            headers: { "Content-Type": "application/json" },
+                            body: JSON.stringify({ content: newContent })
+                        });
     
-            try {
-                // Montar FormData para enviar via POST
-                const formData = new FormData();
-                formData.append("path", current);         // "img/projetos/categoriaX"
-                formData.append("folder_name", folderName);
-                formData.append("medidas", medidas);
-                formData.append("ano", ano);
-                formData.append("endereco", endereco);
-                formData.append("tipo", tipo);
-    
-                const resp = await fetch("/create_sub_folder_with_info", {
-                    method: "POST",
-                    body: formData
-                });
-    
-                const data = await resp.json();
-                if (resp.ok && data.success) {
-                    // Atualizar listagem
-                    loadFiles(currentPath.dataset.currentPath);
-                } else {
-                    alert("Error: " + (data.error || "Desconocido"));
+                        if (saveResponse.ok) {
+                            alert("Archivo guardado con éxito.");
+                            popup.remove();
+                            loadFiles(currentPath.dataset.currentPath); // Recargar la lista
+                        } else {
+                            alert("Error al guardar el archivo.");
+                        }
+                    });
+                } catch (error) {
+                    console.error("Error al editar JSON:", error);
+                    alert("No se pudo abrir el archivo para editar.");
                 }
-            } catch (err) {
-                alert("Error al crear la carpeta: " + err);
-            }
+            });
+        });
+    }
     
-        } else {
-            // Ainda estamos em "img/projetos" ou fora => cria pasta normal
-            fetch(`/create_folder?path=${encodeURIComponent(current)}&name=${encodeURIComponent(folderName)}`, {
-                method: "POST"
-            })
-            .then(r => r.json())
-            .then(data => {
-                if (data.success) {
-                    loadFiles(currentPath.dataset.currentPath);
-                } else {
-                    alert("Error al crear la carpeta: " + (data.error || "Desconocido"));
-                }
-            })
-            .catch(e => alert(e));
-        }
-    });
-    
-    
-    
+
     // Subir archivo
     document.getElementById("upload-file-btn").addEventListener("click", function () {
         const input = document.createElement("input");
@@ -278,18 +270,17 @@ document.addEventListener("DOMContentLoaded", function () {
                 formData.append("files", file);
             }
 
-            // Também use dataset no path
             fetch(`/upload_files?path=${encodeURIComponent(currentPath.dataset.currentPath)}`, {
                 method: "POST",
                 body: formData,
             })
-            .then(response => {
-                if (response.ok) {
-                    loadFiles(currentPath.dataset.currentPath);
-                } else {
-                    alert("Error al subir archivos.");
-                }
-            });
+                .then(response => {
+                    if (response.ok) {
+                        loadFiles(currentPath.dataset.currentPath);
+                    } else {
+                        alert("Error al subir archivos.");
+                    }
+                });
         });
         input.click();
     });

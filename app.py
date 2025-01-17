@@ -712,6 +712,34 @@ def dashboard():
                            blogs=blogs)
 
 
+@app.route('/get_json', methods=['GET'])
+def get_json():
+    path = request.args.get('path')
+    full_path = os.path.join(app.static_folder, path.strip('/'))
+    if not os.path.exists(full_path):
+        return jsonify({"error": "Archivo no encontrado"}), 404
+
+    try:
+        with open(full_path, 'r', encoding='utf-8') as f:
+            data = json.load(f)
+        return jsonify(data), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/save_json', methods=['POST'])
+def save_json():
+    path = request.args.get('path')
+    full_path = os.path.join(app.static_folder, path.strip('/'))
+    if not os.path.exists(full_path):
+        return jsonify({"error": "Archivo no encontrado"}), 404
+
+    try:
+        updated_data = request.get_json()
+        with open(full_path, 'w', encoding='utf-8') as f:
+            json.dump(updated_data, f, ensure_ascii=False, indent=4)
+        return jsonify({"success": "Archivo guardado exitosamente"}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 
 
@@ -747,23 +775,31 @@ def list_files():
 
 @app.route('/edit_file', methods=['GET', 'POST'])
 def edit_file():
-    path = request.args.get('path')
+    path = request.args.get('path')  # Obtener la ruta del archivo desde los parámetros
+
+    if not path:
+        return "Ruta no proporcionada", 400
+
+    full_path = os.path.join(app.static_folder, path)  # Ruta completa al archivo
+
+    if request.method == 'GET':
+        # Leer y devolver el contenido del archivo
+        if os.path.exists(full_path):
+            with open(full_path, 'r', encoding='utf-8') as f:
+                return f.read(), 200  # Devuelve el contenido del archivo como texto
+        return "Archivo no encontrado", 404
 
     if request.method == 'POST':
-        # Guardar cambios en el archivo
-        new_content = request.form.get('content')
-        with open(os.path.join(app.static_folder, path), 'w') as f:
-            f.write(new_content)
-        return redirect(url_for('dashboard'))
+        # Guardar el nuevo contenido en el archivo
+        data = request.get_json()  # Obtener los datos enviados desde el cliente
+        new_content = data.get('content', '')
+        try:
+            with open(full_path, 'w', encoding='utf-8') as f:
+                f.write(new_content)  # Escribir el contenido en el archivo
+            return "Archivo guardado con éxito", 200
+        except Exception as e:
+            return f"Error al guardar el archivo: {str(e)}", 500
 
-    # Leer y mostrar el contenido del archivo para editar
-    full_path = os.path.join(app.static_folder, path)
-    if os.path.exists(full_path):
-        with open(full_path, 'r') as f:
-            content = f.read()
-        return render_template('edit_file.html', content=content, path=path)
-    else:
-        return "Archivo no encontrado", 404
 
 #----------------------------------------------
 #----------------------------------------------
