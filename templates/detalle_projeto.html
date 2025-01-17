@@ -36,7 +36,7 @@
     <section class="seccion imagem-cabecalho">
         <div class="cabecalho">
             <!-- Imagen de cabecera -->
-            <img src="{{ url_for('static', filename='img/projetos/' ~ nome_categoria ~ '/capa.jpg') }}" alt="{{ nome_projeto.replace('_', ' ') }}">
+            <img src="{{ url_for('static', filename='img/projetos/' ~ nome_categoria ~ '/' ~ nome_projeto ~ '/capa.jpg') }}" alt="{{ nome_projeto.replace('_', ' ') }}">
             <div class="overlay-cabecalho"></div>
             <div class="texto-cabecalho">
                 <h1>{{ nome_projeto.replace('_', ' ') }}</h1>

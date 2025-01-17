@@ -40,7 +40,7 @@
     <!-- Seção de imagem de cabeçalho -->
     <section class="seccion imagem-cabecalho">
         <div class="cabecalho">
-            <img src="{{ url_for('static', filename='img/2.jpg') }}" alt="{{ nome_categoria }}">
+            <img src="{{ url_for('static', filename='img/projetos/' ~ nome_categoria ~ '/capa.jpg') }}" alt="{{ nome_categoria.replace('_', ' ') }}">
             <div class="overlay-cabecalho"></div>
             <div class="texto-cabecalho">
                 <h1>{{ nome_categoria.replace('_', ' ') }}</h1>
