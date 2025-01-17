@@ -289,3 +289,23 @@ document.addEventListener("DOMContentLoaded", function () {
     // Cargar la carpeta inicial
     loadFiles();
 });
+
+// Funcionalidad de búsqueda de blogs
+const searchBar = document.getElementById('search-bar');
+const blogContainer = document.getElementById('blog-container');
+
+searchBar.addEventListener('input', function() {
+    const query = this.value.toLowerCase();
+    const blogs = blogContainer.querySelectorAll('.slider-item');
+
+    blogs.forEach(blog => {
+        const titulo = blog.querySelector('h3').textContent.toLowerCase();
+        const autor = blog.querySelector('p').textContent.toLowerCase();
+
+        if (titulo.includes(query) || autor.includes(query)) {
+            blog.style.display = '';
+        } else {
+            blog.style.display = 'none';
+        }
+    });
+});
