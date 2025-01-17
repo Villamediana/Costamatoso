@@ -185,14 +185,20 @@ def detalhe_projeto(nome_categoria, nome_projeto):
     clases = ['wide', 'tall', 'medium', '']  # Clases posibles para el layout
 
     for file_name in os.listdir(projeto_path):
-        if file_name.lower().endswith(('.jpg', '.jpeg', '.png', '.gif')) and file_name != 'capa.jpg':
+        if file_name.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.mp4')) and file_name != 'capa.jpg':
             # Construir la ruta relativa usando forward slashes
             relative_path = f'img/projetos/{nome_categoria}/{nome_projeto}/{file_name}'
-            image_url = url_for('static', filename=relative_path)
+            file_url = url_for('static', filename=relative_path)
 
-            # Asignar una clase aleatoria a cada imagen
-            clase_aleatoria = random.choice(clases)
-            imagens.append({'url': image_url, 'clase': clase_aleatoria})
+            # Diferenciar imágenes y videos
+            if file_name.lower().endswith(('.mp4')):
+                # Añadir un archivo de video
+                imagens.append({'url': file_url, 'tipo': 'video'})
+            else:
+                # Añadir un archivo de imagen con clase aleatoria
+                clase_aleatoria = random.choice(clases)
+                imagens.append({'url': file_url, 'tipo': 'imagen', 'clase': clase_aleatoria})
+
 
     # Contar el número total de fotos
     total_fotos = len(imagens)

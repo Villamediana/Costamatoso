@@ -78,18 +78,29 @@
     <!-- Sección de galería de imágenes -->
     <section class="seccion galeria-imagenes">
         <div class="container-mosaico">
-            {% for imagen in imagens %}
-                <div class="item-mosaico {{ imagen.clase }}">
-                    <!-- Imagen con carga progresiva (lazy loading con blur) -->
-                    <img src="{{ url_for('static', filename='img/placeholder.webp') }}" 
-                         data-src="{{ imagen.url }}" 
-                         class="lazy-image" 
-                         alt="{{ nome_projeto.replace('_', ' ') }}" 
-                         onclick="openLightbox('{{ imagen.url }}')">
+            {% for item in imagens %}
+                <div class="item-mosaico {{ item.clase if item.tipo == 'imagen' }}">
+                    {% if item.tipo == 'imagen' %}
+                        <!-- Imagen con carga progresiva (lazy loading con blur) -->
+                        <img src="{{ url_for('static', filename='img/placeholder.webp') }}" 
+                             data-src="{{ item.url }}" 
+                             class="lazy-image" 
+                             alt="{{ nome_projeto.replace('_', ' ') }}" 
+                             onclick="openLightbox('{{ item.url }}')">
+                    {% elif item.tipo == 'video' %}
+                        <!-- Video con reproducción en el mosaico -->
+                        <video controls class="lazy-video">
+                            <source src="{{ item.url }}" type="video/mp4">
+                            Tu navegador no soporta la reproducción de este video.
+                        </video>
+                    {% endif %}
                 </div>
             {% endfor %}
         </div>
     </section>
+    
+
+    
     
 
 
