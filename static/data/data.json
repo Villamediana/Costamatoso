@@ -1,10 +1,10 @@
 {
     "slider_images": [
         "img/slider_0.jpg",
-        "img/2.jpg",
-        "img/3.jpg",
-        "img/4.jpg",
-        "img/5.jpg"
+        "img/slider_1.jpg",
+        "img/slider_2.jpg",
+        "img/slider_3.jpg",
+        "img/slider_4.jpg"
     ],
     "contato_image": "img/1.jpg",
     "second_section": {
@@ -13,7 +13,7 @@
         "image": "img/time.jpg"
     },
     "third_section": {
-        "text": "Acreditamos que fazer Arquitetura vai muito além da estética.Fazer Arquitetura é pensar, criar, considerar, observar, estudar, planejar, discutir, ponderar, testar, errar, corrigir, aceitar, acertar, experimentar e vivenciar.\n\nFazemos tudo isso para chegar em uma composição única e exclusiva que foi concebida para atender um objetivo específico, desde a ideia mais básica do 'abrigar' até as mais variadas e complexas relações que envolvem uma construção inserida em um espaço e o seu impacto social, ambiental e cultural.",
+        "text": "Acreditamos que fazer Arquitetura vai muito além da estética.Fazer Arquitetura é pensar, criar, considerar, observar, estudar, planejar, discutir, ponderar, testar, errar, corrigir, aceitar, acertar, experimentar e vivenciar.\r\n\r\nFazemos tudo isso para chegar em uma composição única e exclusiva que foi concebida para atender um objetivo específico, desde a ideia mais básica do 'abrigar' até as mais variadas e complexas relações que envolvem uma construção inserida em um espaço e o seu impacto social, ambiental e cultural.",
         "image": "img/time2.jpg"
     }
 }
