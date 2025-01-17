@@ -43,7 +43,7 @@
             <img src="{{ url_for('static', filename='img/2.jpg') }}" alt="{{ nome_categoria }}">
             <div class="overlay-cabecalho"></div>
             <div class="texto-cabecalho">
-                <h1>{{ nome_categoria }}</h1>
+                <h1>{{ nome_categoria.replace('_', ' ') }}</h1>
             </div>
         </div>
     </section>
@@ -58,7 +58,7 @@
                         <img src="{{ projeto.capa_url }}" loading="lazy" alt="{{ projeto.nome }}" class="imagem-animada">
                         <div class="info-imagem">
                             <div class="nome-obra">
-                                {{ projeto.nome }}
+                                {{ projeto.nome.replace('_', ' ') }}
                             </div>
                             <div class="medidas-obra">
                                 <i class="fas fa-ruler-combined"></i> {{ projeto.medidas }}

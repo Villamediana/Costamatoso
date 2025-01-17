@@ -4,9 +4,15 @@
         <a href="#">Galeria</a>
         <ul class="submenu">
             {% for categoria in submenu_items %}
-                <li><a href="{{ url_for('categoria', nome_categoria=categoria) }}" class="{% if request.path == url_for('categoria', nome_categoria=categoria) %}active{% endif %}">{{ categoria }}</a></li>
+                <li>
+                    <a href="{{ url_for('categoria', nome_categoria=categoria) }}" 
+                       class="{% if request.path == url_for('categoria', nome_categoria=categoria) %}active{% endif %}">
+                       {{ categoria.replace('_', ' ') }}
+                    </a>
+                </li>
             {% endfor %}
         </ul>
+        
     </li>
     <li><a href="{{ url_for('nos') }}" class="{% if request.path == url_for('nos') %}active{% endif %}">Sobre nós</a></li>
     <li><a href="{{ url_for('depoimentos') }}" class="{% if request.path == url_for('depoimentos') %}active{% endif %}">Depoimentos</a></li>
