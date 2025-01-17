@@ -79,7 +79,7 @@
     <section class="seccion galeria-imagenes">
         <div class="container-mosaico">
             {% for item in imagens %}
-                <div class="item-mosaico {{ item.clase if item.tipo == 'imagen' }}">
+                <div class="item-mosaico {% if item.tipo == 'imagen' %}{{ item.clase }}{% endif %}">
                     {% if item.tipo == 'imagen' %}
                         <!-- Imagen con carga progresiva (lazy loading con blur) -->
                         <img src="{{ url_for('static', filename='img/placeholder.webp') }}" 
@@ -88,8 +88,8 @@
                              alt="{{ nome_projeto.replace('_', ' ') }}" 
                              onclick="openLightbox('{{ item.url }}')">
                     {% elif item.tipo == 'video' %}
-                        <!-- Video con reproducción en el mosaico -->
-                        <video controls class="lazy-video">
+                        <!-- Video con reproducción automática sin controles -->
+                        <video autoplay muted loop class="lazy-video">
                             <source src="{{ item.url }}" type="video/mp4">
                             Tu navegador no soporta la reproducción de este video.
                         </video>
@@ -98,6 +98,7 @@
             {% endfor %}
         </div>
     </section>
+    
     
 
     
