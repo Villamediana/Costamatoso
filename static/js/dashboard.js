@@ -77,24 +77,25 @@ document.addEventListener("DOMContentLoaded", function () {
                     data.files.forEach(file => {
                         let icon = 'fa-file'; // Icono por defecto para archivo
                         const fileExtension = file.name.split('.').pop().toLowerCase();
-
+                    
                         if (['jpg', 'jpeg', 'png', 'gif'].includes(fileExtension)) {
                             icon = 'fa-file-image'; // Cambia a icono de imagen si es imagen
                         }
-
+                    
                         const li = document.createElement('li');
                         li.innerHTML = `
-        <span class="file-icon"><i class="fas ${icon}"></i></span> 
-        <span>${file.name}</span>
-        <button class="delete-btn" data-path="${file.path}" data-type="file"><i class="fas fa-trash"></i></button>
-        <button class="rename-btn" data-path="${file.path}" data-type="file"><i class="fas fa-edit"></i></button>
-        ${file.name === "info.json" ? `
-            <button class="edit-json-btn" data-path="${file.path}">
-                <i class="fas fa-pen"></i> Editar
-            </button>` : ''}
-    `;
+                            <span class="file-icon"><i class="fas ${icon}"></i></span> 
+                            <a href="/static/${file.path}" target="_blank">${file.name}</a> <!-- Enlace al archivo -->
+                            <button class="delete-btn" data-path="${file.path}" data-type="file"><i class="fas fa-trash"></i></button>
+                            <button class="rename-btn" data-path="${file.path}" data-type="file"><i class="fas fa-edit"></i></button>
+                            ${file.name === "info.json" ? `
+                                <button class="edit-json-btn" data-path="${file.path}">
+                                    <i class="fas fa-pen"></i> Editar
+                                </button>` : ''}
+                        `;
                         fileList.appendChild(li);
                     });
+                    
 
                     // Agregar eventos
                     setupDeleteButtons();
