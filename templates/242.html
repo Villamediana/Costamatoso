@@ -66,7 +66,6 @@
 
     <!-- Sección de cabecera -->
     <section class="seccion imagem-cabecalho">
-        <div class="cabecalho cabecalho-desktop">
             <!-- Imagen de cabecera -->
             <img src="{{ url_for('static', filename='img/242/6.jpg') }}" alt="Serrano Capa">
             <div class="overlay-cabecalho"></div>
@@ -136,30 +135,29 @@
 </section>
 
 
-
-
     <!-- Sección de galería de imágenes -->
-    <!-- Galería de imágenes y videos (excluyendo el primer video) -->
-<section class="seccion galeria-imagenes">
-    <div class="container-mosaico">
-        {% for item in imagens[1:] %}  <!-- Excluye el primer elemento -->
-            <div class="item-mosaico {% if item.tipo == 'imagen' %}{{ item.clase }}{% endif %}">
-                {% if item.tipo == 'imagen' %}
-                    <img src="{{ url_for('static', filename='img/placeholder.webp') }}" 
-                         data-src="{{ item.url }}" 
-                         class="lazy-image" 
-                         alt="{{ nome_projeto.replace('_', ' ') }}" 
-                         onclick="openLightbox('{{ item.url }}')">
-                {% elif item.tipo == 'video' %}
-                    <video autoplay muted loop class="lazy-video">
-                        <source src="{{ item.url }}" type="video/mp4">
-                        Tu navegador no soporta la reproducción de este video.
-                    </video>
-                {% endif %}
-            </div>
-        {% endfor %}
-    </div>
-</section>
+    <section class="seccion galeria-imagenes">
+        <div class="container-mosaico">
+            {% for item in imagens %}
+                <div class="item-mosaico {% if item.tipo == 'imagen' %}{{ item.clase }}{% endif %}">
+                    {% if item.tipo == 'imagen' %}
+                        <!-- Imagen con carga progresiva (lazy loading con blur) -->
+                        <img src="{{ url_for('static', filename='img/placeholder.webp') }}" 
+                             data-src="{{ item.url }}" 
+                             class="lazy-image" 
+                             alt="{{ nome_projeto.replace('_', ' ') }}" 
+                             onclick="openLightbox('{{ item.url }}')">
+                    {% elif item.tipo == 'video' %}
+                        <!-- Video con reproducción automática sin controles -->
+                        <video autoplay muted loop class="lazy-video">
+                            <source src="{{ item.url }}" type="video/mp4">
+                            Tu navegador no soporta la reproducción de este video.
+                        </video>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </section>
     
     <!-- Footer -->
     {% include 'fixed/footer.html' %}
