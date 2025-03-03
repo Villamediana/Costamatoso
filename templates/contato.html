@@ -15,7 +15,7 @@
         <div class="overlay"></div>
 
         <!-- Menú de navegación -->
-        <header class="header">
+        <header class="header-white">
             <nav class="navbar">
                 <div class="logo ocultar-logo">
                     <a href="#"><img src="{{ url_for('static', filename='img/logo-preto-png.png') }}" alt="Logo"></a>
@@ -30,6 +30,17 @@
             {% include 'fixed/menu.html' %}
         </header>
 
+        <!-- Seção de imagem de cabeçalho -->
+    <section class="seccion imagem-cabecalho">
+        <div class="cabecalho">
+            <img src="{{ url_for('static', filename='img/time.jpg') }}" alt="Contato">
+            <div class="overlay-cabecalho"></div>
+            <div class="texto-cabecalho">
+                <h1>Entre em contato</h1>
+            </div>
+        </div>
+    </section>
+
     <!-- Sección de contacto -->
     <section class="seccion-contato">
         
@@ -37,7 +48,6 @@
             
             <div class="contato-container">
                 
-                <h1>ENTRE EM CONTATO</h1>
                 <p>Será um prazer atendê-lo e transformar seu projeto em realidade!</p>
                 <div class="contato-redes">
                     <!-- Íconos en SVG -->

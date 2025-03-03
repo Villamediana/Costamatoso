@@ -11,11 +11,15 @@
 <body>
         <!-- Sobreposición para el fondo -->
         <div class="overlay"></div>
-    <!-- Menú de navegación -->
-    <header class="header">
+
+
+    <!-- Menú de navegação -->
+    <header class="header-white">
         <nav class="navbar">
             <div class="logo ocultar-logo">
-                <a href="#"><img src="{{ url_for('static', filename='img/logo-preto-png.png') }}" alt="Logo"></a>
+                <a href="{{ url_for('index') }}">
+                    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo">
+                </a>
             </div>
             <div class="menu-icon">
                 <span></span>
@@ -27,11 +31,25 @@
         {% include 'fixed/menu.html' %}
     </header>
 
+    <!-- Seção de imagem de cabeçalho -->
+    <section class="seccion imagem-cabecalho">
+        <div class="cabecalho">
+            <img src="{{ url_for('static', filename='img/slider_1.jpg') }}" alt="BLOG">
+            <div class="overlay-cabecalho"></div>
+            <div class="texto-cabecalho">
+                <h1>BLOG</h1>
+            </div>
+        </div>
+    </section>
+
+
     <!-- Título de la sección del Blog -->
     <section class="seccion-blog">
-        <div class="blog-cabecalho">
+<!--
+                <div class="blog-cabecalho">
             <h1>BLOG</h1>
         </div>
+-->
         <div class="container-articulos">
             <!-- Reutilizamos el estilo de las imágenes con título -->
             {% for articulo in articulos %}

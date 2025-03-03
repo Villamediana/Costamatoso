@@ -1,22 +1,24 @@
-<ul class="nav-links">
-    <li><a href="{{ url_for('index') }}" class="{% if request.path == url_for('index') %}active{% endif %}">Início</a></li>
-    <li class="has-submenu">
-        <a href="#">Galeria</a>
-        <ul class="submenu">
-            {% for categoria in submenu_items %}
-                <li>
-                    <a href="{{ url_for('categoria', nome_categoria=categoria) }}" 
-                       class="{% if request.path == url_for('categoria', nome_categoria=categoria) %}active{% endif %}">
-                       {{ categoria.replace('_', ' ') }}
-                    </a>
-                </li>
-            {% endfor %}
-        </ul>
-        
-    </li>
-    <li><a href="{{ url_for('nos') }}" class="{% if request.path == url_for('nos') %}active{% endif %}">Sobre nós</a></li>
-    <li><a href="{{ url_for('depoimentos') }}" class="{% if request.path == url_for('depoimentos') %}active{% endif %}">Depoimentos</a></li>
-    <li><a href="{{ url_for('contato') }}" class="{% if request.path == url_for('contato') %}active{% endif %}">Contato</a></li>
-    <li><a href="{{ url_for('blog') }}" class="{% if request.path.startswith(url_for('blog')) %}active{% endif %}">Blog</a></li>
-    <!--<li><a href="{{ url_for('dashboard') }}" class="{% if request.path.startswith(url_for('dashboard')) %}active{% endif %}">Dashboard</a></li>-->
-</ul>
+<div class="desktop-menu">
+    <ul class="nav-links">
+        <li><a href="{{ url_for('index') }}" class="{% if request.path == url_for('index') %}active{% endif %}">Início</a></li>
+        <li class="has-submenu">
+            <a href="#">Galeria</a>
+            <ul class="submenu">
+                {% for categoria in submenu_items %}
+                    <li>
+                        <a href="{{ url_for('categoria', nome_categoria=categoria) }}" 
+                           class="{% if request.path == url_for('categoria', nome_categoria=categoria) %}active{% endif %}">
+                           {{ categoria.replace('_', ' ') }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+            
+        </li>
+        <li><a href="{{ url_for('nos') }}" class="{% if request.path == url_for('nos') %}active{% endif %}">Sobre nós</a></li>
+        <li><a href="{{ url_for('depoimentos') }}" class="{% if request.path == url_for('depoimentos') %}active{% endif %}">Depoimentos</a></li>
+        <li><a href="{{ url_for('contato') }}" class="{% if request.path == url_for('contato') %}active{% endif %}">Contato</a></li>
+        <li><a href="{{ url_for('blog') }}" class="{% if request.path.startswith(url_for('blog')) %}active{% endif %}">Blog</a></li>
+        <!--<li><a href="{{ url_for('dashboard') }}" class="{% if request.path.startswith(url_for('dashboard')) %}active{% endif %}">Dashboard</a></li>-->
+    </ul>    
+</div>
