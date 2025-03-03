@@ -8,9 +8,9 @@ app = Flask(__name__)
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'jose.villamediana.osorio@gmail.com'  # Cambia esto con tu email
-app.config['MAIL_PASSWORD'] = 'xoqv ridm qanb qovv'  # Cambia esto con la contraseña del email
-app.config['MAIL_DEFAULT_SENDER'] = ('Nombre del Remitente', 'tu_email@gmail.com') # Cambia el nombre y email
+app.config['MAIL_USERNAME'] = 'jose.villamediana.osorio@gmail.com'  # Tu email
+app.config['MAIL_PASSWORD'] = 'yhsl apqh sics zddu'  # Código de aplicación de Gmail
+app.config['MAIL_DEFAULT_SENDER'] = ('Jose Villamediana', 'jose.villamediana.osorio@gmail.com')
 app.config['MAIL_MAX_EMAILS'] = None
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100 MB
 app.secret_key = '3HpAUadGVgxO' 
@@ -292,23 +292,56 @@ def contato():
         proyecto = request.form.get('proyecto')
 
         # Crear el mensaje de correo
-        msg = Message('Novo contato de {}'.format(nome), recipients=['miguel.villamediana@outlook.com'])  # El destinatario del correo
-        msg.body = f"""
-        Novo contato recebido:
-
-        Nome: {nome}
-        Telefone: {telefone}
-        E-mail: {email}
-        Projeto: {proyecto}
-        """
+        #msg = Message('Novo contato de {}'.format(nome), recipients=['miguel.villamediana@outlook.com'])  # El destinatario del correo
+        #msg.body = f"""
+        #Novo contato recebido:
+        #Nome: {nome}
+        #Telefone: {telefone}
+        #E-mail: {email}
+        #Projeto: {proyecto}
+        #"""
 
         # Enviar el correo
+        #try:
+        #    mail.send(msg)
+        #    return redirect(url_for('contato'))  # Redirigir de vuelta a la página de contacto
+        #except Exception as e:
+        #    print(f'Ocorreu um erro ao enviar o e-mail: {str(e)}')
+        #    return redirect(url_for('contato'))  # Redirigir de vuelta a la página de contacto incluso si hay un error
+
+        # Nueva lógica para guardar en un archivo JSON
+        submissions_file = os.path.join(app.static_folder, 'data', 'contact_submissions.json')
+
+        # Intentar cargar las solicitudes existentes, o crear una lista vacía si el archivo no existe
         try:
-            mail.send(msg)
-            return redirect(url_for('contato'))  # Redirigir de vuelta a la página de contacto
+            with open(submissions_file, 'r', encoding='utf-8') as f:
+                submissions = json.load(f)
         except Exception as e:
-            print(f'Ocorreu um erro ao enviar o e-mail: {str(e)}')
-            return redirect(url_for('contato'))  # Redirigir de vuelta a la página de contacto incluso si hay un error
+            print(f"Error al cargar las solicitudes: {e}")
+            submissions = []
+
+        # Crear un nuevo registro de contacto con la fecha actual
+        new_entry = {
+            "nome": nome,
+            "telefone": telefone,
+            "email": email,
+            "proyecto": proyecto,
+            "fecha": datetime.datetime.now().isoformat()
+        }
+
+        # Agregar la nueva solicitud a la lista
+        submissions.append(new_entry)
+
+        # Guardar la lista actualizada en el archivo JSON
+        try:
+            # Asegurarse de que la carpeta existe
+            submissions_folder = os.path.dirname(submissions_file)
+            os.makedirs(submissions_folder, exist_ok=True)
+            with open(submissions_file, 'w', encoding='utf-8') as f:
+                json.dump(submissions, f, ensure_ascii=False, indent=4)
+            print("Solicitud de contacto guardada con éxito.")
+        except Exception as e:
+            print(f"Error al guardar la solicitud: {e}")
 
     return render_template('contato.html', contato_image=contato_image, submenu_items=submenu_items)
 
