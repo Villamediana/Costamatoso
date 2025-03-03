@@ -107,17 +107,6 @@
   </div>
    
 
-  <section class="seccion video-principal">
-    <div class="container">
-        {% if imagens and imagens[0].tipo == 'video' %}
-            <video autoplay muted loop class="video-destaque">
-                <source src="{{ imagens[0].url }}" type="video/mp4">
-                Tu navegador no soporta la reproducción de este video.
-            </video>
-        {% endif %}
-    </div>
-</section>
-
   <section class="seccion conteudo">
     <div class="container texto-justificado">
         <p>
