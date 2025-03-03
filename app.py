@@ -1047,7 +1047,7 @@ def delete_item():
         return jsonify({"error": str(e)}), 500
     
 # Landing page antiga
-@app.route('/projetos/residencias-242')
+@app.route('/projetos/residências-242')
 def residencias_242():
     # Definir el nombre del proyecto
     nome_projeto = "Residencias_242"
