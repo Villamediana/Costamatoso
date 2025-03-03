@@ -110,6 +110,7 @@ def login():
 
 
 # Ruta para cada categoría
+from datetime import datetime
 @app.route('/categoria/<nome_categoria>')
 def categoria(nome_categoria):
     # Ruta a la categoría
@@ -125,7 +126,6 @@ def categoria(nome_categoria):
             # Ruta a la imagen de capa
             capa_path = os.path.join(projeto_path, 'capa.jpg')
             if os.path.exists(capa_path):
-                # Construir la ruta relativa usando forward slashes
                 relative_path = f'img/projetos/{nome_categoria}/{projeto_name}/capa.jpg'
                 capa_url = url_for('static', filename=relative_path)
             else:
@@ -140,11 +140,19 @@ def categoria(nome_categoria):
             else:
                 medidas = 'N/A'
 
+            # Obtener la fecha de última modificación del directorio del proyecto
+            mod_time = os.path.getmtime(projeto_path)  # Fecha de modificación
+            mod_time_str = datetime.fromtimestamp(mod_time).strftime('%Y-%m-%d %H:%M:%S')
+
             projetos.append({
                 'nome': projeto_name,
                 'capa_url': capa_url,
-                'medidas': medidas
+                'medidas': medidas,
+                'mod_time': mod_time_str  # Guardar la fecha de modificación
             })
+
+    # Ordenar los proyectos por fecha de modificación en orden descendente
+    projetos.sort(key=lambda x: x['mod_time'], reverse=True)
 
     # Obtener los ítems del submenú nuevamente para pasarlos a la plantilla
     projetos_path = os.path.join(app.static_folder, 'img', 'projetos')
@@ -743,12 +751,23 @@ def dashboard():
                         'autor': blog_data.get('autor', '-'),
                         'data': blog_data.get('data', '-')
                     })
+    #Obter contatos via email (solução paliativa)
+    contact_data = []
+    contact_json_path = os.path.join(app.static_folder, 'data', 'contact_submissions.json')
+
+    if os.path.exists(contact_json_path):
+        try:
+            with open(contact_json_path, 'r', encoding='utf-8') as json_file:
+                contact_data = json.load(json_file)
+        except Exception as e:
+            print(f"Error al cargar los datos de contactos: {e}")
 
     return render_template('dashboard.html', 
                            slider_images=enumerated_slider_images,
                            second_section=data.get('second_section', {}),
                            third_section=data.get('third_section', {}),
-                           blogs=blogs)
+                           blogs=blogs,
+                           contact_data=contact_data)
 
 
 @app.route('/get_json', methods=['GET'])

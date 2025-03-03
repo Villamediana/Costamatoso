@@ -63,6 +63,7 @@
                 <li><a href="#" data-section="sobre-nos-section">Quem somos (Aba)</a></li>
                 <li><a href="#" data-section="blog-section">Editar Blog</a></li>
                 <li><a href="#" data-section="file-browser-section">Navegar Projetos</a></li>
+                <li><a href="#" data-section="contact-submissions-section">Ver Contactos</a></li>
             </ul>
         </nav>
     </aside>
@@ -167,6 +168,30 @@
                 <ul id="file-list"></ul>
             </div>
         </section>
+
+
+        <!-- Sección Ver Contactos -->
+<section id="contact-submissions-section" class="hidden-section">
+    <h1>Contactos Recibidos</h1>
+    
+    <div id="contact-list">
+        {% if contact_data %}
+            <ul>
+                {% for contact in contact_data %}
+                    <li>
+                        <strong>Nome:</strong> {{ contact.nome }}<br>
+                        <strong>Telefone:</strong> {{ contact.telefone }}<br>
+                        <strong>Email:</strong> {{ contact.email }}<br>
+                        <strong>Projeto:</strong> {{ contact.projeto }}<br>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No hay contactos registrados aún.</p>
+        {% endif %}
+    </div>
+</section>
+
         
     </main>
 
