@@ -21,7 +21,7 @@ mail = Mail(app)
 
 def formatar_data(fecha_str):
     # Convertir la cadena a un objeto de fecha
-    fecha = datetime.datetime.strptime(fecha_str, "%Y-%m-%d")
+    fecha = datetime.strptime(fecha_str, "%Y-%m-%d")
     
     # Transformar la fecha al formato deseado
     fecha_formateada = fecha.strftime("%a, %d de %B de %Y")
