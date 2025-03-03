@@ -1045,6 +1045,47 @@ def delete_item():
     except Exception as e:
         print(f"Error al eliminar el item: {e}")
         return jsonify({"error": str(e)}), 500
+    
+# Landing page antiga
+@app.route('/projetos/residencias-242')
+def residencias_242():
+    # Definir el nombre del proyecto
+    nome_projeto = "Residencias_242"
+
+    # Definir el contenido de la segunda sección
+    second_section = {
+        "title": "Sobre o Projeto",
+        "text": """Esse projeto tem como conceito explorar as texturas dos materiais em seu estado bruto. Nosso principal objetivo era criar uma arquitetura com custo reduzido sem perder qualidade plástica, visual e experimental. Gostamos do efeito que os materiais produzem dentro e fora da casa ao que se refere a suas texturas e formas originais. 
+        
+        Na cobertura utilizamos laje painel aparente no seu interior e sua superfície superior impermeabilizada dispensando uso de estrutura de telhado, telhas pesadas, platibandas e consequentemente reduzindo o peso na estrutura da casa. As paredes são de alvenaria estrutural de blocos de concreto e tijolos cerâmicos maciços dispensando uso de pilares e vigas. Esta casa recebe luz natural das janelas triangulares que nasceram devido ao formato do telhado no pé direito duplo no centro da casa (sala de estar) ajudando a iluminar o interior visto que a construção aproveita toda a largura do terreno, compensando o fato de não poder ter janelas nas laterais. Além disso conseguimos aproveitar bem o espaço com uma cozinha de bancada em ilha integrada com sala de jantar, sala de estar e comunicação direta com a churrasqueira externa e deck de madeira para momentos de lazer."""
+    }
+
+    # Ruta a la carpeta de imágenes
+    imagens_path = os.path.join(app.static_folder, 'img', '242')
+
+    # Obtener todas las imágenes de la carpeta 242
+    imagens = []
+    if os.path.exists(imagens_path):
+        for file_name in os.listdir(imagens_path):
+            if file_name.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.mp4')):
+                relative_path = f'img/242/{file_name}'
+                file_url = url_for('static', filename=relative_path)
+
+                # Diferenciar imágenes y videos
+                if file_name.lower().endswith('.mp4'):
+                    imagens.append({'url': file_url, 'tipo': 'video'})
+                else:
+                    # Clases aleatorias para la galería
+                    clases = ['wide', 'tall', 'medium', '']
+                    imagens.append({'url': file_url, 'tipo': 'imagen', 'clase': random.choice(clases)})
+
+    return render_template(
+        '242.html',
+        nome_projeto=nome_projeto,
+        imagens=imagens,
+        second_section=second_section  # Pasamos la sección para que se muestre en HTML
+    )
+
 
 
 #----------------------------------------------
