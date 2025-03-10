@@ -1,0 +1,43 @@
+nohup: ignoring input
+ * Serving Flask app 'app'
+ * Debug mode: off
+[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5000
+ * Running on http://62.72.8.30:5000
+[33mPress CTRL+C to quit[0m
+201.95.69.199 - - [02/Mar/2025 21:15:53] "GET / HTTP/1.1" 200 -
+201.95.69.199 - - [02/Mar/2025 21:15:53] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:15:53] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:15:53] "[36mGET /static/img/logo.png HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:15:53] "[36mGET /static/img/logo-preto-png.png HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:15:53] "[36mGET /static/img/Logo_branco_novo.png HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:15:53] "[36mGET /static/img/slider_1.jpg HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:15:53] "[36mGET /static/img/slider_0.jpg HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:15:53] "[36mGET /static/img/slider_4.jpg HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:15:53] "[36mGET /static/img/slider_2.jpg HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:15:53] "[36mGET /static/img/slider_3.jpg HTTP/1.1[0m" 304 -
+205.210.31.89 - - [02/Mar/2025 21:16:39] "GET / HTTP/1.0" 200 -
+201.95.69.199 - - [02/Mar/2025 21:18:08] "GET / HTTP/1.1" 200 -
+201.95.69.199 - - [02/Mar/2025 21:18:08] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:18:08] "[36mGET /static/img/logo.png HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:18:08] "[36mGET /static/img/Logo_branco_novo.png HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:18:08] "[36mGET /static/img/logo-preto-png.png HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:18:08] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:18:08] "[36mGET /static/img/slider_2.jpg HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:18:08] "[36mGET /static/img/slider_1.jpg HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:18:08] "[36mGET /static/img/slider_4.jpg HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:18:08] "[36mGET /static/img/slider_3.jpg HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:18:08] "[36mGET /static/img/slider_0.jpg HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:19:15] "GET / HTTP/1.1" 200 -
+201.95.69.199 - - [02/Mar/2025 21:19:15] "[36mGET /static/css/style.css HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:19:15] "[36mGET /static/img/Logo_branco_novo.png HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:19:15] "[36mGET /static/img/logo-preto-png.png HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:19:15] "[36mGET /static/js/script.js HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:19:15] "[36mGET /static/img/logo.png HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:19:15] "[36mGET /static/img/slider_2.jpg HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:19:15] "[36mGET /static/img/slider_4.jpg HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:19:15] "[36mGET /static/img/slider_3.jpg HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:19:15] "[36mGET /static/img/slider_0.jpg HTTP/1.1[0m" 304 -
+201.95.69.199 - - [02/Mar/2025 21:19:15] "[36mGET /static/img/slider_1.jpg HTTP/1.1[0m" 304 -
+45.43.33.210 - - [02/Mar/2025 21:53:44] "GET / HTTP/1.1" 200 -
