@@ -49,6 +49,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+
+    document.addEventListener('keydown', (event) => {
+        if (document.getElementById('lightbox').style.display === 'block') {
+            if (event.key === 'ArrowRight') {
+                // Siguiente imagen
+                currentImageIndex = (currentImageIndex === images.length - 1) ? 0 : currentImageIndex + 1;
+                resetZoom(); // Restablecer zoom
+                showLightboxImage(currentImageIndex);
+            } else if (event.key === 'ArrowLeft') {
+                // Imagen anterior
+                currentImageIndex = (currentImageIndex === 0) ? images.length - 1 : currentImageIndex - 1;
+                resetZoom(); // Restablecer zoom
+                showLightboxImage(currentImageIndex);
+            } else if (event.key === 'Escape') {
+                // Cerrar lightbox con tecla ESC
+                document.getElementById('lightbox').style.display = 'none';
+            }
+        }
+    });
+    
+
     const lazyImages = document.querySelectorAll('.lazy-image');
 
     if ('IntersectionObserver' in window) {
