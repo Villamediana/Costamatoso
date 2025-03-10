@@ -548,7 +548,7 @@ def creation_blog():
         blog_data = {
             "titulo": titulo,
             "autor": autor,
-            "descripcion": contenido_lista[0]["valor"] if contenido_lista else "",
+            "descricao": contenido_lista[0]["valor"] if contenido_lista else "",
             "data": fecha,
             "capa": capa_filename,
             "contenido": contenido_lista,
