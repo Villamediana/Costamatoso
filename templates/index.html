@@ -43,11 +43,20 @@
     <!-- Seção de slideshow -->
     <section class="seccion imagem">
         <!-- Contêiner para as imagens do slideshow -->
-        <div class="slideshow">
-            {% for image in slider_images %}
-                <div class="slide" style="background-image: url('{{ url_for('static', filename=image) }}');"></div>
-            {% endfor %}
-        </div>
+        <!-- Slider Desktop -->
+<div class="slideshow slider-desktop">
+    {% for image in slider_images %}
+        <div class="slide" style="background-image: url('{{ url_for('static', filename=image) }}');"></div>
+    {% endfor %}
+</div>
+
+<!-- Slider Mobile -->
+<div class="slideshow slider-mobile">
+    {% for image in slider_images_mobile %}
+        <div class="slide" style="background-image: url('{{ url_for('static', filename=image) }}');"></div>
+    {% endfor %}
+</div>
+
 
         <div class="slider-footer">
             <p>Grandes projetos começam com grandes escolhas.</p>

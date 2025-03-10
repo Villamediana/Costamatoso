@@ -6,6 +6,13 @@
         "img/slider_3.jpg",
         "img/slider_4.jpg"
     ],
+    "slider_images_mobile": [
+        "img/sliderm_0.jpg",
+        "img/sliderm_1.jpg",
+        "img/sliderm_2.jpg",
+        "img/sliderm_3.jpg",
+        "img/sliderm_4.jpg"
+    ],
     "contato_image": "img/1.jpg",
     "second_section": {
         "title": "Escritório Costa Matoso",

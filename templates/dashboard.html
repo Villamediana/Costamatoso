@@ -59,7 +59,8 @@
         </div>
         <nav class="menu">
             <ul>
-                <li><a href="#" data-section="slider-section" class="active">Editar Slider</a></li>
+                <li><a href="#" data-section="slider-section" class="active">Editar slider desktop</a></li>
+                <li><a href="#" data-section="slider-section_mobile">Editar slider mobile</a></li>
                 <li><a href="#" data-section="quem-somos-section">Quem somos (Home)</a></li>
                 <li><a href="#" data-section="sobre-nos-section">Quem somos (Aba)</a></li>
                 <li><a href="#" data-section="blog-section">Editar Blog</a></li>
@@ -73,7 +74,7 @@
     <main class="main-content">
         <!-- Sección Slider -->
         <section id="slider-section" class="active-section">
-            <h1>Editar Imágenes del Slider</h1>
+            <h1>Editar slider Desktop</h1>
             <form action="{{ url_for('dashboard') }}" method="POST" enctype="multipart/form-data">
                 <div class="slider-container">
                     {% for i, image in slider_images %}
@@ -87,6 +88,24 @@
                 <button type="submit" class="btn">Actualizar Slider</button>
             </form>
         </section>
+
+        <!-- ✅ Slider Mobile (CORRECTO) -->
+<section id="slider-section_mobile" class="hidden-section">
+    <h1>Editar slider Mobile</h1>
+    <form action="{{ url_for('dashboard') }}" method="POST" enctype="multipart/form-data">
+        <div class="slider-container">
+            {% for i, image in slider_images_mobile %}
+                <div class="slider-item">
+                    <img src="{{ url_for('static', filename=image) }}" alt="Slider Mobile {{ i+1 }}" class="slider-preview">
+                    <label class="file-upload-btn" for="slider_image_mobile_{{ i }}">Escolher arquivo</label>
+                    <input type="file" name="slider_image_mobile_{{ i }}" id="slider_image_mobile_{{ i }}">
+                </div>
+            {% endfor %}
+        </div>
+        <button type="submit" class="btn">Actualizar Slider Mobile</button>
+    </form>
+</section>
+
 
         <!-- Sección Quem Somos (Home) -->
         <section id="quem-somos-section" class="hidden-section">

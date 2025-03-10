@@ -1684,3 +1684,23 @@ header {
         right: 10px;
     }
 }
+
+/* Por defecto oculta slider-mobile y muestra slider-desktop */
+.slider-mobile {
+    display: none;
+}
+
+.slider-desktop {
+    display: block;
+}
+
+/* Para dispositivos móviles (menores o iguales a 768px) */
+@media (max-width: 768px) {
+    .slider-desktop {
+        display: none; /* oculta el desktop */
+    }
+
+    .slider-mobile {
+        display: block; /* muestra el móvil */
+    }
+}

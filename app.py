@@ -79,6 +79,7 @@ def index():
 
     # Obtener las imágenes del slider y el contenido de la segunda sección
     slider_images = data.get('slider_images', [])
+    slider_images_mobile = data.get('slider_images_mobile', [])
     second_section = data.get('second_section', {})
 
     # Obtener los ítems del submenú dinámicamente (categorías)
@@ -88,7 +89,7 @@ def index():
         submenu_items = [name for name in os.listdir(projetos_path) if os.path.isdir(os.path.join(projetos_path, name))]
         submenu_items.sort()  # Opcional: ordenar alfabéticamente
 
-    return render_template('index.html', slider_images=slider_images, second_section=second_section, submenu_items=submenu_items)
+    return render_template('index.html', slider_images=slider_images,slider_images_mobile=slider_images_mobile,second_section=second_section, submenu_items=submenu_items)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -691,13 +692,21 @@ def dashboard():
         data = {}
 
     if request.method == 'POST':
-        # Actualizar imágenes del slider
+    # Actualizar imágenes del slider Desktop
         for i in range(5):
             image_file = request.files.get(f'slider_image_{i}')
             if image_file:
                 filename = f'slider_{i}.jpg'  # Guardar con un nombre específico
                 image_file.save(os.path.join(app.static_folder, 'img', filename))
                 data['slider_images'][i] = f'img/{filename}'
+
+        # ✅ Actualizar imágenes del slider Mobile
+        for i in range(5):
+            image_file = request.files.get(f'slider_image_mobile_{i}')  # Cambia el identificador
+            if image_file:
+                filename = f'sliderm_{i}.jpg'  # Guardar con un nombre específico para mobile
+                image_file.save(os.path.join(app.static_folder, 'img', filename))
+                data['slider_images_mobile'][i] = f'img/{filename}'
 
         # Actualizar secciones (Second Section)
         second_section_title = request.form.get('second_section_title')
@@ -733,6 +742,7 @@ def dashboard():
 
     # Enumerar las imágenes para pasarlas a la plantilla
     enumerated_slider_images = list(enumerate(data.get('slider_images', [])))
+    enumerated_slider_images_mobile = list(enumerate(data.get('slider_images_mobile', [])))
 
     # Agregar la funcionalidad para cargar los blogs
     blogs_path = os.path.join(app.static_folder, 'img', 'blog')
@@ -764,11 +774,13 @@ def dashboard():
             print(f"Error al cargar los datos de contactos: {e}")
 
     return render_template('dashboard.html', 
-                           slider_images=enumerated_slider_images,
-                           second_section=data.get('second_section', {}),
-                           third_section=data.get('third_section', {}),
-                           blogs=blogs,
-                           contact_data=contact_data)
+                       slider_images=enumerated_slider_images,
+                       slider_images_mobile=enumerated_slider_images_mobile,  # 👈 ahora sí explícito
+                       second_section=data.get('second_section', {}),
+                       third_section=data.get('third_section', {}),
+                       blogs=blogs,
+                       contact_data=contact_data)
+
 
 
 @app.route('/get_json', methods=['GET'])
