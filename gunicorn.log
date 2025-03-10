@@ -1,26 +1,8 @@
 nohup: ignoring input
-[2025-03-03 19:55:39 +0000] [54712] [INFO] Starting gunicorn 23.0.0
-[2025-03-03 19:55:39 +0000] [54712] [INFO] Listening at: http://0.0.0.0:8000 (54712)
-[2025-03-03 19:55:39 +0000] [54712] [INFO] Using worker: sync
-[2025-03-03 19:55:39 +0000] [54713] [INFO] Booting worker with pid: 54713
-[2025-03-03 19:55:39 +0000] [54714] [INFO] Booting worker with pid: 54714
-[2025-03-03 19:55:39 +0000] [54715] [INFO] Booting worker with pid: 54715
-[2025-03-03 19:55:39 +0000] [54716] [INFO] Booting worker with pid: 54716
-[2025-03-07 17:22:16,505] ERROR in app: Exception on /contato [POST]
-Traceback (most recent call last):
-  File "/var/www/Costamatoso/venv/lib/python3.12/site-packages/flask/app.py", line 1511, in wsgi_app
-    response = self.full_dispatch_request()
-               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/var/www/Costamatoso/venv/lib/python3.12/site-packages/flask/app.py", line 919, in full_dispatch_request
-    rv = self.handle_user_exception(e)
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/var/www/Costamatoso/venv/lib/python3.12/site-packages/flask/app.py", line 917, in full_dispatch_request
-    rv = self.dispatch_request()
-         ^^^^^^^^^^^^^^^^^^^^^^^
-  File "/var/www/Costamatoso/venv/lib/python3.12/site-packages/flask/app.py", line 902, in dispatch_request
-    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
-           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  File "/var/www/Costamatoso/app.py", line 337, in contato
-    "fecha": datetime.datetime.now().isoformat()
-             ^^^^^^^^^^^^^^^^^
-AttributeError: type object 'datetime.datetime' has no attribute 'datetime'
+[2025-03-10 03:14:16 +0000] [1091] [INFO] Starting gunicorn 23.0.0
+[2025-03-10 03:14:16 +0000] [1091] [INFO] Listening at: http://0.0.0.0:8000 (1091)
+[2025-03-10 03:14:16 +0000] [1091] [INFO] Using worker: sync
+[2025-03-10 03:14:16 +0000] [1092] [INFO] Booting worker with pid: 1092
+[2025-03-10 03:14:16 +0000] [1093] [INFO] Booting worker with pid: 1093
+[2025-03-10 03:14:16 +0000] [1094] [INFO] Booting worker with pid: 1094
+[2025-03-10 03:14:16 +0000] [1095] [INFO] Booting worker with pid: 1095
