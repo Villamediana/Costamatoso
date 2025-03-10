@@ -14,6 +14,7 @@ app.config['MAIL_DEFAULT_SENDER'] = ('Jose Villamediana', 'jose.villamediana.oso
 app.config['MAIL_MAX_EMAILS'] = None
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100 MB
 app.secret_key = '3HpAUadGVgxO' 
+os.environ['GUNICORN_CMD_ARGS'] = '--limit-request-field_size 0 --limit-request-line 0'
 #app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 31536000  # 365 días
 
 
