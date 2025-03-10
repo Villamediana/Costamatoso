@@ -110,6 +110,82 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 
+
+    
+    document.getElementById("create-folder-btn").addEventListener("click", function () {
+        const folderName = prompt("Digite o nome da nova pasta:");
+    
+        if (folderName) {
+            const currentPath = document.getElementById("current-path").dataset.currentPath || 'img/projetos';
+    
+            // Verifica si está creando dentro de una categoría (más de 2 niveles)
+            const pathParts = currentPath.split("/");
+            const isInsideCategory = pathParts.length > 2; 
+    
+            if (isInsideCategory) {
+                // Pedir datos para el `info.json`
+                const medidas = prompt("Digite as medidas:");
+                const ano = prompt("Digite o ano:");
+                const endereco = prompt("Digite o endereço:");
+                const tipo = prompt("Digite o tipo:");
+    
+                if (!medidas || !ano || !endereco || !tipo) {
+                    alert("⚠️ Todos os campos são obrigatórios.");
+                    return;
+                }
+    
+                // Enviar la solicitud a `/create_sub_folder_with_info`
+                fetch("/create_sub_folder_with_info", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: new URLSearchParams({
+                        path: currentPath,
+                        folder_name: folderName,
+                        medidas: medidas,
+                        ano: ano,
+                        endereco: endereco,
+                        tipo: tipo
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("✅ Pasta criada com sucesso!");
+                        loadFiles(currentPath);  // 🔥 Actualiza la lista
+                    } else {
+                        alert(`❌ Erro: ${data.error}`);
+                    }
+                })
+                .catch(error => {
+                    console.error("Erro ao criar pasta com info.json:", error);
+                    alert("❌ Erro ao criar a pasta.");
+                });
+    
+            } else {
+                // Si no está dentro de una categoría, crea la carpeta normal
+                fetch(`/create_folder?path=${encodeURIComponent(currentPath)}&name=${encodeURIComponent(folderName)}`, {
+                    method: "POST"
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert("✅ Pasta criada com sucesso!");
+                        loadFiles(currentPath);
+                    } else {
+                        alert(`❌ Erro: ${data.error}`);
+                    }
+                })
+                .catch(error => {
+                    console.error("Erro ao criar a pasta:", error);
+                    alert("❌ Erro ao criar a pasta.");
+                });
+            }
+        }
+    });
+    
+
+
+
     // Actualizar la ruta de breadcrumbs
     function updateBreadcrumb(path) {
         const parts = path.split('/');

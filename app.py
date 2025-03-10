@@ -906,31 +906,22 @@ def create_folder():
         if not path or not folder_name:
             return jsonify({"error": "Ruta o nombre de la carpeta no proporcionados"}), 400
 
-        # Decodificar y limpiar la ruta
-        decoded_path = unquote(path).strip()
-        # Substitui " / " por "/" para evitar path com espaços
-        decoded_path = decoded_path.replace(" / ", "/")
-        # Converte barras invertidas para barras normais
-        decoded_path = decoded_path.replace("\\", "/")
-        # Remove barras finais extras
-        decoded_path = decoded_path.strip("/")
-
-        base_path = os.path.join(app.static_folder, decoded_path)
-
-        # Normalizar la ruta completa
-        new_folder_path = os.path.normpath(os.path.join(base_path, secure_filename(folder_name)))
+        # Construir la ruta completa
+        decoded_path = os.path.join(app.static_folder, unquote(path).strip("/"))
+        new_folder_path = os.path.normpath(os.path.join(decoded_path, secure_filename(folder_name)))
 
         # Verificar si la carpeta ya existe
         if os.path.exists(new_folder_path):
             return jsonify({"error": "La carpeta ya existe"}), 400
 
         # Crear la carpeta
-        os.makedirs(new_folder_path)
+        os.makedirs(new_folder_path, exist_ok=True)
+
         return jsonify({"success": "Carpeta creada con éxito"}), 200
 
-    except Exception as e:
-        print(f"Error al crear la carpeta: {e}")
-        return jsonify({"error": str(e)}), 500
+    except:
+        return jsonify({"error": "No se pudo crear la carpeta"}), 500
+
 
 
 @app.route("/create_sub_folder_with_info", methods=["POST"])
