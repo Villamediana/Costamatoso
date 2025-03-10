@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-    <title>{{ nome_categoria }} - Costamatoso</title>
+    <title>{{ nome_categoria.replace('_', ' ') }} - Costamatoso</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
     <!-- Vincular ao CSS usando Flask -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
