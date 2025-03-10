@@ -1252,52 +1252,65 @@ header {
     /* ... el resto de estilos (fondo semi-transparente, etc.) ... */
   }
   
-  /* Contenedor relativo que envuelve img y flechas */
+  
+
   .lightbox-content-wrapper {
-    position: absolute;
+    position: fixed;
     top: 50%;
     left: 50%;
-    /* Centramos la “caja” en pantalla */
     transform: translate(-50%, -50%);
-    /* Opcional: limitar tamaño para que no desborde la pantalla */
-    max-width: 95%;
-    max-height: 95%;
-    /* Para alinear imagen y flechas uno al lado del otro si gustas,
-       o mantenerlos superpuestos (lo normal en un lightbox) */
-    display: inline-block; 
-  }
-  
-  /* La imagen ocupa el espacio disponible */
-  .lightbox-content {
-    display: block;
+    width: 90vw;  /* Limita el ancho al 90% de la pantalla */
+    height: 90vh; /* Limita la altura al 90% de la pantalla */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden; /* Evita que la imagen se salga */
+}
+
+.lightbox-content {
     max-width: 100%;
     max-height: 100%;
-    object-fit: contain;
-    /* Si tenías margin:auto, quítalo para que el wrapper lo controle */
-  }
-  
-  /* Flechas */
-  .lightbox-arrow {
+    width: auto;
+    height: auto;
+    object-fit: contain; /* Mantiene la proporción sin desbordarse */
+}
+
+
+.lightbox-arrow {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
     font-size: 2rem;
-    color: #fff;
+    color: white;
     padding: 10px;
     border-radius: 50%;
     cursor: pointer;
     user-select: none;
     z-index: 1001;
     transition: background 0.3s;
-  }
-  
-  .lightbox-arrow-left {
-    left: 10px; /* Ajusta según gusto */
-  }
-  
-  .lightbox-arrow-right {
-    right: 10px; /* Ajusta según gusto */
-  }
+    background: rgba(0, 0, 0, 0); /* Fondo semitransparente */
+    width: 40px; /* Tamaño fijo */
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Ajusta la distancia de las flechas con respecto a la imagen */
+.lightbox-arrow-left {
+    left: 5px;  /* Ajusta más cerca del borde */
+}
+
+.lightbox-arrow-right {
+    right: 5px; /* Ajusta más cerca del borde */
+}
+
+/* Efecto hover para mejorar la visibilidad */
+.lightbox-arrow:hover {
+    background: rgba(255, 255, 255, 0.8);
+    color: black;
+}
+
   
   /* Botón de cierre */
   .close {
