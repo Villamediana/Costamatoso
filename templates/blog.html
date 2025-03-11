@@ -59,7 +59,7 @@
                     <img src="{{ url_for('static', filename=articulo['capa']) }}" alt="{{ articulo['titulo'] }}">
                     <div class="contenido-articulo">
                         <h2>{{ articulo['titulo'] }}</h2>
-                        <p>{{ articulo['descricao'] | striptags | truncate(50, True, '...') }}</p>
+                        <p>{{ articulo['descricao'] | striptags | truncate(100, True, '...') }}</p>
                     </div>
                 </a>
             </div>
