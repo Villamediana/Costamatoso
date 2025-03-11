@@ -1,8 +1,0 @@
-nohup: ignoring input
-[2025-03-10 03:14:16 +0000] [1091] [INFO] Starting gunicorn 23.0.0
-[2025-03-10 03:14:16 +0000] [1091] [INFO] Listening at: http://0.0.0.0:8000 (1091)
-[2025-03-10 03:14:16 +0000] [1091] [INFO] Using worker: sync
-[2025-03-10 03:14:16 +0000] [1092] [INFO] Booting worker with pid: 1092
-[2025-03-10 03:14:16 +0000] [1093] [INFO] Booting worker with pid: 1093
-[2025-03-10 03:14:16 +0000] [1094] [INFO] Booting worker with pid: 1094
-[2025-03-10 03:14:16 +0000] [1095] [INFO] Booting worker with pid: 1095
