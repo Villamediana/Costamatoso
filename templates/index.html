@@ -4,12 +4,66 @@
     <meta charset="UTF-8">
     <title>Costamatoso</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
-    <!-- Etiqueta meta para dispositivos móveis -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Vincular ao CSS usando Flask -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    
-    <script type="text/javascript" async src="https://d335luupugsy2.cloudfront.net/js/loader-scripts/e14c28a9-8a58-40cc-911a-e42b3f76a7c5-loader.js" ></script>
+    <script type="text/javascript" async src="https://d335luupugsy2.cloudfront.net/js/loader-scripts/e14c28a9-8a58-40cc-911a-e42b3f76a7c5-loader.js"></script>
+
+    <style>
+        #preloader {
+        position: fixed;
+        z-index: 9999;
+        background: white;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .progress-circle {
+        position: relative;
+        width: 120px;
+        height: 120px;
+    }
+
+    .progress-circle svg {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+    }
+
+    .progress-circle circle {
+        fill: none;
+        stroke-width: 10;
+        r: 50;
+        cx: 60;
+        cy: 60;
+    }
+
+    .progress-circle .bg {
+        stroke: #eee;
+    }
+
+    .progress-circle .progress {
+        stroke: #000;
+        stroke-linecap: round;
+        transition: stroke-dashoffset 0.2s ease;
+    }
+
+    #progress-text {
+        font-size: 14px;
+        font-weight: 300;
+        color: #666;
+        margin-top: -10px;
+    }
+
+    #preloader img {
+        width: 80px;
+        margin-top: 10px;
+    }
+    </style>
 </head>
 <body>
     <!-- Preloader -->
@@ -20,8 +74,10 @@
                 <circle class="progress" cx="60" cy="60" r="50"></circle>
             </svg>
         </div>
+        <div id="progress-text">0%</div>
         <img src="{{ url_for('static', filename='img/logo-preto-png.png') }}" alt="Logo">
     </div>
+    
 
     <!-- Sobreposição para o fundo -->
     <div class="overlay"></div>
@@ -38,28 +94,21 @@
                 <span></span>
             </div>
         </nav>
-        <!-- Menú desplegable -->
         {% include 'fixed/menu.html' %}
     </header>
 
     <!-- Seção de slideshow -->
     <section class="seccion imagem">
-        <!-- Contêiner para as imagens do slideshow -->
-        <!-- Slider Desktop -->
-<div class="slideshow slider-desktop">
-    {% for image in slider_images %}
-        <div class="slide" style="background-image: url('{{ url_for('static', filename=image) }}');"></div>
-    {% endfor %}
-</div>
-
-<!-- Slider Mobile -->
-<div class="slideshow slider-mobile">
-    {% for image in slider_images_mobile %}
-        <div class="slide" style="background-image: url('{{ url_for('static', filename=image) }}');"></div>
-    {% endfor %}
-</div>
-
-
+        <div class="slideshow slider-desktop">
+            {% for image in slider_images %}
+                <div class="slide" style="background-image: url('{{ url_for('static', filename=image) }}');"></div>
+            {% endfor %}
+        </div>
+        <div class="slideshow slider-mobile">
+            {% for image in slider_images_mobile %}
+                <div class="slide" style="background-image: url('{{ url_for('static', filename=image) }}');"></div>
+            {% endfor %}
+        </div>
         <div class="slider-footer">
             <p>Grandes projetos começam com grandes escolhas.</p>
             <hr class="slider-line">
@@ -73,39 +122,70 @@
             <p class="texto-animado" data-texto="{{ second_section.text }}"></p>
         </div>
     </section>
-    
-<!--    <div id="cookie-banner" style="display:none; background:#ccc; padding:10px;">
+
+    <!-- Banner de cookies -->
+    <div id="cookie-banner" style="display:none; background:#ccc; padding:10px;">
         <p>Usamos cookies para melhorar sua experiência.</p>
         <button id="accept-cookies">Aceitar</button>
-    </div>-->
+    </div>
 
     {% include 'fixed/footer.html' %}
-
-    <!-- Vincular ao arquivo JavaScript usando Flask -->
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
     <script>
-        // Script para o preloader
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                var preloader = document.getElementById('preloader');
-                preloader.style.opacity = '0';
-                setTimeout(function() {
-                    preloader.style.display = 'none';
-                }, 1000); // Transição suave antes de remover o preloader
-            }, 3000); // Garante que o preloader apareça por pelo menos 3 segundos
+        // Progresso do preloader com porcentagem
+        const progressText = document.getElementById('progress-text');
+        const progressCircle = document.querySelector('.progress');
+        const totalResources = performance.getEntriesByType("resource").length || 50;
+        let loaded = 0;
+
+        function updateProgress() {
+            let percent = Math.floor((loaded / totalResources) * 100);
+            percent = Math.min(percent, 100);
+            progressText.innerText = percent + "%";
+
+            const radius = 50;
+            const circumference = 2 * Math.PI * radius;
+            const offset = circumference - (percent / 100) * circumference;
+            progressCircle.style.strokeDasharray = circumference;
+            progressCircle.style.strokeDashoffset = offset;
+        }
+
+        window.addEventListener("load", () => {
+            loaded = totalResources;
+            updateProgress();
+
+            const preloader = document.getElementById('preloader');
+            preloader.style.transition = 'opacity 0.8s ease';
+            preloader.style.opacity = '0';
+            setTimeout(() => {
+                preloader.style.display = 'none';
+            }, 800);
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
+        const observer = new PerformanceObserver((list) => {
+            list.getEntries().forEach(() => {
+                loaded++;
+                updateProgress();
+            });
+        });
+        observer.observe({ type: "resource", buffered: true });
+
+        // Banner de cookies
+        document.addEventListener('DOMContentLoaded', function () {
             var cookieBanner = document.getElementById('cookie-banner');
             var cookiesAccepted = localStorage.getItem('cookiesAccepted');
             if (!cookiesAccepted || cookiesAccepted !== 'true') {
                 cookieBanner.style.display = 'block';
             }
-        });
 
-        document.getElementById('accept-cookies').addEventListener('click', function() {
-            localStorage.setItem('cookiesAccepted', 'true');
-            document.getElementById('cookie-banner').style.display = 'none';
+            var btn = document.getElementById('accept-cookies');
+            if (btn) {
+                btn.addEventListener('click', function () {
+                    localStorage.setItem('cookiesAccepted', 'true');
+                    cookieBanner.style.display = 'none';
+                });
+            }
         });
     </script>
 </body>
