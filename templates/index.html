@@ -6,24 +6,104 @@
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
     <!-- Etiqueta meta para dispositivos móveis -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Vincular ao CSS usando Flask -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     
-    <script type="text/javascript" async src="https://d335luupugsy2.cloudfront.net/js/loader-scripts/e14c28a9-8a58-40cc-911a-e42b3f76a7c5-loader.js" ></script>
+    <!-- Arquivo CSS principal -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Ajustes específicos para o preloader (inline) -->
+    <style>
+      /* Preloader: tela inteira, centralizado em coluna */
+      #preloader {
+        position: fixed; 
+        top: 0; 
+        left: 0;
+        width: 100%; 
+        height: 100%;
+        background-color: rgba(192, 192, 192, 1);
+        z-index: 2000;
+        display: flex; 
+        flex-direction: column; 
+        align-items: center; 
+        justify-content: center;
+        transition: opacity 1s ease;
+      }
+
+      /* Círculo de loading + logo dentro */
+      .progress-circle {
+        position: relative; 
+        width: 120px; 
+        height: 120px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .progress-circle svg {
+        width: 100%;
+        height: 100%;
+      }
+
+      /* Círculos (fundo e progresso) */
+      .progress-circle circle {
+        fill: none;
+        stroke-width: 4;
+        stroke-linecap: round;
+        transform: rotate(-90deg);
+        transform-origin: 50% 50%;
+      }
+      .progress-circle .bg {
+        stroke: rgba(255, 255, 255, 0.2);
+      }
+      .progress-circle .progress {
+        stroke: #FFFFFF;
+        stroke-dasharray: 314;
+        stroke-dashoffset: 314;
+        animation: loadCircle 3s cubic-bezier(0.25, 0.1, 0.25, 1) forwards;
+      }
+
+      @keyframes loadCircle {
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
+
+      /* Logo dentro do círculo, centralizado */
+      .logo-inside-circle {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 50px;  /* Ajuste conforme necessidade */
+        height: auto;
+      }
+
+      /* Texto “carregando site” abaixo do círculo */
+      .loading-text {
+        margin-top: 8px;
+        font-size: 14px;
+        color: #333;
+        text-align: center;
+      }
+    </style>
 </head>
 <body>
     <!-- Preloader -->
-
     <div id="preloader">
         <div class="progress-circle">
             <svg>
                 <circle class="bg" cx="60" cy="60" r="50"></circle>
                 <circle class="progress" cx="60" cy="60" r="50"></circle>
             </svg>
+            <!-- Logo no centro do círculo -->
+            <img 
+                src="{{ url_for('static', filename='img/logo-preto-png.png') }}" 
+                alt="Logo" 
+                class="logo-inside-circle"
+            >
         </div>
-        <img src="{{ url_for('static', filename='img/logo-preto-png.png') }}" alt="Logo">
+        <!-- Texto abaixo do círculo -->
+        <p class="loading-text">Carregando site</p>
     </div>
-    
 
     <!-- Sobreposição para o fundo -->
     <div class="overlay"></div>
@@ -32,7 +112,9 @@
     <header class="header-white">
         <nav class="navbar">
             <div class="logo">
-                <a href="{{ url_for('index') }}"><img src="{{ url_for('static', filename='img/Logo_branco_novo.png') }}" alt="Logo"></a>
+                <a href="{{ url_for('index') }}">
+                    <img src="{{ url_for('static', filename='img/Logo_branco_novo.png') }}" alt="Logo">
+                </a>
             </div>
             <div class="menu-icon">
                 <span></span>
@@ -40,27 +122,24 @@
                 <span></span>
             </div>
         </nav>
-        <!-- Menú desplegable -->
         {% include 'fixed/menu.html' %}
     </header>
 
     <!-- Seção de slideshow -->
     <section class="seccion imagem">
-        <!-- Contêiner para as imagens do slideshow -->
         <!-- Slider Desktop -->
-<div class="slideshow slider-desktop">
-    {% for image in slider_images %}
-        <div class="slide" style="background-image: url('{{ url_for('static', filename=image) }}');"></div>
-    {% endfor %}
-</div>
+        <div class="slideshow slider-desktop">
+            {% for image in slider_images %}
+                <div class="slide" style="background-image: url('{{ url_for('static', filename=image) }}');"></div>
+            {% endfor %}
+        </div>
 
-<!-- Slider Mobile -->
-<div class="slideshow slider-mobile">
-    {% for image in slider_images_mobile %}
-        <div class="slide" style="background-image: url('{{ url_for('static', filename=image) }}');"></div>
-    {% endfor %}
-</div>
-
+        <!-- Slider Mobile -->
+        <div class="slideshow slider-mobile">
+            {% for image in slider_images_mobile %}
+                <div class="slide" style="background-image: url('{{ url_for('static', filename=image) }}');"></div>
+            {% endfor %}
+        </div>
 
         <div class="slider-footer">
             <p>Grandes projetos começam com grandes escolhas.</p>
@@ -76,25 +155,31 @@
         </div>
     </section>
     
-<!--    <div id="cookie-banner" style="display:none; background:#ccc; padding:10px;">
+    <!-- Banner de Cookies (opcional) -->
+    <!--
+    <div id="cookie-banner" style="display:none; background:#ccc; padding:10px;">
         <p>Usamos cookies para melhorar sua experiência.</p>
         <button id="accept-cookies">Aceitar</button>
-    </div>-->
+    </div>
+    -->
 
     {% include 'fixed/footer.html' %}
 
-    <!-- Vincular ao arquivo JavaScript usando Flask -->
+    <!-- JS do Flask -->
     <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+    <!-- Script para o preloader (3s mínimo) -->
     <script>
-
         window.addEventListener('load', function() {
-            var preloader = document.getElementById('preloader');
-            preloader.style.opacity = '0';
-            setTimeout(function() {
-                preloader.style.display = 'none';
-            }, 1000);
-        });
+    var preloader = document.getElementById('preloader');
+    preloader.style.opacity = '0';
+    setTimeout(function() {
+        preloader.style.display = 'none';
+    }, 1000);
+});
 
+
+        // Banner de cookies
         document.addEventListener('DOMContentLoaded', function() {
             var cookieBanner = document.getElementById('cookie-banner');
             var cookiesAccepted = localStorage.getItem('cookiesAccepted');
