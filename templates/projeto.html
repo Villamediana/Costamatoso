@@ -1,83 +1,109 @@
 <!DOCTYPE html>
 <html lang="pt">
 <head>
-    <title>{{ nome_categoria.replace('_', ' ') }} - Costamatoso</title>
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
-    <!-- Vincular ao CSS usando Flask -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <!-- Etiqueta meta para dispositivos móveis -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Vincular a Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <!-- Puedes cambiar 'Roboto' por 'Open Sans' si lo prefieres -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
-    <!-- Vincular al CSS usando Flask -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <script type="text/javascript" async src="https://d335luupugsy2.cloudfront.net/js/loader-scripts/e14c28a9-8a58-40cc-911a-e42b3f76a7c5-loader.js" ></script>
-    <!-- ... otras etiquetas ... -->
+  <title>{{ nome_categoria.replace('_', ' ') }} – Costamatoso</title>
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  {# ▸ preload das 4 primeiras capas #}
+  {% for p in projetos[:4] %}
+    <link rel="preload" as="image" href="{{ p.capa_url }}">
+  {% endfor %}
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+
+  <!-- Hotjar / script externo do cliente (mantido) -->
+  <script async src="https://d335luupugsy2.cloudfront.net/js/loader-scripts/e14c28a9-8a58-40cc-911a-e42b3f76a7c5-loader.js"></script>
+
+  <style>
+    /* SPINNER BOLINHA --------------------------------------------------- */
+    .placeholder{
+      position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+      background:#f3f3f3;
+    }
+    .loader{
+      width:20px;height:20px;border:3px solid #aaa;border-top-color:#333;border-radius:50%;
+      animation:spin 1s linear infinite;
+    }
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .imagem-galeria{position:relative;overflow:hidden}
+    .imagem-galeria img{width:100%;height:auto;display:block;transition:opacity .3s}
+  </style>
 </head>
 <body>
-    <!-- Sobreposição para o fundo -->
-    <div class="overlay"></div>
+  <div class="overlay"></div>
 
-    <!-- Menú de navegação -->
-    <header class="header-white">
-        <nav class="navbar">
-            <div class="logo ocultar-logo">
-                <a href="{{ url_for('index') }}">
-                    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo">
-                </a>
-            </div>
-            <div class="menu-icon">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </nav>
-        <!-- Menú desplegable -->
-        {% include 'fixed/menu.html' %}
-    </header>
+  <!-- NAV -->
+  <header class="header-white">
+    <nav class="navbar">
+      <div class="logo ocultar-logo">
+        <a href="{{ url_for('index') }}">
+          <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo">
+        </a>
+      </div>
+      <div class="menu-icon"><span></span><span></span><span></span></div>
+    </nav>
+    {% include 'fixed/menu.html' %}
+  </header>
 
-    <!-- Seção de imagem de cabeçalho -->
-    <section class="seccion imagem-cabecalho">
-        <div class="cabecalho">
-            <img src="{{ url_for('static', filename='img/projetos/' ~ nome_categoria ~ '/capa.jpg') }}" alt="{{ nome_categoria.replace('_', ' ') }}">
-            <div class="overlay-cabecalho"></div>
-            <div class="texto-cabecalho">
-                <h1>{{ nome_categoria.replace('_', ' ') }}</h1>
+  <!-- CAPA DA CATEGORIA ----------------------------------------------- -->
+  <section class="seccion imagem-cabecalho">
+    <div class="cabecalho">
+      <img src="{{ url_for('static', filename='img/projetos/' ~ nome_categoria ~ '/capa.jpg') }}"
+           alt="{{ nome_categoria.replace('_', ' ') }}">
+      <div class="overlay-cabecalho"></div>
+      <div class="texto-cabecalho"><h1>{{ nome_categoria.replace('_', ' ') }}</h1></div>
+    </div>
+  </section>
+
+  <!-- GALERIA ---------------------------------------------------------- -->
+  <section class="seccion galeria">
+    <div class="container-galeria">
+      {% for projeto in projetos %}
+        <div class="imagem-galeria">
+          <a href="{{ url_for('detalhe_projeto', nome_categoria=nome_categoria, nome_projeto=projeto.nome) }}">
+            <div class="placeholder"><div class="loader"></div></div>
+            <img src="{{ projeto.capa_url }}"
+                 loading="lazy"
+                 alt="{{ projeto.nome }}"
+                 class="imagem-animada">
+            <div class="info-imagem">
+              <div class="nome-obra">{{ projeto.nome.replace('_', ' ') }}</div>
+              <div class="medidas-obra"><i class="fas fa-ruler-combined"></i> {{ projeto.medidas }}</div>
             </div>
+          </a>
         </div>
-    </section>
+      {% endfor %}
+    </div>
+  </section>
 
-    <!-- Sección de galería -->
-    <section class="seccion galeria">
-        <!-- Contêiner de imágenes -->
-        <div class="container-galeria">
-            {% for projeto in projetos %}
-                <div class="imagem-galeria">
-                    <a href="{{ url_for('detalhe_projeto', nome_categoria=nome_categoria, nome_projeto=projeto.nome) }}">
-                        <img src="{{ projeto.capa_url }}" loading="lazy" alt="{{ projeto.nome }}" class="imagem-animada">
-                        <div class="info-imagem">
-                            <div class="nome-obra">
-                                {{ projeto.nome.replace('_', ' ') }}
-                            </div>
-                            <div class="medidas-obra">
-                                <i class="fas fa-ruler-combined"></i> {{ projeto.medidas }}
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            {% endfor %}
-        </div>
-    </section>
-    
+  {% include 'fixed/footer.html' %}
 
-    <!-- Footer -->
-    {% include 'fixed/footer.html' %}
+  <!-- JS --------------------------------------------------------------- -->
+  <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
 
-
-    <!-- Vincular ao arquivo JavaScript usando Flask -->
-    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  <script>
+    /* remove placeholder quando a imagem carrega ou falha */
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.imagem-galeria img').forEach(img => {
+        const done = () => {
+          const ph = img.parentElement.querySelector('.placeholder');
+          if (ph) ph.remove();
+          img.style.opacity = 1;
+        };
+        if (img.complete) done();
+        else{
+          img.addEventListener('load', done);
+          img.addEventListener('error', done);
+        }
+      });
+    });
+  </script>
 </body>
 </html>
