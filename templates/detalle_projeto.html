@@ -9,11 +9,12 @@
   <!-- seu CSS global -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-  {# preload das 4 primeiras imagens #}
+  {# preload das 4 primeiras imagens do mosaico #}
   {% for item in imagens[:4] if item.tipo == 'imagen' %}
     <link rel="preload" as="image" href="{{ item.url }}">
   {% endfor %}
 
+  <!-- libs externas mantidas -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
   <script async src="https://d335luupugsy2.cloudfront.net/js/loader-scripts/e14c28a9-8a58-40cc-911a-e42b3f76a7c5-loader.js"></script>
 </head>
@@ -33,8 +34,9 @@
   <!-- cabeçalho -->
   <section class="seccion imagem-cabecalho">
     <div class="cabecalho cabecalho-desktop">
-      <img src="{{ url_for('static', filename='img/projetos/' ~ nome_categoria ~ '/' ~ nome_projeto ~ '/capa.jpg') }}"
-           alt="{{ nome_projeto.replace('_', ' ') }}">
+      <img
+        src="{{ url_for('static', filename='img/projetos/' ~ nome_categoria ~ '/' ~ nome_projeto ~ '/capa.jpg') }}"
+        alt="{{ nome_projeto.replace('_', ' ') }}">
       <div class="overlay-cabecalho"></div>
       <div class="texto-cabecalho">
         <h1>{{ nome_projeto.replace('_', ' ') }}</h1>
@@ -53,24 +55,26 @@
     </div>
   </div>
 
-  <!-- galeria -->
+  <!-- galeria / mosaico -->
   <section class="seccion galeria-imagenes">
     <div class="container-mosaico">
       {% for item in imagens %}
         <div class="item-mosaico {% if item.tipo == 'imagen' %}{{ item.clase }}{% endif %}">
           {% if item.tipo == 'imagen' %}
             {% if loop.index0 < 4 %}
+              <!-- primeiras 4: carregam imediatamente -->
               <img
                 src="{{ item.url }}"
                 alt="{{ nome_projeto.replace('_', ' ') }}"
-                class="imagem-animada lazy-img"
+                class="lazy-img imagem-animada"
                 onclick="openLightbox('{{ item.url }}')">
             {% else %}
+              <!-- demais: lazy + spinner -->
               <img
                 data-src="{{ item.url }}"
                 loading="lazy"
                 alt="{{ nome_projeto.replace('_', ' ') }}"
-                class="imagem-animada lazy-img"
+                class="lazy-img imagem-animada"
                 onclick="openLightbox('{{ item.url }}')">
             {% endif %}
           {% else %}
@@ -86,27 +90,29 @@
 
   {% include 'fixed/footer.html' %}
 
+  <!-- seu JS principal -->
   <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
 
+  <!-- spinner via JS (mesmo padrão de antes) -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // insere keyframes do spinner
-      const style = document.createElement('style');
-      style.textContent = '@keyframes spinnerRotate { to { transform: rotate(360deg); } }';
-      document.head.appendChild(style);
+      // insere keyframes uma vez
+      const sf = document.createElement('style');
+      sf.textContent = '@keyframes sp-spin{to{transform:rotate(360deg)}}';
+      document.head.appendChild(sf);
 
       const imgs = document.querySelectorAll('img.lazy-img');
 
-      // adiciona overlay + spinner em todas as imagens
       imgs.forEach(img => {
-        const overlay = document.createElement('div');
-        Object.assign(overlay.style, {
+        // cria overlay transparente + spinner
+        const ov = document.createElement('div');
+        Object.assign(ov.style, {
           position: 'absolute',
           inset: '0',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'transparent',
+          background: '#f3f3f3',
           pointerEvents: 'none'
         });
 
@@ -117,17 +123,17 @@
           border: '3px solid #aaa',
           borderTopColor: '#333',
           borderRadius: '50%',
-          animation: 'spinnerRotate 1s linear infinite'
+          animation: 'sp-spin 1s linear infinite'
         });
-        overlay.appendChild(spinner);
+        ov.appendChild(spinner);
 
         const parent = img.parentElement;
         parent.style.position = 'relative';
-        parent.prepend(overlay);
+        parent.prepend(ov);
 
-        img._removeSpinner = () => overlay.remove();
+        img._removeSpinner = () => ov.remove();
 
-        // se já carregou (4 primeiras), remove imediatamente
+        // se já carregou (4 primeiras)
         if (img.complete && img.src) {
           img._removeSpinner();
         } else {
@@ -136,16 +142,21 @@
         }
       });
 
-      // lazy-load para imagens com data-src
-      const lazy = Array.from(imgs).filter(img => img.dataset.src);
+      // lazy-load para o restante
+      const lazy = Array.from(imgs).filter(i => i.dataset.src);
       if (!('IntersectionObserver' in window)) {
-        lazy.forEach(img => { img.src = img.dataset.src; });
+        lazy.forEach(img => {
+          img.src = img.dataset.src;
+          img.onload = img.onerror = img._removeSpinner;
+          img.removeAttribute('data-src');
+        });
         return;
       }
+
       const io = new IntersectionObserver((entries, obs) => {
-        entries.forEach(entry => {
-          if (!entry.isIntersecting) return;
-          const img = entry.target;
+        entries.forEach(e => {
+          if (!e.isIntersecting) return;
+          const img = e.target;
           img.src = img.dataset.src;
           img.onload = img.onerror = () => {
             img._removeSpinner();
@@ -154,6 +165,7 @@
           obs.unobserve(img);
         });
       }, { rootMargin: '200px' });
+
       lazy.forEach(img => io.observe(img));
     });
   </script>
