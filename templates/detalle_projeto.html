@@ -6,7 +6,7 @@
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- CSS global -->
+  <!-- seu CSS global -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
   {# preload das 4 primeiras imagens #}
@@ -60,17 +60,18 @@
         <div class="item-mosaico {% if item.tipo == 'imagen' %}{{ item.clase }}{% endif %}">
           {% if item.tipo == 'imagen' %}
             {% if loop.index0 < 4 %}
-              <img src="{{ item.url }}"
-                   alt="{{ nome_projeto.replace('_', ' ') }}"
-                   {% if loop.index0 == 0 %}fetchpriority="high"{% endif %}
-                   onclick="openLightbox('{{ item.url }}')">
+              <img
+                src="{{ item.url }}"
+                alt="{{ nome_projeto.replace('_', ' ') }}"
+                class="imagem-animada lazy-img"
+                onclick="openLightbox('{{ item.url }}')">
             {% else %}
-              <!-- apenas spinner enquanto carrega -->
-              <img data-src="{{ item.url }}"
-                   loading="lazy"
-                   class="lazy-image"
-                   alt="{{ nome_projeto.replace('_', ' ') }}"
-                   onclick="openLightbox('{{ item.url }}')">
+              <img
+                data-src="{{ item.url }}"
+                loading="lazy"
+                alt="{{ nome_projeto.replace('_', ' ') }}"
+                class="imagem-animada lazy-img"
+                onclick="openLightbox('{{ item.url }}')">
             {% endif %}
           {% else %}
             <video autoplay muted loop class="lazy-video">
@@ -87,57 +88,73 @@
 
   <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
 
-  <!-- Lazy‑load + spinner -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      /* keyframes para spinner */
+      // insere keyframes do spinner
       const style = document.createElement('style');
-      style.textContent = '@keyframes spn{to{transform:rotate(360deg)}}';
+      style.textContent = '@keyframes spinnerRotate { to { transform: rotate(360deg); } }';
       document.head.appendChild(style);
 
-      const lazyImgs = document.querySelectorAll('img.lazy-image');
+      const imgs = document.querySelectorAll('img.lazy-img');
 
-      function addSpinner(img) {
-        const cover = document.createElement('div');
-        Object.assign(cover.style, {
-          position:'absolute',inset:0,display:'flex',
-          alignItems:'center',justifyContent:'center',
-          background:'transparent',pointerEvents:'none'
+      // adiciona overlay + spinner em todas as imagens
+      imgs.forEach(img => {
+        const overlay = document.createElement('div');
+        Object.assign(overlay.style, {
+          position: 'absolute',
+          inset: '0',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'transparent',
+          pointerEvents: 'none'
         });
-        const ball = document.createElement('div');
-        Object.assign(ball.style, {
-          width:'20px',height:'20px',
-          border:'3px solid #aaa',borderTopColor:'#333',
-          borderRadius:'50%',animation:'spn 1s linear infinite'
+
+        const spinner = document.createElement('div');
+        Object.assign(spinner.style, {
+          width: '20px',
+          height: '20px',
+          border: '3px solid #aaa',
+          borderTopColor: '#333',
+          borderRadius: '50%',
+          animation: 'spinnerRotate 1s linear infinite'
         });
-        cover.appendChild(ball);
+        overlay.appendChild(spinner);
+
         const parent = img.parentElement;
-        parent.style.position='relative';
-        parent.prepend(cover);
-        return () => cover.remove();
-      }
+        parent.style.position = 'relative';
+        parent.prepend(overlay);
 
+        img._removeSpinner = () => overlay.remove();
+
+        // se já carregou (4 primeiras), remove imediatamente
+        if (img.complete && img.src) {
+          img._removeSpinner();
+        } else {
+          img.addEventListener('load', img._removeSpinner);
+          img.addEventListener('error', img._removeSpinner);
+        }
+      });
+
+      // lazy-load para imagens com data-src
+      const lazy = Array.from(imgs).filter(img => img.dataset.src);
       if (!('IntersectionObserver' in window)) {
-        lazyImgs.forEach(img => img.src = img.dataset.src);
+        lazy.forEach(img => { img.src = img.dataset.src; });
         return;
       }
-
       const io = new IntersectionObserver((entries, obs) => {
-        entries.forEach(e => {
-          if (e.isIntersecting) {
-            const img = e.target;
-            const rmSpinner = addSpinner(img);
-            img.src = img.dataset.src;
-            img.onload = img.onerror = () => {
-              img.removeAttribute('data-src');
-              rmSpinner();
-            };
-            obs.unobserve(img);
-          }
+        entries.forEach(entry => {
+          if (!entry.isIntersecting) return;
+          const img = entry.target;
+          img.src = img.dataset.src;
+          img.onload = img.onerror = () => {
+            img._removeSpinner();
+            img.removeAttribute('data-src');
+          };
+          obs.unobserve(img);
         });
-      }, { rootMargin:'200px' });
-
-      lazyImgs.forEach(img => io.observe(img));
+      }, { rootMargin: '200px' });
+      lazy.forEach(img => io.observe(img));
     });
   </script>
 </body>
