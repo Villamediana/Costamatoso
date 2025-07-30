@@ -6,22 +6,20 @@
   <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- seu CSS global -->
+  <!-- CSS global -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-  {# preload das 4 primeiras imagens do mosaico #}
+  {# preload das 4 primeiras imagens #}
   {% for item in imagens[:4] if item.tipo == 'imagen' %}
     <link rel="preload" as="image" href="{{ item.url }}">
   {% endfor %}
 
-  <!-- libs externas mantidas -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
   <script async src="https://d335luupugsy2.cloudfront.net/js/loader-scripts/e14c28a9-8a58-40cc-911a-e42b3f76a7c5-loader.js"></script>
 </head>
 <body>
   <div class="overlay"></div>
 
-  <!-- NAV -->
   <header class="header-white">
     <nav class="navbar">
       <div class="logo ocultar-logo">
@@ -32,7 +30,7 @@
     {% include 'fixed/menu.html' %}
   </header>
 
-  <!-- cabeçalho do projeto -->
+  <!-- cabeçalho -->
   <section class="seccion imagem-cabecalho">
     <div class="cabecalho cabecalho-desktop">
       <img src="{{ url_for('static', filename='img/projetos/' ~ nome_categoria ~ '/' ~ nome_projeto ~ '/capa.jpg') }}"
@@ -41,13 +39,11 @@
       <div class="texto-cabecalho">
         <h1>{{ nome_projeto.replace('_', ' ') }}</h1>
         <span>{{ tipo.replace('_', ' ') }}</span>
-        <!-- grid de info (inalterado) -->
-        <!-- … -->
       </div>
     </div>
   </section>
 
-  <!-- LIGHTBOX (inalterado) -->
+  <!-- lightbox -->
   <div id="lightbox" class="lightbox">
     <div id="lightbox-content-wrapper" class="lightbox-content-wrapper">
       <span class="close" id="close-btn">&times;</span>
@@ -57,29 +53,26 @@
     </div>
   </div>
 
-  <!-- GALERIA / MOSAICO ------------------------------------------------- -->
+  <!-- galeria -->
   <section class="seccion galeria-imagenes">
     <div class="container-mosaico">
       {% for item in imagens %}
         <div class="item-mosaico {% if item.tipo == 'imagen' %}{{ item.clase }}{% endif %}">
           {% if item.tipo == 'imagen' %}
             {% if loop.index0 < 4 %}
-              <!-- primeiras 4 já vêm direto -->
               <img src="{{ item.url }}"
                    alt="{{ nome_projeto.replace('_', ' ') }}"
                    {% if loop.index0 == 0 %}fetchpriority="high"{% endif %}
                    onclick="openLightbox('{{ item.url }}')">
             {% else %}
-              <!-- restante com placeholder e lazy -->
-              <img src="{{ url_for('static', filename='img/placeholder.webp') }}"
-                   data-src="{{ item.url }}"
+              <!-- apenas spinner enquanto carrega -->
+              <img data-src="{{ item.url }}"
                    loading="lazy"
                    class="lazy-image"
                    alt="{{ nome_projeto.replace('_', ' ') }}"
                    onclick="openLightbox('{{ item.url }}')">
             {% endif %}
           {% else %}
-            <!-- vídeo permanece igual -->
             <video autoplay muted loop class="lazy-video">
               <source src="{{ item.url }}" type="video/mp4">
               Seu navegador não suporta vídeo.
@@ -90,66 +83,59 @@
     </div>
   </section>
 
-  <!-- DESCUBRA MAIS (inalterado) -->
-  <section class="seccion descubra-projetos">
-    <!-- … -->
-  </section>
-
   {% include 'fixed/footer.html' %}
 
   <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
 
-  <!-- Lazy‑load + spinner via JS (sem novo CSS) ------------------------- -->
+  <!-- Lazy‑load + spinner -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
       /* keyframes para spinner */
-      const st = document.createElement('style');
-      st.textContent = '@keyframes spn{to{transform:rotate(360deg)}}';
-      document.head.appendChild(st);
+      const style = document.createElement('style');
+      style.textContent = '@keyframes spn{to{transform:rotate(360deg)}}';
+      document.head.appendChild(style);
 
       const lazyImgs = document.querySelectorAll('img.lazy-image');
 
-      /* cria spinner sobre imagem */
       function addSpinner(img) {
-        const wrap = document.createElement('div');
-        Object.assign(wrap.style, {
+        const cover = document.createElement('div');
+        Object.assign(cover.style, {
           position:'absolute',inset:0,display:'flex',
           alignItems:'center',justifyContent:'center',
-          background:'#f3f3f3',pointerEvents:'none'
+          background:'transparent',pointerEvents:'none'
         });
-        const sp = document.createElement('div');
-        Object.assign(sp.style, {
+        const ball = document.createElement('div');
+        Object.assign(ball.style, {
           width:'20px',height:'20px',
           border:'3px solid #aaa',borderTopColor:'#333',
           borderRadius:'50%',animation:'spn 1s linear infinite'
         });
-        wrap.appendChild(sp);
+        cover.appendChild(ball);
         const parent = img.parentElement;
-        parent.style.position = 'relative';
-        parent.prepend(wrap);
-        return () => wrap.remove();
+        parent.style.position='relative';
+        parent.prepend(cover);
+        return () => cover.remove();
       }
 
-      /* fallback simples caso IntersectionObserver não exista */
       if (!('IntersectionObserver' in window)) {
-        lazyImgs.forEach(img => { img.src = img.dataset.src; });
+        lazyImgs.forEach(img => img.src = img.dataset.src);
         return;
       }
 
       const io = new IntersectionObserver((entries, obs) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            const img = entry.target;
-            const remove = addSpinner(img);
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            const img = e.target;
+            const rmSpinner = addSpinner(img);
             img.src = img.dataset.src;
             img.onload = img.onerror = () => {
               img.removeAttribute('data-src');
-              remove();
+              rmSpinner();
             };
             obs.unobserve(img);
           }
         });
-      }, { rootMargin: '200px' });
+      }, { rootMargin:'200px' });
 
       lazyImgs.forEach(img => io.observe(img));
     });
