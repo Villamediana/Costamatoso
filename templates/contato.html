@@ -2,55 +2,54 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <title>Contato - Costamatoso</title>
+    <title>Contato ‑ Costamatoso</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='img/logo.png') }}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <!-- Vincular al archivo JavaScript que maneja el menú -->
-<script src="{{ url_for('static', filename='js/script.js') }}"></script>
-<script type="text/javascript" async src="https://d335luupugsy2.cloudfront.net/js/loader-scripts/e14c28a9-8a58-40cc-911a-e42b3f76a7c5-loader.js" ></script>
 
+    <!-- CSS principal -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Notyf CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+
+    <!-- JavaScript do menu -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+    <script async src="https://d335luupugsy2.cloudfront.net/js/loader-scripts/e14c28a9-8a58-40cc-911a-e42b3f76a7c5-loader.js"></script>
+
+    <!-- Notyf JS -->
+    <script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
 </head>
 <body>
-   
-        <!-- Sobreposición para el fondo -->
-        <div class="overlay"></div>
+    <!-- Sobreposição para o fundo -->
+    <div class="overlay"></div>
 
-        <!-- Menú de navegación -->
-        <header class="header-white">
-            <nav class="navbar">
-                <div class="logo ocultar-logo">
-                    <a href="#"><img src="{{ url_for('static', filename='img/logo-preto-png.png') }}" alt="Logo"></a>
-                </div>
-                <div class="menu-icon">
-                    <span></span>
-                    <span></span>
-                    <span></span>
-                </div>
-            </nav>
-            <!-- Menú desplegable -->
-            {% include 'fixed/menu.html' %}
-        </header>
+    <!-- Cabeçalho / menu -->
+    <header class="header-white">
+        <nav class="navbar">
+            <div class="logo ocultar-logo">
+                <a href="#"><img src="{{ url_for('static', filename='img/logo-preto-png.png') }}" alt="Logo"></a>
+            </div>
+            <div class="menu-icon"><span></span><span></span><span></span></div>
+        </nav>
+        {% include 'fixed/menu.html' %}
+    </header>
 
-        <!-- Seção de imagem de cabeçalho -->
+    <!-- Imagem de cabeçalho -->
     <section class="seccion imagem-cabecalho">
         <div class="cabecalho">
             <img src="{{ url_for('static', filename='img/time.jpg') }}" alt="Contato">
             <div class="overlay-cabecalho"></div>
-            <div class="texto-cabecalho">
-                <h1>Entre em contato</h1>
-            </div>
+            <div class="texto-cabecalho"><h1>Entre em contato</h1></div>
         </div>
     </section>
 
-    <!-- Sección de contacto -->
+    <!-- Seção de contato -->
     <section class="seccion-contato">
-        
         <div class="contato-background">
-            
             <div class="contato-container">
-                
-                <p>Será um prazer atendê-lo e transformar seu projeto em realidade!</p>
+                <p>Será um prazer atendê‑lo e transformar seu projeto em realidade!</p>
+
+                <!-- redes sociais -->
                 <div class="contato-redes">
                     <!-- Íconos en SVG -->
                     <a href="https://www.instagram.com/costamatosoarquitetura/" target="_blank">
@@ -70,11 +69,10 @@
                     </a>
                 </div>
 
-                <!-- Formulario de contacto -->
                 <form class="form-contato" action="{{ url_for('contato') }}" method="POST">
-                    <input type="text" name="nome" placeholder="Nome" required>
-                    <input type="tel" id="telefone" placeholder="Telefone" required>
-                    <input type="email" name="email" placeholder="E-mail" required>
+                    <input type="text"  name="nome"      placeholder="Nome"    required>
+                    <input type="tel"   name="telefone"  id="telefone" placeholder="Telefone" required>
+                    <input type="email" name="email"     placeholder="E‑mail"  required>
                     <select name="proyecto" required>
                         <option disabled selected>Possui terreno ou imóvel para o nosso projeto?</option>
                         <option>Sim, tenho um terreno e desejo construir.</option>
@@ -83,14 +81,29 @@
                     </select>
                     <button type="submit">ENVIAR</button>
                 </form>
-                
-                
-                <!-- Texto de trabajo -->
-                <p class="contato-trabalhe">Trabalhe conosco! envie seu currículo ou portifólio para contato@costamatoso.com.br</p>
+
+                <p class="contato-trabalhe">
+                    Trabalhe conosco! envie seu currículo ou portifólio para contato@costamatoso.com.br
+                </p>
             </div>
         </div>
     </section>
 
     {% include 'fixed/footer.html' %}
+
+    {% with msgs = get_flashed_messages(with_categories=true) %}
+      {% if msgs %}
+        <script>
+          document.addEventListener('DOMContentLoaded', function(){
+            const notyf = new Notyf();
+            {% if msgs[0][0] == 'erro' %}
+              notyf.error("{{ msgs[0][1] }}");
+            {% else %}
+              notyf.success("{{ msgs[0][1] }}");
+            {% endif %}
+          });
+        </script>
+      {% endif %}
+    {% endwith %}
 </body>
 </html>

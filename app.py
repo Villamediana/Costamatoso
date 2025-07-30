@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
-import os, json, datetime, shutil,uuid
+import os, json, shutil,uuid
+from datetime import datetime
 from flask_mail import Mail, Message
 from werkzeug.utils import secure_filename
 
@@ -112,7 +113,6 @@ def login():
 
 
 # Ruta para cada categoría
-from datetime import datetime
 @app.route('/categoria/<nome_categoria>')
 def categoria(nome_categoria):
     # Ruta a la categoría
@@ -274,86 +274,64 @@ def detalhe_projeto(nome_categoria, nome_projeto):
 
 @app.route('/contato', methods=['GET', 'POST'])
 def contato():
+    # ── dados fixos da página ─────────────────────────────────────────
     json_path = os.path.join(app.static_folder, 'data', 'data.json')
-
-    # Cargar los datos del JSON
     try:
         with open(json_path, 'r', encoding='utf-8') as json_file:
             data = json.load(json_file)
     except Exception as e:
-        print(f"Error al cargar el JSON: {e}")
+        print(f"Erro ao carregar data.json: {e}")
         data = {}
 
-    # Obtener las imágenes del slider y el contenido de la segunda sección
-    contato_image = data['contato_image']
+    contato_image = data.get('contato_image', 'img/default.jpg')  # evita KeyError
 
-    # Obtener los ítems del submenú dinámicamente (categorías)
     projetos_path = os.path.join(app.static_folder, 'img', 'projetos')
-    submenu_items = []
-    if os.path.exists(projetos_path):
-        submenu_items = [name for name in os.listdir(projetos_path) if os.path.isdir(os.path.join(projetos_path, name))]
-        submenu_items.sort()  # Opcional: ordenar alfabéticamente
+    submenu_items = sorted(
+        [n for n in os.listdir(projetos_path)
+         if os.path.isdir(os.path.join(projetos_path, n))]
+    ) if os.path.exists(projetos_path) else []
 
+    # ── formulário ────────────────────────────────────────────────────
     if request.method == 'POST':
-        # Obtener los datos del formulario
-        nome = request.form.get('nome')
-        telefone = request.form.get('telefone')
-        email = request.form.get('email')
-        proyecto = request.form.get('proyecto')
+        nome      = request.form.get('nome')
+        telefone  = request.form.get('telefone')
+        email     = request.form.get('email')
+        proyecto  = request.form.get('proyecto')
 
-        # Crear el mensaje de correo
-        #msg = Message('Novo contato de {}'.format(nome), recipients=['miguel.villamediana@outlook.com'])  # El destinatario del correo
-        #msg.body = f"""
-        #Novo contato recebido:
-        #Nome: {nome}
-        #Telefone: {telefone}
-        #E-mail: {email}
-        #Projeto: {proyecto}
-        #"""
+        submissions_file = os.path.join(app.static_folder, 'data',
+                                        'contact_submissions.json')
 
-        # Enviar el correo
-        #try:
-        #    mail.send(msg)
-        #    return redirect(url_for('contato'))  # Redirigir de vuelta a la página de contacto
-        #except Exception as e:
-        #    print(f'Ocorreu um erro ao enviar o e-mail: {str(e)}')
-        #    return redirect(url_for('contato'))  # Redirigir de vuelta a la página de contacto incluso si hay un error
-
-        # Nueva lógica para guardar en un archivo JSON
-        submissions_file = os.path.join(app.static_folder, 'data', 'contact_submissions.json')
-
-        # Intentar cargar las solicitudes existentes, o crear una lista vacía si el archivo no existe
         try:
             with open(submissions_file, 'r', encoding='utf-8') as f:
                 submissions = json.load(f)
-        except Exception as e:
-            print(f"Error al cargar las solicitudes: {e}")
+        except Exception:
             submissions = []
 
-        # Crear un nuevo registro de contacto con la fecha actual
-        new_entry = {
+        submissions.append({
             "nome": nome,
             "telefone": telefone,
             "email": email,
             "proyecto": proyecto,
-            "fecha": datetime.datetime.now().isoformat()
-        }
+            "fecha": datetime.now().isoformat()
+        })
 
-        # Agregar la nueva solicitud a la lista
-        submissions.append(new_entry)
-
-        # Guardar la lista actualizada en el archivo JSON
         try:
-            # Asegurarse de que la carpeta existe
-            submissions_folder = os.path.dirname(submissions_file)
-            os.makedirs(submissions_folder, exist_ok=True)
+            os.makedirs(os.path.dirname(submissions_file), exist_ok=True)
             with open(submissions_file, 'w', encoding='utf-8') as f:
                 json.dump(submissions, f, ensure_ascii=False, indent=4)
-            print("Solicitud de contacto guardada con éxito.")
+            flash("Obrigado! Em breve entraremos em contato 😊")
         except Exception as e:
-            print(f"Error al guardar la solicitud: {e}")
+            print(f"Erro ao salvar contato: {e}")
+            flash("Ocorreu um erro. Tente novamente mais tarde.", "erro")
 
-    return render_template('contato.html', contato_image=contato_image, submenu_items=submenu_items)
+        # ← PRG pattern: volta em GET para evitar reenvio
+        return redirect(url_for('contato'))
+
+    # GET normal
+    return render_template('contato.html',
+                           contato_image=contato_image,
+                           submenu_items=submenu_items)
+
 
 @app.route('/blog')
 def blog():
