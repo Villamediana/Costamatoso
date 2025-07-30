@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 
-  {# ▸ pre‑load só as duas primeiras imagens do slider desktop #}
+  {# pre‑load das duas primeiras imagens desktop #}
   {% if slider_images|length > 0 %}
     <link rel="preload" as="image" href="{{ url_for('static', filename=slider_images[0]) }}">
     {% if slider_images|length > 1 %}
@@ -59,6 +59,7 @@
 
   <!-- SLIDESHOW ---------------------------------------------------------- -->
   <section class="seccion imagem">
+    <!-- Desktop -->
     <div class="slideshow slider-desktop">
       {% for image in slider_images %}
         <div class="slide"
@@ -70,6 +71,7 @@
       {% endfor %}
     </div>
 
+    <!-- Mobile -->
     <div class="slideshow slider-mobile">
       {% for image in slider_images_mobile %}
         <div class="slide"
@@ -96,47 +98,44 @@
     </div>
   </section>
 
-  <!-- COOKIES BANNER (opcional) -->
-  {# … mantém como estava, só escondido #}
-
   {% include 'fixed/footer.html' %}
 
-  <!-- JS PRINCIPAL -->
+  <!-- JS principal -->
   <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
 
-  <!-- PRELOADER + LAZY‑LOAD --------------------------------------------- -->
+  <!-- PRELOADER + LAZY‑LOAD ------------------------------------------------- -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      /* fecha preloader logo que HTML foi parseado */
-      const pre = document.getElementById('preloader');
-      pre.style.opacity = 0;
-      setTimeout(() => pre.remove(), 600);
+      /* 1. espera a primeira imagem visível carregar */
+      const firstDesktop = "{{ slider_images|length and url_for('static', filename=slider_images[0]) or '' }}";
+      const firstMobile  = "{{ slider_images_mobile|length and url_for('static', filename=slider_images_mobile[0]) or '' }}";
+      const isMobile     = matchMedia('(max-width: 767px)').matches;
+      const firstNeeded  = isMobile ? firstMobile : firstDesktop;
 
-      /* lazy‑load dos slides (desktop + mobile) */
+      const img     = new Image();
+      let finished  = false;
+      img.src       = firstNeeded;
+      img.onload    = removePreloader;
+      setTimeout(removePreloader, 3000);  // fallback
+
+      function removePreloader() {
+        if (finished) return;
+        finished = true;
+        const pre = document.getElementById('preloader');
+        pre.style.opacity = 0;
+        setTimeout(() => pre.remove(), 600);
+      }
+
+      /* 2. lazy‑load restante dos slides */
       const io = new IntersectionObserver((entries, obs) => {
         entries.forEach(e => {
           if (e.isIntersecting) {
-            const el = e.target;
-            if (!el.style.backgroundImage) {
-              el.style.backgroundImage = `url(${el.dataset.bg})`;
-            }
-            obs.unobserve(el);
+            e.target.style.backgroundImage ||= `url(${e.target.dataset.bg})`;
+            obs.unobserve(e.target);
           }
         });
       }, {rootMargin: '200px'});
-
       document.querySelectorAll('.slide').forEach(el => io.observe(el));
-
-      /* banner de cookies (igual) */
-      const cookieBanner = document.getElementById('cookie-banner');
-      if (cookieBanner && localStorage.getItem('cookiesAccepted') !== 'true') {
-        cookieBanner.style.display = 'block';
-        document.getElementById('accept-cookies')
-                .addEventListener('click', () => {
-                  localStorage.setItem('cookiesAccepted', 'true');
-                  cookieBanner.style.display = 'none';
-                });
-      }
     });
   </script>
 </body>
