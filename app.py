@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
-import os, json, shutil,uuid
+import os, json, shutil, uuid, re, time
 from datetime import datetime
+from collections import defaultdict
 from flask_mail import Mail, Message
 import smtplib
 from werkzeug.utils import secure_filename
@@ -22,6 +23,51 @@ os.environ['GUNICORN_CMD_ARGS'] = '--limit-request-field_size 0 --limit-request-
 
 
 mail = Mail(app)
+
+# ---- Anti-spam utilities (simple, in-memory) ---------------------------------
+rate_limit_store = defaultdict(list)  # ip -> list[timestamps]
+RATE_LIMIT_MAX = 3
+RATE_LIMIT_WINDOW_SEC = 10 * 60  # 10 minutes
+
+URL_PATTERN = re.compile(r"(https?://|www\.)", re.IGNORECASE)
+BLACKLIST_KEYWORDS = {
+    'btc', 'bitcoin', 'crypto', 'wallet', 'transaction', 'verify', 'alert',
+    'receive', 'grab', 'obtain', 'free', 'iphone', 'claim'
+}
+
+def normalize_phone(raw: str) -> str:
+    if not raw:
+        return ''
+    # Keep only digits and plus sign at start
+    raw = raw.strip()
+    plus = raw.startswith('+')
+    digits = re.sub(r"\D", "", raw)
+    return ('+' if plus else '') + digits
+
+def is_valid_email(email: str) -> bool:
+    if not email or len(email) > 254:
+        return False
+    return re.match(r"^[^@\s]+@[^@\s]+\.[^@\s]+$", email) is not None
+
+def looks_spammy_text(value: str) -> bool:
+    if not value:
+        return False
+    v = value.lower()
+    if URL_PATTERN.search(v):
+        return True
+    for kw in BLACKLIST_KEYWORDS:
+        if kw in v:
+            return True
+    return False
+
+def is_rate_limited(ip: str) -> bool:
+    now = time.time()
+    timestamps = [t for t in rate_limit_store[ip] if now - t < RATE_LIMIT_WINDOW_SEC]
+    rate_limit_store[ip] = timestamps
+    if len(timestamps) >= RATE_LIMIT_MAX:
+        return True
+    rate_limit_store[ip].append(now)
+    return False
 
 def get_contact_recipients():
     env_recipients = os.environ.get('CONTACT_RECIPIENTS')
@@ -301,10 +347,41 @@ def contato():
 
     # ── formulário ────────────────────────────────────────────────────
     if request.method == 'POST':
-        nome      = request.form.get('nome')
-        telefone  = request.form.get('telefone')
-        email     = request.form.get('email')
-        proyecto  = request.form.get('proyecto')
+        ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+        # Honeypot and timing
+        honeypot  = request.form.get('website')  # hidden field; must stay empty
+        t0_str    = request.form.get('form_ts')  # hidden timestamp seconds
+        try:
+            t0 = float(t0_str) if t0_str else 0.0
+        except Exception:
+            t0 = 0.0
+        elapsed = time.time() - t0 if t0 > 0 else 9999
+
+        nome      = (request.form.get('nome') or '').strip()
+        telefone  = normalize_phone(request.form.get('telefone') or '')
+        email     = (request.form.get('email') or '').strip()
+        proyecto  = (request.form.get('proyecto') or '').strip()
+
+        # Basic validations
+        if honeypot:
+            flash("Formulário inválido.", "erro")
+            return redirect(url_for('contato'))
+        if elapsed < 3:  # too fast
+            flash("Envio muito rápido. Tente novamente.", "erro")
+            return redirect(url_for('contato'))
+        if is_rate_limited(ip):
+            flash("Muitas tentativas. Aguarde alguns minutos.", "erro")
+            return redirect(url_for('contato'))
+        if not nome or not telefone or not email:
+            flash("Preencha todos os campos obrigatórios.", "erro")
+            return redirect(url_for('contato'))
+        if not is_valid_email(email):
+            flash("E‑mail inválido.", "erro")
+            return redirect(url_for('contato'))
+        # Spam content checks
+        if looks_spammy_text(nome) or looks_spammy_text(proyecto):
+            flash("Conteúdo detectado como spam.", "erro")
+            return redirect(url_for('contato'))
 
         submissions_file = os.path.join(app.static_folder, 'data',
                                         'contact_submissions.json')
@@ -320,7 +397,8 @@ def contato():
             "telefone": telefone,
             "email": email,
             "proyecto": proyecto,
-            "fecha": datetime.now().isoformat()
+            "fecha": datetime.now().isoformat(),
+            "ip": ip
         })
 
         try:
@@ -808,6 +886,16 @@ def dashboard():
         try:
             with open(contact_json_path, 'r', encoding='utf-8') as json_file:
                 contact_data = json.load(json_file)
+            # Ocultar entradas suspeitas já salvas
+            filtered = []
+            for c in contact_data:
+                nome = (c.get('nome') or '')
+                proyecto = (c.get('proyecto') or '')
+                email = (c.get('email') or '')
+                if looks_spammy_text(nome) or looks_spammy_text(proyecto) or not is_valid_email(email):
+                    continue
+                filtered.append(c)
+            contact_data = filtered
         except Exception as e:
             print(f"Error al cargar los datos de contactos: {e}")
 

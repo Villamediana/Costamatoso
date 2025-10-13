@@ -70,6 +70,10 @@
                 </div>
 
                 <form class="form-contato" action="{{ url_for('contato') }}" method="POST">
+                    <input type="hidden" name="form_ts" value="{{ (namespace(ts=0) and 0) or 0 }}">
+                    <div style="position:absolute; left:-5000px;" aria-hidden="true">
+                        <input type="text" name="website" tabindex="-1" autocomplete="off">
+                    </div>
                     <input type="text"  name="nome"      placeholder="Nome"    required>
                     <input type="tel"   name="telefone"  id="telefone" placeholder="Telefone" required>
                     <input type="email" name="email"     placeholder="E‑mail"  required>
@@ -79,7 +83,7 @@
                         <option>Sim, tenho um imóvel e desejo fazer um projeto de interiores.</option>
                         <option>Não, ainda não tenho terreno e imóvel.</option>
                     </select>
-                    <button type="submit">ENVIAR</button>
+                    <button id="contato-submit" type="submit">ENVIAR</button>
                 </form>
 
                 <p class="contato-trabalhe">
@@ -105,5 +109,12 @@
         </script>
       {% endif %}
     {% endwith %}
+    <script>
+      // set form timestamp at DOM ready
+      document.addEventListener('DOMContentLoaded', function(){
+        var ts = document.querySelector('input[name="form_ts"]');
+        if (ts) ts.value = (Date.now()/1000).toString();
+      });
+    </script>
 </body>
 </html>
