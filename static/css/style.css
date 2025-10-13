@@ -1172,8 +1172,128 @@ header {
     position: relative;
     width: 100%;
     height: 50vh; /* Ajusta la altura como prefieras */
-    background-size: cover;
-    background-position: center;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Para imagens de depoimentos sem recorte */
+.depo-image-contain {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    object-position: center center;
+    display: block;
+}
+
+/* Depoimentos em blocos (imagem, título, texto) */
+.depo-block {
+    max-width: 1000px;
+    margin: 0 auto 24px auto;
+    padding: 16px 20px;
+    display: flex;
+    gap: 24px;
+    align-items: stretch; /* faz as colunas terem a mesma altura */
+}
+
+.depo-block-image {
+    flex: 0 0 280px;
+    min-height: 220px; /* altura mínima para não ficar muito pequena */
+    height: auto; /* permite esticar até a altura do texto */
+    display: flex; /* centraliza a imagem verticalmente dentro da coluna */
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.depo-block-content {
+    flex: 1 1 auto;
+}
+
+.depo-block-title {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0 0 12px 0;
+    text-align: left;
+}
+
+.depo-block-text {
+    font-size: 15px;
+    line-height: 1.6;
+    text-align: justify;
+}
+
+@media (max-width: 768px) {
+    .depo-block {
+        flex-direction: column;
+        gap: 14px;
+    }
+    .depo-block-image {
+        width: 100%;
+        height: 220px;
+        flex: 0 0 auto;
+    }
+}
+
+/* Rounded images */
+.depo-block-image img {
+    border-radius: 12px;
+}
+
+/* Scroll-in animation */
+.depo-anim {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+.depo-anim.aparecer {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Dashboard list styling */
+.depo-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px 0;
+}
+
+.depo-item {
+    display: grid;
+    grid-template-columns: 120px 1fr auto;
+    gap: 12px;
+    align-items: start;
+    padding: 10px;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background: #fff;
+}
+
+.depo-thumb img {
+    width: 120px;
+    height: 90px;
+    object-fit: contain;
+    background: #f5f5f5;
+    border-radius: 6px;
+}
+
+.depo-actions button {
+    margin: 2px 0;
+}
+
+.depo-new {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 10px;
+    border: 1px dashed #ccc;
+    border-radius: 8px;
+    background: #fafafa;
 }
 
 /* Listas numeradas y no numeradas */

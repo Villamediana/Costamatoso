@@ -53,11 +53,7 @@
 
     <!-- Sidebar de navegación -->
     <aside class="sidebar">
-        <div class="logo">
-            <a href="{{ url_for('index') }}">
-            Admin
-            </a>
-        </div>
+        <div class="logo"></div>
         <nav class="menu">
             <ul>
                 <li><a href="#" data-section="slider-section" class="active">Editar slider desktop</a></li>
@@ -65,6 +61,7 @@
                 <li><a href="#" data-section="quem-somos-section">Quem somos (Home)</a></li>
                 <li><a href="#" data-section="sobre-nos-section">Quem somos (Aba)</a></li>
                 <li><a href="#" data-section="blog-section">Editar Blog</a></li>
+                <li><a href="#" data-section="depoimentos-section">Depoimentos</a></li>
                 <li><a href="#" data-section="file-browser-section">Navegar Projetos</a></li>
                 <li><a href="#" data-section="contact-submissions-section">Ver Contactos</a></li>
             </ul>
@@ -90,6 +87,72 @@
             </form>
         </section>
 
+        <!-- Sección Depoimentos -->
+        <section id="depoimentos-section" class="hidden-section">
+            <h1>Gerenciar Depoimentos</h1>
+            <h2>Novo Depoimento</h2>
+            <div class="depo-new">
+                <input type="text" id="new-depo-title" placeholder="Título" />
+                <textarea id="new-depo-text" rows="3" placeholder="Texto"></textarea>
+                <label class="file-upload-btn">Imagem
+                    <input type="file" id="new-depo-image" style="display:none;" />
+                </label>
+                <button id="add-depo-btn">Adicionar</button>
+            </div>
+
+            <hr>
+            <div class="depo-table-wrapper">
+                <table class="depo-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 140px; text-align:center;">Imagem</th>
+                            <th>Título</th>
+                            <th>Texto</th>
+                            <th style="width: 180px; text-align:center;">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="depo-list">
+                        {% if testimonials %}
+                            {% for d in testimonials %}
+                                <tr class="depo-item" data-index="{{ loop.index0 }}">
+                                    <td>
+                                        <div class="depo-thumb">
+                                            <img src="{{ url_for('static', filename=d.image) }}" alt="{{ d.title }}">
+                                        </div>
+                                        <label class="file-upload-btn small">Trocar
+                                            <input type="file" class="depo-image-file" data-current="{{ d.image }}" style="display:none;" />
+                                        </label>
+                                        <div class="muted small">{{ d.image }}</div>
+                                    </td>
+                                    <td>
+                                        <input type="text" value="{{ d.title }}" class="depo-title" />
+                                    </td>
+                                    <td>
+                                        <textarea class="depo-text" rows="2">{{ d.text }}</textarea>
+                                    </td>
+                                    <td class="depo-actions">
+                                        <button class="move-up" title="Subir">▲</button>
+                                        <button class="move-down" title="Descer">▼</button>
+                                        <button class="save-depo-btn">Salvar</button>
+                                        <button class="delete-depo-btn danger">Excluir</button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% endif %}
+                    </tbody>
+                </table>
+            </div>
+
+            <h2>Imagem de Cabeçalho (Depoimentos)</h2>
+            <form action="{{ url_for('dashboard') }}" method="POST" enctype="multipart/form-data">
+                <div class="section-item">
+                    <img src="{{ url_for('static', filename='img/capa-depoimentos.jpg') }}" alt="Capa Depoimentos" class="section-preview">
+                    <label class="file-upload-btn" for="depoimentos_capa_image">Trocar capa</label>
+                    <input type="file" name="depoimentos_capa_image" id="depoimentos_capa_image">
+                </div>
+                <button type="submit" class="btn">Salvar Capa</button>
+            </form>
+        </section>
         <!-- ✅ Slider Mobile (CORRECTO) -->
 <section id="slider-section_mobile" class="hidden-section">
     <h1>Editar slider Mobile</h1>

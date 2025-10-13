@@ -385,3 +385,154 @@ searchBar.addEventListener('input', function() {
         }
     });
 });
+
+// ===== Depoimentos CRUD (simple) =====
+document.addEventListener('DOMContentLoaded', () => {
+    const depoSection = document.getElementById('depoimentos-section');
+    if (!depoSection) return;
+
+    // Helper para leer JSON actual del backend y guardar
+    async function loadDepoimentosJSON() {
+        const res = await fetch('/get_json?path=/data/depoimentos.json');
+        if (!res.ok) throw new Error('Erro ao carregar depoimentos.json');
+        return res.json();
+    }
+
+    async function saveDepoimentosJSON(data) {
+        const res = await fetch('/save_json?path=/data/depoimentos.json', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error('Erro ao salvar depoimentos.json');
+    }
+
+    // Upload de imagem para /static/img/depoimentos
+    async function uploadDepoImage(file) {
+        const formData = new FormData();
+        formData.append('files', file);
+        const res = await fetch('/upload_files?path=' + encodeURIComponent('img/depoimentos'), {
+            method: 'POST',
+            body: formData
+        });
+        if (!res.ok) throw new Error('Erro ao subir imagem');
+        return 'img/depoimentos/' + file.name;
+    }
+
+    // Renderizar tabela sem recarregar
+    function renderDepoTable(data) {
+        const tbody = document.getElementById('depo-list');
+        if (!tbody) return;
+        const rows = data.map((d, i) => `
+            <tr class="depo-item" data-index="${i}">
+                <td>
+                    <div class="depo-thumb">
+                        <img src="/static/${d.image}" alt="${d.title}">
+                    </div>
+                    <label class="file-upload-btn small">Trocar
+                        <input type="file" class="depo-image-file" data-current="${d.image}" style="display:none;" />
+                    </label>
+                    <div class="muted small">${d.image}</div>
+                </td>
+                <td>
+                    <input type="text" value="${d.title.replace(/"/g, '&quot;')}" class="depo-title" />
+                </td>
+                <td>
+                    <textarea class="depo-text" rows="2">${d.text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</textarea>
+                </td>
+                <td class="depo-actions">
+                    <button class="move-up" title="Subir">▲</button>
+                    <button class="move-down" title="Descer">▼</button>
+                    <button class="save-depo-btn">Salvar</button>
+                    <button class="delete-depo-btn danger">Excluir</button>
+                </td>
+            </tr>
+        `).join('');
+        tbody.innerHTML = rows;
+    }
+
+    // Guardar cambios en items existentes
+    depoSection.addEventListener('click', async (e) => {
+        if (e.target.classList.contains('save-depo-btn')) {
+            const item = e.target.closest('.depo-item');
+            const title = item.querySelector('.depo-title').value.trim();
+            const text = item.querySelector('.depo-text').value.trim();
+            const fileInput = item.querySelector('.depo-image-file');
+            let imagePath = fileInput.dataset.current;
+
+            try {
+                if (fileInput.files && fileInput.files[0]) {
+                    imagePath = await uploadDepoImage(fileInput.files[0]);
+                }
+                const data = await loadDepoimentosJSON();
+                const idx = parseInt(item.dataset.index, 10);
+                if (idx >= 0) {
+                    data[idx] = { title, text, image: imagePath };
+                    await saveDepoimentosJSON(data);
+                    alert('Depoimento salvo');
+                    const updated = await loadDepoimentosJSON();
+                    renderDepoTable(updated);
+                }
+            } catch (err) {
+                alert('Erro ao salvar: ' + err.message);
+            }
+        }
+
+        if (e.target.classList.contains('delete-depo-btn')) {
+            if (!confirm('Excluir este depoimento?')) return;
+            const item = e.target.closest('.depo-item');
+            const idx = parseInt(item.dataset.index, 10);
+            try {
+                const data = await loadDepoimentosJSON();
+                data.splice(idx, 1);
+                await saveDepoimentosJSON(data);
+                alert('Depoimento excluído');
+                const updated = await loadDepoimentosJSON();
+                renderDepoTable(updated);
+            } catch (err) {
+                alert('Erro ao excluir: ' + err.message);
+            }
+        }
+
+        if (e.target.classList.contains('move-up') || e.target.classList.contains('move-down')) {
+            const item = e.target.closest('.depo-item');
+            const idx = parseInt(item.dataset.index, 10);
+            const direction = e.target.classList.contains('move-up') ? -1 : 1;
+            try {
+                const data = await loadDepoimentosJSON();
+                const newIdx = idx + direction;
+                if (newIdx < 0 || newIdx >= data.length) return;
+                const [moved] = data.splice(idx, 1);
+                data.splice(newIdx, 0, moved);
+                await saveDepoimentosJSON(data);
+                const updated = await loadDepoimentosJSON();
+                renderDepoTable(updated);
+            } catch (err) {
+                alert('Erro ao reordenar: ' + err.message);
+            }
+        }
+    });
+
+    // Adicionar novo depoimento
+    const addBtn = document.getElementById('add-depo-btn');
+    if (addBtn) {
+        addBtn.addEventListener('click', async () => {
+            const title = document.getElementById('new-depo-title').value.trim();
+            const text = document.getElementById('new-depo-text').value.trim();
+            const file = document.getElementById('new-depo-image').files[0];
+            if (!title || !text || !file) { alert('Preencha título, texto e imagem'); return; }
+            try {
+                const imagePath = await uploadDepoImage(file);
+                const data = await loadDepoimentosJSON();
+                data.push({ title, text, image: imagePath });
+                await saveDepoimentosJSON(data);
+                alert('Depoimento adicionado');
+                const updated = await loadDepoimentosJSON();
+                renderDepoTable(updated);
+            } catch (err) {
+                alert('Erro ao adicionar: ' + err.message);
+            }
+        });
+    }
+    // Inicial: tabela já vem renderizada do servidor
+});

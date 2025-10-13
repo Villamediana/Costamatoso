@@ -632,9 +632,8 @@ def edit_blog(folder_name):
 
 @app.route('/depoimentos')
 def depoimentos():
+    # carregar conteúdo base da página
     json_path = os.path.join(app.static_folder, 'data', 'data.json')
-
-    # Cargar los datos del JSON
     try:
         with open(json_path, 'r', encoding='utf-8') as json_file:
             data = json.load(json_file)
@@ -642,9 +641,18 @@ def depoimentos():
         print(f"Error al cargar el JSON: {e}")
         data = {}
 
-    # Obtener las secciones del JSON
     second_section = data.get('second_section', {})
     third_section = data.get('third_section', {})
+
+    # carregar depoimentos dinâmicos
+    testimonials = []
+    depo_json = os.path.join(app.static_folder, 'data', 'depoimentos.json')
+    try:
+        if os.path.exists(depo_json):
+            with open(depo_json, 'r', encoding='utf-8') as f:
+                testimonials = json.load(f)
+    except Exception as e:
+        print(f"Erro ao carregar depoimentos.json: {e}")
 
     # Obtener los ítems del submenú dinámicamente (categorías)
     projetos_path = os.path.join(app.static_folder, 'img', 'projetos')
@@ -653,7 +661,7 @@ def depoimentos():
         submenu_items = [name for name in os.listdir(projetos_path) if os.path.isdir(os.path.join(projetos_path, name))]
         submenu_items.sort()  # Opcional: ordenar alfabéticamente
 
-    return render_template('depoimentos.html', second_section=second_section, third_section=third_section, submenu_items=submenu_items)
+    return render_template('depoimentos.html', second_section=second_section, third_section=third_section, submenu_items=submenu_items, testimonials=testimonials)
 
 @app.route('/nos')
 def nos():
@@ -759,6 +767,11 @@ def dashboard():
             third_section_image.save(os.path.join(app.static_folder, 'img', 'time2.jpg'))
             data['third_section']['image'] = 'img/time2.jpg'
 
+        # Atualizar imagem de cabeçalho da página de depoimentos
+        depo_capa_image = request.files.get('depoimentos_capa_image')
+        if depo_capa_image:
+            depo_capa_image.save(os.path.join(app.static_folder, 'img', 'capa-depoimentos.jpg'))
+
         # Guardar los cambios en el archivo JSON
         with open(json_path, 'w', encoding='utf-8') as json_file:
             json.dump(data, json_file, ensure_ascii=False, indent=4)
@@ -798,13 +811,24 @@ def dashboard():
         except Exception as e:
             print(f"Error al cargar los datos de contactos: {e}")
 
+    # Carregar depoimentos para edição
+    testimonials = []
+    depo_json_path = os.path.join(app.static_folder, 'data', 'depoimentos.json')
+    if os.path.exists(depo_json_path):
+        try:
+            with open(depo_json_path, 'r', encoding='utf-8') as f:
+                testimonials = json.load(f)
+        except Exception as e:
+            print(f"Erro ao carregar depoimentos.json no dashboard: {e}")
+
     return render_template('dashboard.html', 
                        slider_images=enumerated_slider_images,
                        slider_images_mobile=enumerated_slider_images_mobile,  # 👈 ahora sí explícito
                        second_section=data.get('second_section', {}),
                        third_section=data.get('third_section', {}),
                        blogs=blogs,
-                       contact_data=contact_data)
+                       contact_data=contact_data,
+                       testimonials=testimonials)
 
 
 

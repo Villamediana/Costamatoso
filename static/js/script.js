@@ -98,6 +98,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Código para animar el texto línea por línea y el título al hacer scroll
     const textosAnimados = document.querySelectorAll('.texto-animado');
     const titulosAnimados = document.querySelectorAll('.titulo-animado'); // Seleccionar todos los títulos
+    const depoBlocks = document.querySelectorAll('.depo-anim');
 
 // Animar títulos
 if (titulosAnimados.length > 0) {
@@ -147,6 +148,20 @@ if (textosAnimados.length > 0) {
     lineas.forEach(linha => {
         observer.observe(linha);
     });
+}
+
+// Animar depoimentos ao entrar em vista
+if (depoBlocks.length > 0) {
+    const observerDepo = new IntersectionObserver(function(entries, observer) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('aparecer');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15 });
+
+    depoBlocks.forEach(bl => observerDepo.observe(bl));
 }
 
 
