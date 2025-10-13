@@ -75,7 +75,7 @@
                         <input type="text" name="website" tabindex="-1" autocomplete="off">
                     </div>
                     <input type="text"  name="nome"      placeholder="Nome"    required>
-                    <input type="tel"   name="telefone"  id="telefone" placeholder="Telefone" required>
+                    <input type="tel"   name="telefone"  id="telefone" placeholder="Telefone" inputmode="tel" autocomplete="tel" maxlength="16" required>
                     <input type="email" name="email"     placeholder="E‑mail"  required>
                     <select name="proyecto" required>
                         <option disabled selected>Possui terreno ou imóvel para o nosso projeto?</option>
@@ -110,10 +110,54 @@
       {% endif %}
     {% endwith %}
     <script>
-      // set form timestamp at DOM ready
+      // set form timestamp, apply phone mask, and validate on submit
       document.addEventListener('DOMContentLoaded', function(){
         var ts = document.querySelector('input[name="form_ts"]');
         if (ts) ts.value = (Date.now()/1000).toString();
+
+        var tel = document.getElementById('telefone');
+        function onlyDigits(v){ return (v || '').replace(/\D+/g,''); }
+        function formatBRPhone(d){
+          // d: only digits
+          if (d.length <= 10) {
+            // (##) ####-####
+            return d
+              .replace(/(\d{2})(\d)/, '($1) $2')
+              .replace(/(\d{4})(\d)/, '$1-$2')
+              .substring(0, 14);
+          }
+          // (##) #####-####
+          return d
+            .replace(/(\d{2})(\d)/, '($1) $2')
+            .replace(/(\d{5})(\d)/, '$1-$2')
+            .substring(0, 15);
+        }
+        if (tel) {
+          tel.addEventListener('input', function(){
+            var d = onlyDigits(tel.value);
+            tel.value = formatBRPhone(d);
+          });
+        }
+
+        var form = document.querySelector('.form-contato');
+        if (form) {
+          form.addEventListener('submit', function(e){
+            var email = (form.email && form.email.value || '').trim();
+            var phoneDigits = onlyDigits(tel && tel.value);
+            var emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+            var phoneOk = phoneDigits.length >= 10 && phoneDigits.length <= 14; // BR: 10-11; allow cc
+            if (!emailOk || !phoneOk) {
+              e.preventDefault();
+              try {
+                var notyf = new Notyf();
+                if (!emailOk) notyf.error('E-mail inválido.');
+                if (!phoneOk) notyf.error('Telefone inválido.');
+              } catch(_) {
+                alert((!emailOk ? 'E-mail inválido. ' : '') + (!phoneOk ? 'Telefone inválido.' : ''));
+              }
+            }
+          });
+        }
       });
     </script>
 </body>
