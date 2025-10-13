@@ -27,7 +27,7 @@ def get_contact_recipients():
     env_recipients = os.environ.get('CONTACT_RECIPIENTS')
     if env_recipients:
         return [r.strip() for r in env_recipients.split(',') if r.strip()]
-    return ['comercial@costamatoso.com.br', 'contato@costamatoso.com.br']
+    return ['comercial@costamatoso.com.br']
 
 def formatar_data(fecha_str):
     # Convertir la cadena a un objeto de fecha
