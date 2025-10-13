@@ -2,16 +2,18 @@ from flask import Flask, render_template, request, redirect, url_for, session, j
 import os, json, shutil,uuid
 from datetime import datetime
 from flask_mail import Mail, Message
+import smtplib
 from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 
-app.config['MAIL_SERVER'] = 'smtp.gmail.com'
-app.config['MAIL_PORT'] = 587
-app.config['MAIL_USE_TLS'] = True
-app.config['MAIL_USERNAME'] = 'jose.villamediana.osorio@gmail.com'  # Tu email
-app.config['MAIL_PASSWORD'] = 'yhsl apqh sics zddu'  # Código de aplicación de Gmail
-app.config['MAIL_DEFAULT_SENDER'] = ('Jose Villamediana', 'jose.villamediana.osorio@gmail.com')
+app.config['MAIL_SERVER'] = 'email-ssl.com.br'
+app.config['MAIL_PORT'] = 465
+app.config['MAIL_USE_TLS'] = False
+app.config['MAIL_USE_SSL'] = True
+app.config['MAIL_USERNAME'] = 'miguel.villamediana@costamatoso.com.br'
+app.config['MAIL_PASSWORD'] = 'Construtora@Mudar123'
+app.config['MAIL_DEFAULT_SENDER'] = ('CostaMatoso', 'miguel.villamediana@costamatoso.com.br')
 app.config['MAIL_MAX_EMAILS'] = None
 app.config['MAX_CONTENT_LENGTH'] = 100 * 1024 * 1024  # 100 MB
 app.secret_key = '3HpAUadGVgxO' 
@@ -20,6 +22,12 @@ os.environ['GUNICORN_CMD_ARGS'] = '--limit-request-field_size 0 --limit-request-
 
 
 mail = Mail(app)
+
+def get_contact_recipients():
+    env_recipients = os.environ.get('CONTACT_RECIPIENTS')
+    if env_recipients:
+        return [r.strip() for r in env_recipients.split(',') if r.strip()]
+    return ['comercial@costamatoso.com.br', 'contato@costamatoso.com.br']
 
 def formatar_data(fecha_str):
     # Convertir la cadena a un objeto de fecha
@@ -320,6 +328,26 @@ def contato():
             with open(submissions_file, 'w', encoding='utf-8') as f:
                 json.dump(submissions, f, ensure_ascii=False, indent=4)
             flash("Obrigado! Em breve entraremos em contato 😊")
+            # Enviar e-mail ao comercial
+            try:
+                destinatarios = get_contact_recipients()
+                assunto = 'Novo contato do site - Costa Matoso'
+                corpo = (
+                    f"Nome: {nome}\n"
+                    f"Telefone: {telefone}\n"
+                    f"E-mail: {email}\n"
+                    f"Interesse: {proyecto}\n"
+                    f"Data: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n"
+                    f"IP: {request.headers.get('X-Forwarded-For', request.remote_addr)}\n"
+                )
+                msg = Message(subject=assunto, recipients=destinatarios, reply_to=email)
+                msg.body = corpo
+                # Debug básico
+                print(f"[MAIL] Enviando contato para: {destinatarios}")
+                mail.send(msg)
+                print("[MAIL] Enviado com sucesso")
+            except Exception as e:
+                print(f"Erro ao enviar e-mail de contato: {e}")
         except Exception as e:
             print(f"Erro ao salvar contato: {e}")
             flash("Ocorreu um erro. Tente novamente mais tarde.", "erro")
@@ -651,6 +679,25 @@ def nos():
         submenu_items.sort()  # Opcional: ordenar alfabéticamente
 
     return render_template('nos.html', second_section=second_section, third_section=third_section, submenu_items=submenu_items)
+
+
+@app.route('/mail_test')
+def mail_test():
+    if not session.get('authorized'):
+        return redirect(url_for('login'))
+    try:
+        destinatarios = get_contact_recipients()
+        msg = Message(subject='[TEST] SMTP Costa Matoso',
+                      recipients=destinatarios,
+                      body='Teste de envio SMTP via Flask-Mail.',
+                      reply_to=app.config.get('MAIL_USERNAME'))
+        print(f"[MAIL_TEST] Enviando para: {destinatarios}")
+        mail.send(msg)
+        print("[MAIL_TEST] Enviado com sucesso")
+        return jsonify({"ok": True, "recipients": destinatarios})
+    except Exception as e:
+        print(f"[MAIL_TEST] Erro: {e}")
+        return jsonify({"ok": False, "error": str(e)}), 500
 
 
 @app.route('/dashboard', methods=['GET', 'POST'])
