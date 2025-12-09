@@ -65,6 +65,7 @@
                 <li><a href="#" data-section="blog-section">Editar Blog</a></li>
                 <li><a href="#" data-section="campanhas-section">Campanhas</a></li>
                 <li><a href="#" data-section="depoimentos-section">Depoimentos</a></li>
+                <li><a href="#" data-section="visitors-section">Visitantes</a></li>
                 <li><a href="#" data-section="file-browser-section">Navegar Projetos</a></li>
                 <li><a href="#" data-section="contact-submissions-section">Ver Contactos</a></li>
             </ul>
@@ -325,6 +326,67 @@
                         </div>
                     </div>
                 {% endfor %}
+            </div>
+        </section>
+
+        <!-- Sección Visitantes -->
+        <section id="visitors-section" class="hidden-section">
+            <h1>Análise de Visitantes</h1>
+            
+            <div style="margin-bottom: 20px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                <button id="refresh-visitors-btn" class="btn" style="background-color: #3498db;">Atualizar Dados</button>
+                <span id="visitors-count" style="color: #666; font-size: 0.9em;"></span>
+            </div>
+
+            <div class="visitors-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 30px;">
+                <div style="background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <h3 style="margin: 0 0 10px 0; color: #2c3e50; font-size: 0.9em;">Total de Visitantes</h3>
+                    <p id="stat-total" style="margin: 0; font-size: 2em; font-weight: bold; color: #3498db;">0</p>
+                </div>
+                <div style="background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <h3 style="margin: 0 0 10px 0; color: #2c3e50; font-size: 0.9em;">Desktop</h3>
+                    <p id="stat-desktop" style="margin: 0; font-size: 2em; font-weight: bold; color: #27ae60;">0</p>
+                </div>
+                <div style="background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <h3 style="margin: 0 0 10px 0; color: #2c3e50; font-size: 0.9em;">Mobile</h3>
+                    <p id="stat-mobile" style="margin: 0; font-size: 2em; font-weight: bold; color: #e74c3c;">0</p>
+                </div>
+                <div style="background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    <h3 style="margin: 0 0 10px 0; color: #2c3e50; font-size: 0.9em;">Tempo Médio</h3>
+                    <p id="stat-avg-time" style="margin: 0; font-size: 2em; font-weight: bold; color: #f39c12;">0s</p>
+                </div>
+            </div>
+
+            <div class="visitors-table-wrapper" style="background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <h2 style="margin-top: 0;">Sessões de Visitantes</h2>
+                <div style="overflow-x: auto;">
+                    <table class="depo-table" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th>ID Sessão</th>
+                                <th>Dispositivo</th>
+                                <th>Entrada</th>
+                                <th>Saída</th>
+                                <th>Tempo Total</th>
+                                <th>Páginas</th>
+                                <th>Cliques</th>
+                                <th>Detalhes</th>
+                            </tr>
+                        </thead>
+                        <tbody id="visitors-list"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Modal de Detalhes -->
+            <div id="visitor-detail-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; overflow-y: auto;">
+                <div style="background: white; margin: 50px auto; max-width: 900px; padding: 30px; border-radius: 8px; box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="margin: 0;">Detalhes da Sessão</h2>
+                        <button id="close-modal-btn" style="background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">Fechar</button>
+                    </div>
+                    <div id="visitor-detail-content"></div>
+                </div>
             </div>
         </section>
 

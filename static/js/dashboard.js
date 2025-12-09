@@ -891,6 +891,238 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error('Erro ao carregar campanhas:', err);
         }
     })();
+
+    // ============================================================
+    // GERENCIAMENTO DE VISITANTES
+    // ============================================================
+    
+    async function loadVisitors() {
+        const res = await fetch('/get_visitors');
+        if (!res.ok) throw new Error('Erro ao carregar visitantes');
+        return await res.json();
+    }
+
+    function formatTime(ms) {
+        if (!ms) return '0s';
+        const seconds = Math.floor(ms / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+        
+        if (hours > 0) {
+            return `${hours}h ${minutes % 60}m`;
+        } else if (minutes > 0) {
+            return `${minutes}m ${seconds % 60}s`;
+        } else {
+            return `${seconds}s`;
+        }
+    }
+
+    function formatDate(dateString) {
+        if (!dateString) return 'N/A';
+        const date = new Date(dateString);
+        return date.toLocaleString('pt-BR', {
+            day: '2-digit',
+            month: '2-digit',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    function updateStats(visitors) {
+        const total = visitors.length;
+        const desktop = visitors.filter(v => v.deviceType === 'desktop').length;
+        const mobile = visitors.filter(v => v.deviceType === 'mobile').length;
+        
+        const totalTime = visitors.reduce((sum, v) => sum + (v.totalTimeSpent || 0), 0);
+        const avgTime = total > 0 ? totalTime / total : 0;
+        
+        document.getElementById('stat-total').textContent = total;
+        document.getElementById('stat-desktop').textContent = desktop;
+        document.getElementById('stat-mobile').textContent = mobile;
+        document.getElementById('stat-avg-time').textContent = formatTime(avgTime);
+        document.getElementById('visitors-count').textContent = `${total} visitante(s) registrado(s)`;
+    }
+
+    function renderVisitorsTable(visitors) {
+        const tbody = document.getElementById('visitors-list');
+        if (!tbody) return;
+        
+        if (visitors.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 20px;">Nenhum visitante registrado ainda.</td></tr>';
+            return;
+        }
+        
+        const rows = visitors.map(v => {
+            const sessionId = v.sessionId || 'N/A';
+            const device = v.deviceType === 'mobile' ? '📱 Mobile' : '🖥️ Desktop';
+            const entry = formatDate(v.entryTime);
+            const exit = formatDate(v.exitTime);
+            const totalTime = formatTime(v.totalTimeSpent);
+            const pagesCount = v.pages ? v.pages.length : 0;
+            const clicksCount = v.clicks ? v.clicks.length : 0;
+            
+            return `
+                <tr>
+                    <td style="font-family: monospace; font-size: 0.85em;">${sessionId.substring(0, 20)}...</td>
+                    <td>${device}</td>
+                    <td>${entry}</td>
+                    <td>${exit}</td>
+                    <td>${totalTime}</td>
+                    <td>${pagesCount}</td>
+                    <td>${clicksCount}</td>
+                    <td>
+                        <button class="view-details-btn" data-session-id="${sessionId}" style="background-color: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer;">Ver Detalhes</button>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+        
+        tbody.innerHTML = rows;
+        
+        // Adicionar event listeners aos botões de detalhes
+        document.querySelectorAll('.view-details-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const sessionId = btn.dataset.sessionId;
+                const visitor = visitors.find(v => v.sessionId === sessionId);
+                if (visitor) {
+                    showVisitorDetails(visitor);
+                }
+            });
+        });
+    }
+
+    function showVisitorDetails(visitor) {
+        const modal = document.getElementById('visitor-detail-modal');
+        const content = document.getElementById('visitor-detail-content');
+        
+        if (!modal || !content) return;
+        
+        // Informações básicas
+        let html = `
+            <div style="margin-bottom: 30px;">
+                <h3 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">Informações da Sessão</h3>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-top: 15px;">
+                    <div><strong>ID Sessão:</strong><br><span style="font-family: monospace; font-size: 0.9em;">${visitor.sessionId}</span></div>
+                    <div><strong>Dispositivo:</strong><br>${visitor.deviceType === 'mobile' ? '📱 Mobile' : '🖥️ Desktop'}</div>
+                    <div><strong>Entrada:</strong><br>${formatDate(visitor.entryTime)}</div>
+                    <div><strong>Saída:</strong><br>${formatDate(visitor.exitTime)}</div>
+                    <div><strong>Tempo Total:</strong><br>${formatTime(visitor.totalTimeSpent)}</div>
+                    <div><strong>Resolução:</strong><br>${visitor.screenWidth}x${visitor.screenHeight}</div>
+                </div>
+            </div>
+        `;
+        
+        // Páginas visitadas
+        if (visitor.pages && visitor.pages.length > 0) {
+            html += `
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">Páginas Visitadas</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                        <thead>
+                            <tr style="background: #f5f5f5;">
+                                <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">URL</th>
+                                <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Título</th>
+                                <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Tempo</th>
+                                <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Carregamento</th>
+                                <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Visitas</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${visitor.pages.map(p => `
+                                <tr>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">${p.url}</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">${p.title || 'N/A'}</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">${formatTime(p.timeSpent)}</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">${p.loadTime ? (p.loadTime + 'ms') : 'N/A'}</td>
+                                    <td style="padding: 10px; border: 1px solid #ddd;">${p.visits || 1}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+        
+        // Cliques
+        if (visitor.clicks && visitor.clicks.length > 0) {
+            html += `
+                <div style="margin-bottom: 30px;">
+                    <h3 style="color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;">Cliques (${visitor.clicks.length})</h3>
+                    <div style="max-height: 400px; overflow-y: auto; margin-top: 15px;">
+                        <table style="width: 100%; border-collapse: collapse;">
+                            <thead>
+                                <tr style="background: #f5f5f5; position: sticky; top: 0;">
+                                    <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Hora</th>
+                                    <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Página</th>
+                                    <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Elemento</th>
+                                    <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Link</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${visitor.clicks.slice(-50).map(c => `
+                                    <tr>
+                                        <td style="padding: 8px; border: 1px solid #ddd; font-size: 0.85em;">${formatDate(c.timestamp)}</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${c.url}</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd;">${c.element.tag}${c.element.id ? '#' + c.element.id : ''}${c.element.className ? '.' + c.element.className.split(' ')[0] : ''}</td>
+                                        <td style="padding: 8px; border: 1px solid #ddd; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                            ${c.element.href ? `<a href="${c.element.href}" target="_blank" style="color: #3498db;">${c.element.href.substring(0, 40)}...</a>` : 'N/A'}
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+        
+        content.innerHTML = html;
+        modal.style.display = 'block';
+    }
+
+    // Event listeners
+    const refreshBtn = document.getElementById('refresh-visitors-btn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', async () => {
+            try {
+                const visitors = await loadVisitors();
+                updateStats(visitors);
+                renderVisitorsTable(visitors);
+            } catch (err) {
+                alert('Erro ao carregar visitantes: ' + err.message);
+            }
+        });
+    }
+
+    const closeModalBtn = document.getElementById('close-modal-btn');
+    if (closeModalBtn) {
+        closeModalBtn.addEventListener('click', () => {
+            const modal = document.getElementById('visitor-detail-modal');
+            if (modal) modal.style.display = 'none';
+        });
+    }
+
+    // Fechar modal ao clicar fora
+    const modal = document.getElementById('visitor-detail-modal');
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    }
+
+    // Carregar visitantes ao iniciar
+    (async () => {
+        try {
+            const visitors = await loadVisitors();
+            updateStats(visitors);
+            renderVisitorsTable(visitors);
+        } catch (err) {
+            console.error('Erro ao carregar visitantes:', err);
+        }
+    })();
 });
 
 // ============================================================

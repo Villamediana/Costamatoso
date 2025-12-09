@@ -1056,6 +1056,79 @@ def upload_campanha_image():
         print(f"Erro ao fazer upload de imagem de campanha: {e}")
         return jsonify({"error": str(e)}), 500
 
+#---------------------------------------------------------------------------
+# ROTAS DE TRACKING DE VISITANTES
+#---------------------------------------------------------------------------
+
+@app.route('/save_tracking', methods=['POST'])
+def save_tracking():
+    """Salva dados de tracking de visitantes"""
+    try:
+        # Aceitar tanto JSON quanto Blob (sendBeacon)
+        if request.content_type and 'application/json' in request.content_type:
+            data = request.get_json()
+        else:
+            # Se for Blob, ler como bytes e converter
+            try:
+                data = json.loads(request.data.decode('utf-8'))
+            except:
+                data = request.get_json()
+        
+        if not data:
+            return jsonify({"error": "Dados não fornecidos"}), 400
+        
+        visitors_path = os.path.join(app.static_folder, 'data', 'visitors.json')
+        
+        # Carregar visitantes existentes
+        visitors = []
+        if os.path.exists(visitors_path):
+            try:
+                with open(visitors_path, 'r', encoding='utf-8') as f:
+                    visitors = json.load(f)
+            except Exception as e:
+                print(f"Erro ao carregar visitors.json: {e}")
+                visitors = []
+        
+        # Verificar se já existe esta sessão (evitar duplicatas)
+        existing_index = next((i for i, v in enumerate(visitors) if v.get('sessionId') == data.get('sessionId')), -1)
+        
+        if existing_index >= 0:
+            # Atualizar sessão existente
+            visitors[existing_index] = data
+        else:
+            # Adicionar novo visitante
+            visitors.append(data)
+        
+        # Limitar a 1000 visitantes mais recentes para não ficar muito pesado
+        if len(visitors) > 1000:
+            visitors = visitors[-1000:]
+        
+        # Salvar
+        with open(visitors_path, 'w', encoding='utf-8') as f:
+            json.dump(visitors, f, ensure_ascii=False, indent=2)
+        
+        return jsonify({"success": True}), 200
+    except Exception as e:
+        print(f"Erro ao salvar tracking: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/get_visitors', methods=['GET'])
+def get_visitors():
+    """Retorna dados de visitantes para o dashboard"""
+    try:
+        visitors_path = os.path.join(app.static_folder, 'data', 'visitors.json')
+        if os.path.exists(visitors_path):
+            with open(visitors_path, 'r', encoding='utf-8') as f:
+                visitors = json.load(f)
+            # Retornar os mais recentes primeiro
+            return jsonify(list(reversed(visitors))), 200
+        return jsonify([]), 200
+    except Exception as e:
+        print(f"Erro ao carregar visitantes: {e}")
+        return jsonify({"error": str(e)}), 500
+
 @app.route('/get_json', methods=['GET'])
 def get_json():
     path = request.args.get('path')
