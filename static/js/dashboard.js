@@ -9,27 +9,41 @@ document.addEventListener("DOMContentLoaded", function () {
         sidebar.classList.toggle("active");
     });
 
+    // Función para mostrar una sección específica
+    function showSection(sectionId) {
+        // Remover la clase 'active' de todos los enlaces del menú
+        menuLinks.forEach(link => link.classList.remove("active"));
+
+        // Ocultar todas las secciones
+        sections.forEach(section => section.classList.add("hidden-section"));
+        sections.forEach(section => section.classList.remove("active-section"));
+
+        // Mostrar la sección correspondiente
+        const targetSection = document.getElementById(sectionId);
+        if (targetSection) {
+            targetSection.classList.remove("hidden-section");
+            targetSection.classList.add("active-section");
+            
+            // Encontrar y activar el enlace correspondiente
+            const activeLink = document.querySelector(`a[data-section="${sectionId}"]`);
+            if (activeLink) {
+                activeLink.classList.add("active");
+            }
+        }
+    }
+
     // Cambiar entre secciones en el menú
     menuLinks.forEach(link => {
         link.addEventListener("click", function (e) {
             e.preventDefault();
 
-            // Remover la clase 'active' de todos los enlaces del menú
-            menuLinks.forEach(link => link.classList.remove("active"));
-
-            // Agregar la clase 'active' al enlace clicado
-            this.classList.add("active");
-
-            // Ocultar todas las secciones
-            sections.forEach(section => section.classList.add("hidden-section"));
-            sections.forEach(section => section.classList.remove("active-section"));
-
-            // Mostrar la sección correspondiente
-            const targetSection = document.getElementById(this.getAttribute("data-section"));
-            if (targetSection) {
-                targetSection.classList.remove("hidden-section");
-                targetSection.classList.add("active-section");
-            }
+            const sectionId = this.getAttribute("data-section");
+            
+            // Actualizar la URL con hash
+            window.location.hash = sectionId;
+            
+            // Mostrar la sección
+            showSection(sectionId);
 
             // Cerrar el menú en dispositivos pequeños
             if (window.innerWidth <= 768) {
@@ -37,6 +51,29 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     });
+
+    // Cargar la sección desde el hash al cargar la página o cambiar el hash
+    function loadSectionFromHash() {
+        const hash = window.location.hash.substring(1); // Remover el #
+        if (hash) {
+            showSection(hash);
+        } else {
+            // Si no hay hash, mostrar la primera sección activa o la primera disponible
+            const firstActive = document.querySelector(".active-section");
+            if (!firstActive && sections.length > 0) {
+                const firstSectionId = sections[0].id;
+                showSection(firstSectionId);
+                // Actualizar el hash también
+                window.location.hash = firstSectionId;
+            }
+        }
+    }
+
+    // Cargar sección al cargar la página
+    loadSectionFromHash();
+
+    // Escuchar cambios en el hash (navegación del navegador)
+    window.addEventListener("hashchange", loadSectionFromHash);
 
     // Función para cargar los archivos y carpetas del directorio /projetos
     const fileList = document.getElementById("file-list");

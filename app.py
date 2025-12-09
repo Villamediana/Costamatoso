@@ -897,11 +897,6 @@ def dashboard():
             third_section_image.save(os.path.join(app.static_folder, 'img', 'time2.jpg'))
             data['third_section']['image'] = 'img/time2.jpg'
 
-        # Atualizar imagem de cabeçalho da página de depoimentos
-        depo_capa_image = request.files.get('depoimentos_capa_image')
-        if depo_capa_image:
-            depo_capa_image.save(os.path.join(app.static_folder, 'img', 'capa-depoimentos.jpg'))
-
         # Guardar los cambios en el archivo JSON
         with open(json_path, 'w', encoding='utf-8') as json_file:
             json.dump(data, json_file, ensure_ascii=False, indent=4)

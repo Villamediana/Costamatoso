@@ -144,16 +144,6 @@
                     </tbody>
                 </table>
             </div>
-
-            <h2>Imagem de Cabeçalho (Depoimentos)</h2>
-            <form action="{{ url_for('dashboard') }}" method="POST" enctype="multipart/form-data">
-                <div class="section-item">
-                    <img src="{{ url_for('static', filename='img/capa-depoimentos.jpg') }}" alt="Capa Depoimentos" class="section-preview">
-                    <label class="file-upload-btn" for="depoimentos_capa_image">Trocar capa</label>
-                    <input type="file" name="depoimentos_capa_image" id="depoimentos_capa_image">
-                </div>
-                <button type="submit" class="btn">Salvar Capa</button>
-            </form>
         </section>
         <!-- ✅ Slider Mobile (CORRECTO) -->
 <section id="slider-section_mobile" class="hidden-section">
