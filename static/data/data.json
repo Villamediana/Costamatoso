@@ -13,6 +13,24 @@
         "img/sliderm_3.jpg",
         "img/sliderm_4.jpg"
     ],
+    "header_images": {
+        "sobre_nos": {
+            "desktop": "img/time.jpg",
+            "mobile": "img/time.jpg"
+        },
+        "contato": {
+            "desktop": "img/time.jpg",
+            "mobile": "img/time.jpg"
+        },
+        "blog": {
+            "desktop": "img/slider_1.jpg",
+            "mobile": "img/slider_1.jpg"
+        },
+        "depoimentos": {
+            "desktop": "img/capa-depoimentos.jpg",
+            "mobile": "img/capa-depoimentos.jpg"
+        }
+    },
     "contato_image": "img/1.jpg",
     "second_section": {
         "title": "A Costa Matoso",

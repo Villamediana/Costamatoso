@@ -338,6 +338,7 @@ def contato():
         data = {}
 
     contato_image = data.get('contato_image', 'img/default.jpg')  # evita KeyError
+    header_images = data.get('header_images', {})
 
     projetos_path = os.path.join(app.static_folder, 'img', 'projetos')
     submenu_items = sorted(
@@ -436,11 +437,23 @@ def contato():
     # GET normal
     return render_template('contato.html',
                            contato_image=contato_image,
+                           header_images=header_images,
                            submenu_items=submenu_items)
 
 
 @app.route('/blog')
 def blog():
+    # Cargar header_images do data.json
+    json_path = os.path.join(app.static_folder, 'data', 'data.json')
+    try:
+        with open(json_path, 'r', encoding='utf-8') as json_file:
+            data_json = json.load(json_file)
+    except Exception as e:
+        print(f"Erro ao carregar data.json: {e}")
+        data_json = {}
+    
+    header_images = data_json.get('header_images', {})
+    
     # Ruta donde están los blogs
     blog_path = os.path.join(app.static_folder, 'img', 'blog')
 
@@ -473,7 +486,7 @@ def blog():
     # Obtener los ítems del submenú dinámicamente (categorías)
     submenu_items = get_submenu_items()
 
-    return render_template('blog.html', articulos=articulos, submenu_items=submenu_items)
+    return render_template('blog.html', articulos=articulos, header_images=header_images, submenu_items=submenu_items)
 
 
 @app.route('/blog/<nombre_articulo>')
@@ -721,6 +734,7 @@ def depoimentos():
 
     second_section = data.get('second_section', {})
     third_section = data.get('third_section', {})
+    header_images = data.get('header_images', {})
 
     # carregar depoimentos dinâmicos
     testimonials = []
@@ -739,7 +753,7 @@ def depoimentos():
         submenu_items = [name for name in os.listdir(projetos_path) if os.path.isdir(os.path.join(projetos_path, name))]
         submenu_items.sort()  # Opcional: ordenar alfabéticamente
 
-    return render_template('depoimentos.html', second_section=second_section, third_section=third_section, submenu_items=submenu_items, testimonials=testimonials)
+    return render_template('depoimentos.html', second_section=second_section, third_section=third_section, header_images=header_images, submenu_items=submenu_items, testimonials=testimonials)
 
 @app.route('/nos')
 def nos():
@@ -756,6 +770,7 @@ def nos():
     # Obtener las secciones del JSON
     second_section = data.get('second_section', {})
     third_section = data.get('third_section', {})
+    header_images = data.get('header_images', {})
 
     # Obtener los ítems del submenú dinámicamente (categorías)
     projetos_path = os.path.join(app.static_folder, 'img', 'projetos')
@@ -764,7 +779,7 @@ def nos():
         submenu_items = [name for name in os.listdir(projetos_path) if os.path.isdir(os.path.join(projetos_path, name))]
         submenu_items.sort()  # Opcional: ordenar alfabéticamente
 
-    return render_template('nos.html', second_section=second_section, third_section=third_section, submenu_items=submenu_items)
+    return render_template('nos.html', second_section=second_section, third_section=third_section, header_images=header_images, submenu_items=submenu_items)
 
 
 @app.route('/mail_test')
@@ -818,6 +833,43 @@ def dashboard():
                 filename = f'sliderm_{i}.jpg'  # Guardar con un nombre específico para mobile
                 image_file.save(os.path.join(app.static_folder, 'img', filename))
                 data['slider_images_mobile'][i] = f'img/{filename}'
+
+        # Atualizar Cabeçalhos Desktop
+        if 'header_images' not in data:
+            data['header_images'] = {}
+        
+        headers_desktop = {
+            'sobre_nos': 'header_sobre_nos_desktop',
+            'contato': 'header_contato_desktop',
+            'blog': 'header_blog_desktop',
+            'depoimentos': 'header_depoimentos_desktop'
+        }
+        
+        for key, form_name in headers_desktop.items():
+            image_file = request.files.get(form_name)
+            if image_file:
+                filename = f'header_{key}_desktop.jpg'
+                image_file.save(os.path.join(app.static_folder, 'img', filename))
+                if key not in data['header_images']:
+                    data['header_images'][key] = {}
+                data['header_images'][key]['desktop'] = f'img/{filename}'
+
+        # Atualizar Cabeçalhos Mobile
+        headers_mobile = {
+            'sobre_nos': 'header_sobre_nos_mobile',
+            'contato': 'header_contato_mobile',
+            'blog': 'header_blog_mobile',
+            'depoimentos': 'header_depoimentos_mobile'
+        }
+        
+        for key, form_name in headers_mobile.items():
+            image_file = request.files.get(form_name)
+            if image_file:
+                filename = f'header_{key}_mobile.jpg'
+                image_file.save(os.path.join(app.static_folder, 'img', filename))
+                if key not in data['header_images']:
+                    data['header_images'][key] = {}
+                data['header_images'][key]['mobile'] = f'img/{filename}'
 
         # Actualizar secciones (Second Section)
         second_section_title = request.form.get('second_section_title')
@@ -912,6 +964,7 @@ def dashboard():
     return render_template('dashboard.html', 
                        slider_images=enumerated_slider_images,
                        slider_images_mobile=enumerated_slider_images_mobile,  # 👈 ahora sí explícito
+                       header_images=data.get('header_images', {}),
                        second_section=data.get('second_section', {}),
                        third_section=data.get('third_section', {}),
                        blogs=blogs,

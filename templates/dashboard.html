@@ -58,6 +58,8 @@
             <ul>
                 <li><a href="#" data-section="slider-section" class="active">Editar slider desktop</a></li>
                 <li><a href="#" data-section="slider-section_mobile">Editar slider mobile</a></li>
+                <li><a href="#" data-section="header-desktop-section">Cabeçalhos Desktop</a></li>
+                <li><a href="#" data-section="header-mobile-section">Cabeçalhos Mobile</a></li>
                 <li><a href="#" data-section="quem-somos-section">Quem somos (Home)</a></li>
                 <li><a href="#" data-section="sobre-nos-section">Quem somos (Aba)</a></li>
                 <li><a href="#" data-section="blog-section">Editar Blog</a></li>
@@ -170,6 +172,73 @@
     </form>
 </section>
 
+        <!-- Sección Cabeçalhos Desktop -->
+        <section id="header-desktop-section" class="hidden-section">
+            <h1>Cabeçalhos Desktop</h1>
+            <form action="{{ url_for('dashboard') }}" method="POST" enctype="multipart/form-data">
+                <div class="slider-container">
+                    <div class="slider-item">
+                        <h3>Sobre Nós</h3>
+                        <img src="{{ url_for('static', filename=header_images.sobre_nos.desktop) }}" alt="Header Sobre Nós Desktop" class="slider-preview">
+                        <label class="file-upload-btn" for="header_sobre_nos_desktop">Escolher arquivo</label>
+                        <input type="file" name="header_sobre_nos_desktop" id="header_sobre_nos_desktop">
+                    </div>
+                    <div class="slider-item">
+                        <h3>Contato</h3>
+                        <img src="{{ url_for('static', filename=header_images.contato.desktop) }}" alt="Header Contato Desktop" class="slider-preview">
+                        <label class="file-upload-btn" for="header_contato_desktop">Escolher arquivo</label>
+                        <input type="file" name="header_contato_desktop" id="header_contato_desktop">
+                    </div>
+                    <div class="slider-item">
+                        <h3>Blog</h3>
+                        <img src="{{ url_for('static', filename=header_images.blog.desktop) }}" alt="Header Blog Desktop" class="slider-preview">
+                        <label class="file-upload-btn" for="header_blog_desktop">Escolher arquivo</label>
+                        <input type="file" name="header_blog_desktop" id="header_blog_desktop">
+                    </div>
+                    <div class="slider-item">
+                        <h3>Depoimentos</h3>
+                        <img src="{{ url_for('static', filename=header_images.depoimentos.desktop) }}" alt="Header Depoimentos Desktop" class="slider-preview">
+                        <label class="file-upload-btn" for="header_depoimentos_desktop">Escolher arquivo</label>
+                        <input type="file" name="header_depoimentos_desktop" id="header_depoimentos_desktop">
+                    </div>
+                </div>
+                <button type="submit" class="btn">Actualizar Cabeçalhos Desktop</button>
+            </form>
+        </section>
+
+        <!-- Sección Cabeçalhos Mobile -->
+        <section id="header-mobile-section" class="hidden-section">
+            <h1>Cabeçalhos Mobile</h1>
+            <form action="{{ url_for('dashboard') }}" method="POST" enctype="multipart/form-data">
+                <div class="slider-container">
+                    <div class="slider-item">
+                        <h3>Sobre Nós</h3>
+                        <img src="{{ url_for('static', filename=header_images.sobre_nos.mobile) }}" alt="Header Sobre Nós Mobile" class="slider-preview">
+                        <label class="file-upload-btn" for="header_sobre_nos_mobile">Escolher arquivo</label>
+                        <input type="file" name="header_sobre_nos_mobile" id="header_sobre_nos_mobile">
+                    </div>
+                    <div class="slider-item">
+                        <h3>Contato</h3>
+                        <img src="{{ url_for('static', filename=header_images.contato.mobile) }}" alt="Header Contato Mobile" class="slider-preview">
+                        <label class="file-upload-btn" for="header_contato_mobile">Escolher arquivo</label>
+                        <input type="file" name="header_contato_mobile" id="header_contato_mobile">
+                    </div>
+                    <div class="slider-item">
+                        <h3>Blog</h3>
+                        <img src="{{ url_for('static', filename=header_images.blog.mobile) }}" alt="Header Blog Mobile" class="slider-preview">
+                        <label class="file-upload-btn" for="header_blog_mobile">Escolher arquivo</label>
+                        <input type="file" name="header_blog_mobile" id="header_blog_mobile">
+                    </div>
+                    <div class="slider-item">
+                        <h3>Depoimentos</h3>
+                        <img src="{{ url_for('static', filename=header_images.depoimentos.mobile) }}" alt="Header Depoimentos Mobile" class="slider-preview">
+                        <label class="file-upload-btn" for="header_depoimentos_mobile">Escolher arquivo</label>
+                        <input type="file" name="header_depoimentos_mobile" id="header_depoimentos_mobile">
+                    </div>
+                </div>
+                <button type="submit" class="btn">Actualizar Cabeçalhos Mobile</button>
+            </form>
+        </section>
 
         <!-- Sección Quem Somos (Home) -->
         <section id="quem-somos-section" class="hidden-section">
