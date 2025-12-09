@@ -572,4 +572,63 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     // Inicial: tabela já vem renderizada do servidor
+
+    // ============================================================
+    // PREVIEW DE IMAGENS AO SELECIONAR ARQUIVO
+    // ============================================================
+    
+    // Função para mostrar preview da imagem selecionada
+    function setupImagePreviews() {
+        // Selecionar todos os inputs de arquivo em seções de sliders e headers
+        const fileInputs = document.querySelectorAll(
+            '#slider-section input[type="file"], ' +
+            '#slider-section_mobile input[type="file"], ' +
+            '#header-desktop-section input[type="file"], ' +
+            '#header-mobile-section input[type="file"], ' +
+            '#quem-somos-section input[type="file"], ' +
+            '#sobre-nos-section input[type="file"]'
+        );
+
+        fileInputs.forEach(input => {
+            input.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                // Verificar se é uma imagem
+                if (!file.type.startsWith('image/')) {
+                    alert('Por favor, selecione apenas imagens.');
+                    return;
+                }
+
+                // Encontrar a imagem de preview mais próxima
+                const container = input.closest('.slider-item, .section-item');
+                if (!container) return;
+
+                const previewImg = container.querySelector('img.slider-preview, img.section-preview');
+                if (!previewImg) return;
+
+                // Criar URL temporária e atualizar a preview
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    previewImg.src = event.target.result;
+                    // Adicionar um indicador visual de que foi alterado
+                    previewImg.style.border = '3px solid #4CAF50';
+                    previewImg.style.boxShadow = '0 0 10px rgba(76, 175, 80, 0.5)';
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+    }
+
+    // Configurar previews ao carregar a página
+    setupImagePreviews();
+
+    // Reconfigurar previews quando mudar de seção (para casos dinâmicos)
+    const observer = new MutationObserver(() => {
+        setupImagePreviews();
+    });
+
+    sections.forEach(section => {
+        observer.observe(section, { childList: true, subtree: true });
+    });
 });
