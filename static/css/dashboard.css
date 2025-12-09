@@ -140,7 +140,7 @@ textarea:focus {
 
 .floating-btn {
     position: fixed;
-    bottom: 20px; /* Ajusta la posición vertical */
+    top: 20px; /* Ajusta la posición vertical - agora no topo */
     right: 20px; /* Ajusta la posición horizontal */
     width: 40px; /* Tamaño del botón */
     height: 40px;

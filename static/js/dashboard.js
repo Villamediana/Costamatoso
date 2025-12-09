@@ -453,14 +453,132 @@ document.addEventListener('DOMContentLoaded', () => {
             body: formData
         });
         if (!res.ok) throw new Error('Erro ao subir imagem');
+        const data = await res.json();
+        // Usar o nome normalizado retornado pelo backend
+        if (data.files && data.files.length > 0) {
+            return 'img/depoimentos/' + data.files[0];
+        }
+        // Fallback para o nome original (não deveria acontecer)
         return 'img/depoimentos/' + file.name;
+    }
+
+    // Função para configurar previews de depoimentos
+    function setupDepoimentosPreviews() {
+        // Preview para novo depoimento
+        const newDepoImage = document.getElementById('new-depo-image');
+        if (newDepoImage) {
+            // Criar elemento de preview se não existir
+            let previewContainer = document.querySelector('.depo-new-preview');
+            if (!previewContainer) {
+                previewContainer = document.createElement('div');
+                previewContainer.className = 'depo-new-preview';
+                previewContainer.style.cssText = 'margin: 10px 0; text-align: center;';
+                const previewImg = document.createElement('img');
+                previewImg.style.cssText = 'max-width: 200px; max-height: 200px; border-radius: 8px; border: 2px solid #ddd;';
+                previewImg.alt = 'Preview';
+                previewContainer.appendChild(previewImg);
+                newDepoImage.parentElement.parentElement.insertBefore(previewContainer, newDepoImage.parentElement.nextSibling);
+            }
+            
+            // Remover listeners antigos e adicionar novo
+            const newInput = newDepoImage.cloneNode(true);
+            newDepoImage.parentNode.replaceChild(newInput, newDepoImage);
+            
+            newInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                if (!file.type.startsWith('image/')) {
+                    alert('Por favor, selecione apenas imagens.');
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const previewImg = previewContainer.querySelector('img');
+                    previewImg.src = event.target.result;
+                    previewImg.style.border = '3px solid #4CAF50';
+                    previewImg.style.boxShadow = '0 0 10px rgba(76, 175, 80, 0.5)';
+                };
+                reader.readAsDataURL(file);
+            });
+        }
+        
+        // Preview para depoimentos existentes (trocar imagem)
+        const depoImageFiles = document.querySelectorAll('.depo-image-file');
+        depoImageFiles.forEach(input => {
+            // Remover listeners antigos
+            const newInput = input.cloneNode(true);
+            input.parentNode.replaceChild(newInput, input);
+            
+            newInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                if (!file.type.startsWith('image/')) {
+                    alert('Por favor, selecione apenas imagens.');
+                    return;
+                }
+                
+                // Encontrar a imagem de preview no mesmo row
+                const row = newInput.closest('.depo-item');
+                if (!row) return;
+                
+                const previewImg = row.querySelector('.depo-thumb img');
+                if (!previewImg) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    previewImg.src = event.target.result;
+                    previewImg.style.border = '3px solid #4CAF50';
+                    previewImg.style.boxShadow = '0 0 10px rgba(76, 175, 80, 0.5)';
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+    }
+
+    // Função para extrair ano do título
+    function extractYear(title) {
+        // Extrai o ano do título no formato "Família Resende, Socorro/SP (2025)"
+        const match = title.match(/\((\d{4})\)/);
+        if (match) {
+            return parseInt(match[1], 10);
+        }
+        // Se não encontrar ano, retorna 0 para colocar no final
+        return 0;
+    }
+
+    // Função para verificar se os depoimentos já estão ordenados por ano
+    function isAlreadySorted(data) {
+        for (let i = 0; i < data.length - 1; i++) {
+            const yearA = extractYear(data[i].title);
+            const yearB = extractYear(data[i + 1].title);
+            if (yearA < yearB) {
+                return false; // Não está ordenado (deveria ser descendente)
+            }
+        }
+        return true; // Já está ordenado
+    }
+
+    // Função para ordenar depoimentos por ano (mais recente primeiro)
+    function sortDepoimentosByYear(data) {
+        return [...data].sort((a, b) => {
+            const yearA = extractYear(a.title);
+            const yearB = extractYear(b.title);
+            return yearB - yearA; // Descendente: mais recente primeiro
+        });
     }
 
     // Renderizar tabela sem recarregar
     function renderDepoTable(data) {
         const tbody = document.getElementById('depo-list');
         if (!tbody) return;
-        const rows = data.map((d, i) => `
+        
+        // Usar dados como estão se já estiverem ordenados
+        const sortedData = isAlreadySorted(data) ? data : sortDepoimentosByYear(data);
+        
+        const rows = sortedData.map((d, i) => `
             <tr class="depo-item" data-index="${i}">
                 <td>
                     <div class="depo-thumb">
@@ -478,14 +596,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     <textarea class="depo-text" rows="2">${d.text.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</textarea>
                 </td>
                 <td class="depo-actions">
-                    <button class="move-up" title="Subir">▲</button>
-                    <button class="move-down" title="Descer">▼</button>
                     <button class="save-depo-btn">Salvar</button>
                     <button class="delete-depo-btn danger">Excluir</button>
                 </td>
             </tr>
         `).join('');
         tbody.innerHTML = rows;
+        
+        // Reconfigurar previews após renderizar a tabela
+        setupDepoimentosPreviews();
     }
 
     // Guardar cambios en items existentes
@@ -504,11 +623,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 const data = await loadDepoimentosJSON();
                 const idx = parseInt(item.dataset.index, 10);
                 if (idx >= 0) {
-                    data[idx] = { title, text, image: imagePath };
-                    await saveDepoimentosJSON(data);
+                    // Encontrar o item correto na lista
+                    const sortedData = isAlreadySorted(data) ? data : sortDepoimentosByYear(data);
+                    if (idx < sortedData.length) {
+                        sortedData[idx] = { title, text, image: imagePath };
+                    }
+                    // Reordenar apenas se necessário e salvar
+                    const reordered = isAlreadySorted(sortedData) ? sortedData : sortDepoimentosByYear(sortedData);
+                    await saveDepoimentosJSON(reordered);
                     alert('Depoimento salvo');
-                    const updated = await loadDepoimentosJSON();
-                    renderDepoTable(updated);
+                    renderDepoTable(reordered);
                 }
             } catch (err) {
                 alert('Erro ao salvar: ' + err.message);
@@ -521,33 +645,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const idx = parseInt(item.dataset.index, 10);
             try {
                 const data = await loadDepoimentosJSON();
-                data.splice(idx, 1);
-                await saveDepoimentosJSON(data);
+                const sortedData = isAlreadySorted(data) ? data : sortDepoimentosByYear(data);
+                sortedData.splice(idx, 1);
+                await saveDepoimentosJSON(sortedData);
                 alert('Depoimento excluído');
-                const updated = await loadDepoimentosJSON();
-                renderDepoTable(updated);
+                renderDepoTable(sortedData);
             } catch (err) {
                 alert('Erro ao excluir: ' + err.message);
             }
         }
 
-        if (e.target.classList.contains('move-up') || e.target.classList.contains('move-down')) {
-            const item = e.target.closest('.depo-item');
-            const idx = parseInt(item.dataset.index, 10);
-            const direction = e.target.classList.contains('move-up') ? -1 : 1;
-            try {
-                const data = await loadDepoimentosJSON();
-                const newIdx = idx + direction;
-                if (newIdx < 0 || newIdx >= data.length) return;
-                const [moved] = data.splice(idx, 1);
-                data.splice(newIdx, 0, moved);
-                await saveDepoimentosJSON(data);
-                const updated = await loadDepoimentosJSON();
-                renderDepoTable(updated);
-            } catch (err) {
-                alert('Erro ao reordenar: ' + err.message);
-            }
-        }
     });
 
     // Adicionar novo depoimento
@@ -562,21 +669,234 @@ document.addEventListener('DOMContentLoaded', () => {
                 const imagePath = await uploadDepoImage(file);
                 const data = await loadDepoimentosJSON();
                 data.push({ title, text, image: imagePath });
-                await saveDepoimentosJSON(data);
+                // Ordenar apenas se necessário e salvar
+                const sortedData = isAlreadySorted(data) ? data : sortDepoimentosByYear(data);
+                await saveDepoimentosJSON(sortedData);
                 alert('Depoimento adicionado');
-                const updated = await loadDepoimentosJSON();
-                renderDepoTable(updated);
+                renderDepoTable(sortedData);
             } catch (err) {
                 alert('Erro ao adicionar: ' + err.message);
             }
         });
     }
+
     // Inicial: tabela já vem renderizada do servidor
+    // Ordenar automaticamente ao carregar apenas se necessário
+    (async () => {
+        try {
+            const data = await loadDepoimentosJSON();
+            if (!isAlreadySorted(data)) {
+                // Só reorganiza e salva se não estiver ordenado
+                const sortedData = sortDepoimentosByYear(data);
+                await saveDepoimentosJSON(sortedData);
+                renderDepoTable(sortedData);
+            } else {
+                // Já está ordenado, só renderiza
+                renderDepoTable(data);
+            }
+        } catch (err) {
+            console.error('Erro ao ordenar depoimentos:', err);
+        }
+    })();
+    // Configurar previews de depoimentos na inicialização
+    setupDepoimentosPreviews();
 
     // ============================================================
-    // PREVIEW DE IMAGENS AO SELECIONAR ARQUIVO
+    // GERENCIAMENTO DE CAMPANHAS
     // ============================================================
     
+    async function loadCampanhasJSON() {
+        const res = await fetch('/get_campanhas');
+        if (!res.ok) throw new Error('Erro ao carregar campanhas');
+        return await res.json();
+    }
+
+    async function saveCampanhasJSON(data) {
+        const res = await fetch('/save_campanhas', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        if (!res.ok) throw new Error('Erro ao salvar campanhas');
+    }
+
+    async function uploadCampanhaImage(file) {
+        const formData = new FormData();
+        formData.append('file', file);
+        const res = await fetch('/upload_campanha_image', {
+            method: 'POST',
+            body: formData
+        });
+        if (!res.ok) throw new Error('Erro ao subir imagem');
+        const data = await res.json();
+        return data.filename;
+    }
+
+    function renderCampanhasTable(campanhas) {
+        const tbody = document.getElementById('campanhas-list');
+        if (!tbody) return;
+        
+        const rows = campanhas.map((c, i) => `
+            <tr class="campanha-item" data-index="${i}">
+                <td>
+                    <div class="depo-thumb">
+                        <img src="/static/${c.image}" alt="${c.title}" style="max-width: 100px; border-radius: 4px;">
+                    </div>
+                </td>
+                <td>
+                    <input type="text" value="${c.title.replace(/"/g, '&quot;')}" class="campanha-title" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" />
+                </td>
+                <td>
+                    <input type="url" value="${c.link.replace(/"/g, '&quot;')}" class="campanha-link" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;" />
+                </td>
+                <td style="text-align: center;">
+                    <label style="display: flex; align-items: center; justify-content: center; gap: 5px; cursor: pointer;">
+                        <input type="checkbox" class="campanha-active" ${c.active ? 'checked' : ''} style="width: 20px; height: 20px; cursor: pointer;" />
+                        <span>${c.active ? 'Ativa' : 'Inativa'}</span>
+                    </label>
+                </td>
+                <td class="depo-actions">
+                    <button class="save-campanha-btn" style="background-color: #27ae60;">Salvar</button>
+                    <button class="delete-campanha-btn danger">Excluir</button>
+                </td>
+            </tr>
+        `).join('');
+        tbody.innerHTML = rows;
+    }
+
+    // Preview para nova campanha
+    const newCampanhaImage = document.getElementById('new-campanha-image');
+    if (newCampanhaImage) {
+        newCampanhaImage.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            if (!file.type.startsWith('image/')) {
+                alert('Por favor, selecione apenas imagens.');
+                return;
+            }
+            
+            let previewContainer = document.querySelector('.campanha-new-preview');
+            if (!previewContainer.querySelector('img')) {
+                const previewImg = document.createElement('img');
+                previewImg.style.cssText = 'max-width: 300px; max-height: 200px; border-radius: 8px; border: 2px solid #ddd;';
+                previewImg.alt = 'Preview';
+                previewContainer.appendChild(previewImg);
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const previewImg = previewContainer.querySelector('img');
+                previewImg.src = event.target.result;
+                previewImg.style.border = '3px solid #27ae60';
+                previewImg.style.boxShadow = '0 0 10px rgba(39, 174, 96, 0.5)';
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    // Adicionar nova campanha
+    const addCampanhaBtn = document.getElementById('add-campanha-btn');
+    if (addCampanhaBtn) {
+        addCampanhaBtn.addEventListener('click', async () => {
+            const title = document.getElementById('new-campanha-title').value.trim();
+            const link = document.getElementById('new-campanha-link').value.trim();
+            const file = document.getElementById('new-campanha-image').files[0];
+            const active = document.getElementById('new-campanha-active').checked;
+            
+            if (!title || !link || !file) {
+                alert('Preencha título, link e imagem');
+                return;
+            }
+            
+            try {
+                const imagePath = await uploadCampanhaImage(file);
+                const campanhas = await loadCampanhasJSON();
+                campanhas.push({ title, link, image: imagePath, active });
+                await saveCampanhasJSON(campanhas);
+                alert('Campanha adicionada com sucesso!');
+                
+                // Limpar formulário
+                document.getElementById('new-campanha-title').value = '';
+                document.getElementById('new-campanha-link').value = '';
+                document.getElementById('new-campanha-image').value = '';
+                document.getElementById('new-campanha-active').checked = true;
+                document.querySelector('.campanha-new-preview').innerHTML = '';
+                
+                renderCampanhasTable(campanhas);
+            } catch (err) {
+                alert('Erro ao adicionar campanha: ' + err.message);
+            }
+        });
+    }
+
+    // Event delegation para ações de campanhas
+    const campanhasTable = document.querySelector('.campanhas-table-wrapper');
+    if (campanhasTable) {
+        campanhasTable.addEventListener('click', async (e) => {
+            if (e.target.classList.contains('save-campanha-btn')) {
+                const item = e.target.closest('.campanha-item');
+                const idx = parseInt(item.dataset.index, 10);
+                const title = item.querySelector('.campanha-title').value.trim();
+                const link = item.querySelector('.campanha-link').value.trim();
+                const active = item.querySelector('.campanha-active').checked;
+                
+                try {
+                    const campanhas = await loadCampanhasJSON();
+                    if (idx >= 0 && idx < campanhas.length) {
+                        campanhas[idx].title = title;
+                        campanhas[idx].link = link;
+                        campanhas[idx].active = active;
+                        await saveCampanhasJSON(campanhas);
+                        alert('Campanha salva com sucesso!');
+                        renderCampanhasTable(campanhas);
+                    }
+                } catch (err) {
+                    alert('Erro ao salvar campanha: ' + err.message);
+                }
+            }
+            
+            if (e.target.classList.contains('delete-campanha-btn')) {
+                if (!confirm('Excluir esta campanha?')) return;
+                const item = e.target.closest('.campanha-item');
+                const idx = parseInt(item.dataset.index, 10);
+                
+                try {
+                    const campanhas = await loadCampanhasJSON();
+                    campanhas.splice(idx, 1);
+                    await saveCampanhasJSON(campanhas);
+                    alert('Campanha excluída com sucesso!');
+                    renderCampanhasTable(campanhas);
+                } catch (err) {
+                    alert('Erro ao excluir campanha: ' + err.message);
+                }
+            }
+        });
+        
+        // Atualizar label de status ao mudar checkbox
+        campanhasTable.addEventListener('change', (e) => {
+            if (e.target.classList.contains('campanha-active')) {
+                const label = e.target.parentElement.querySelector('span');
+                label.textContent = e.target.checked ? 'Ativa' : 'Inativa';
+            }
+        });
+    }
+
+    // Carregar campanhas ao iniciar
+    (async () => {
+        try {
+            const campanhas = await loadCampanhasJSON();
+            renderCampanhasTable(campanhas);
+        } catch (err) {
+            console.error('Erro ao carregar campanhas:', err);
+        }
+    })();
+});
+
+// ============================================================
+// PREVIEW DE IMAGENS AO SELECIONAR ARQUIVO (Sliders e Headers)
+// ============================================================
+document.addEventListener("DOMContentLoaded", function () {
     // Função para mostrar preview da imagem selecionada
     function setupImagePreviews() {
         // Selecionar todos os inputs de arquivo em seções de sliders e headers
@@ -624,6 +944,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupImagePreviews();
 
     // Reconfigurar previews quando mudar de seção (para casos dinâmicos)
+    const sections = document.querySelectorAll("section");
     const observer = new MutationObserver(() => {
         setupImagePreviews();
     });

@@ -63,6 +63,7 @@
                 <li><a href="#" data-section="quem-somos-section">Quem somos (Home)</a></li>
                 <li><a href="#" data-section="sobre-nos-section">Quem somos (Aba)</a></li>
                 <li><a href="#" data-section="blog-section">Editar Blog</a></li>
+                <li><a href="#" data-section="campanhas-section">Campanhas</a></li>
                 <li><a href="#" data-section="depoimentos-section">Depoimentos</a></li>
                 <li><a href="#" data-section="file-browser-section">Navegar Projetos</a></li>
                 <li><a href="#" data-section="contact-submissions-section">Ver Contactos</a></li>
@@ -133,8 +134,6 @@
                                         <textarea class="depo-text" rows="2">{{ d.text }}</textarea>
                                     </td>
                                     <td class="depo-actions">
-                                        <button class="move-up" title="Subir">▲</button>
-                                        <button class="move-down" title="Descer">▼</button>
                                         <button class="save-depo-btn">Salvar</button>
                                         <button class="delete-depo-btn danger">Excluir</button>
                                     </td>
@@ -160,7 +159,45 @@
         </div>
         <button type="submit" class="btn">Actualizar Slider Mobile</button>
     </form>
-</section>
+        </section>
+
+        <!-- Sección Campanhas -->
+        <section id="campanhas-section" class="hidden-section">
+            <h1>Gerenciar Campanhas</h1>
+            
+            <h2>Nova Campanha</h2>
+            <div class="campanha-new" style="background: #fff; padding: 20px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <input type="text" id="new-campanha-title" placeholder="Título da Campanha" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px;" />
+                <input type="url" id="new-campanha-link" placeholder="Link de destino (https://...)" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px;" />
+                <label class="file-upload-btn" style="display: inline-block; margin-bottom: 15px;">
+                    Imagem da Campanha
+                    <input type="file" id="new-campanha-image" style="display:none;" accept="image/*" />
+                </label>
+                <div class="campanha-new-preview" style="margin: 15px 0; text-align: center;"></div>
+                <label style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px; cursor: pointer;">
+                    <input type="checkbox" id="new-campanha-active" checked style="width: 20px; height: 20px; cursor: pointer;" />
+                    <span>Campanha ativa (aparece no site)</span>
+                </label>
+                <button id="add-campanha-btn" class="btn" style="background-color: #27ae60;">Adicionar Campanha</button>
+            </div>
+
+            <hr>
+            <h2>Campanhas Cadastradas</h2>
+            <div class="campanhas-table-wrapper">
+                <table class="depo-table">
+                    <thead>
+                        <tr>
+                            <th>Imagem</th>
+                            <th>Título</th>
+                            <th>Link</th>
+                            <th>Status</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="campanhas-list"></tbody>
+                </table>
+            </div>
+        </section>
 
         <!-- Sección Cabeçalhos Desktop -->
         <section id="header-desktop-section" class="hidden-section">

@@ -44,7 +44,7 @@
             color: #34495e;
         }
 
-        input[type="text"], input[type="date"] {
+        input[type="text"], input[type="date"], textarea {
             width: 100%;
             padding: 12px 15px;
             margin-bottom: 15px;
@@ -52,11 +52,17 @@
             border: 1px solid #ddd;
             border-radius: 6px;
             transition: border-color 0.3s ease;
+            font-family: inherit;
         }
 
-        input[type="text"]:focus, input[type="date"]:focus {
+        input[type="text"]:focus, input[type="date"]:focus, textarea:focus {
             border-color: #3498db;
             outline: none;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
         }
 
         #toolbar {
@@ -116,6 +122,10 @@
 
             <!-- Autor -->
             <input type="text" id="autor" name="autor" placeholder="Autor" value="{{ blog['autor'] if blog else '' }}" required>
+
+            <!-- Descrição -->
+            <label for="descricao" style="font-weight: bold; color: #34495e; display: block; margin-bottom: 5px;">Descrição (opcional - se não preencher, será usado o primeiro parágrafo do conteúdo)</label>
+            <textarea id="descricao" name="descricao" placeholder="Descrição do blog que aparecerá na listagem...">{{ blog['descricao'] if blog and blog.get('descricao') else '' }}</textarea>
 
             <!-- Editor -->
             <div id="toolbar"></div>

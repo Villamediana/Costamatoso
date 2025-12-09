@@ -100,8 +100,33 @@
 
   {% include 'fixed/footer.html' %}
 
+  <!-- Overlay para campanhas (apenas no home) -->
+  <div class="campanhas-overlay" id="campanhas-overlay"></div>
+
+  <!-- Popup de Campanhas Desktop -->
+  <div id="campanhas-popup-desktop" class="campanhas-popup-desktop">
+      <button class="campanhas-close" aria-label="Fechar">&times;</button>
+      <div class="campanhas-slider-container">
+          <button class="campanhas-prev" aria-label="Anterior">‹</button>
+          <div class="campanhas-slides"></div>
+          <button class="campanhas-next" aria-label="Próximo">›</button>
+      </div>
+      <div class="campanhas-dots"></div>
+  </div>
+
+  <!-- Notificação de Campanhas Mobile -->
+  <div id="campanhas-mobile" class="campanhas-mobile">
+      <div class="campanhas-mobile-slider">
+          <div class="campanhas-dots-mobile"></div>
+      </div>
+  </div>
+
   <!-- JS principal -->
   <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
+  
+  <!-- CSS e JS de campanhas (apenas no home) -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/campanhas.css') }}">
+  <script src="{{ url_for('static', filename='js/campanhas.js') }}"></script>
 
   <!-- PRELOADER + LAZY‑LOAD ------------------------------------------------- -->
   <script>

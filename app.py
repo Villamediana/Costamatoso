@@ -641,11 +641,20 @@ def creation_blog():
             elif parrafo:
                 contenido_lista.append({"tipo": "parrafo", "valor": parrafo})
 
+        # Obter descrição do formulário ou usar primeiro parágrafo como fallback
+        descricao = request.form.get('descricao', '').strip()
+        if not descricao and contenido_lista:
+            # Se não tiver descrição, usar o primeiro parágrafo
+            for item in contenido_lista:
+                if item.get('tipo') == 'parrafo' and item.get('valor', '').strip():
+                    descricao = item.get('valor', '').strip()
+                    break
+
         # Crear el JSON del blog
         blog_data = {
             "titulo": titulo,
             "autor": autor,
-            "descricao": contenido_lista[0]["valor"] if contenido_lista else "",
+            "descricao": descricao,
             "data": fecha,
             "capa": capa_filename,
             "contenido": contenido_lista,
@@ -743,6 +752,14 @@ def depoimentos():
         if os.path.exists(depo_json):
             with open(depo_json, 'r', encoding='utf-8') as f:
                 testimonials = json.load(f)
+            
+            # Ordenar por ano (mais recente primeiro)
+            def extract_year(title):
+                import re
+                match = re.search(r'\((\d{4})\)', title)
+                return int(match.group(1)) if match else 0
+            
+            testimonials.sort(key=lambda x: extract_year(x.get('title', '')), reverse=True)
     except Exception as e:
         print(f"Erro ao carregar depoimentos.json: {e}")
 
@@ -956,6 +973,16 @@ def dashboard():
         except Exception as e:
             print(f"Erro ao carregar depoimentos.json no dashboard: {e}")
 
+    # Carregar campanhas para edição
+    campanhas = []
+    campanhas_json_path = os.path.join(app.static_folder, 'data', 'campanhas.json')
+    if os.path.exists(campanhas_json_path):
+        try:
+            with open(campanhas_json_path, 'r', encoding='utf-8') as f:
+                campanhas = json.load(f)
+        except Exception as e:
+            print(f"Erro ao carregar campanhas.json no dashboard: {e}")
+
     return render_template('dashboard.html', 
                        slider_images=enumerated_slider_images,
                        slider_images_mobile=enumerated_slider_images_mobile,  # 👈 ahora sí explícito
@@ -964,9 +991,70 @@ def dashboard():
                        third_section=data.get('third_section', {}),
                        blogs=blogs,
                        contact_data=contact_data,
-                       testimonials=testimonials)
+                       testimonials=testimonials,
+                       campanhas=campanhas)
 
 
+
+#---------------------------------------------------------------------------
+# ROTAS DE CAMPANHAS
+#---------------------------------------------------------------------------
+
+@app.route('/get_campanhas', methods=['GET'])
+def get_campanhas():
+    """Retorna as campanhas em JSON"""
+    try:
+        campanhas_path = os.path.join(app.static_folder, 'data', 'campanhas.json')
+        if os.path.exists(campanhas_path):
+            with open(campanhas_path, 'r', encoding='utf-8') as f:
+                campanhas = json.load(f)
+            return jsonify(campanhas), 200
+        return jsonify([]), 200
+    except Exception as e:
+        print(f"Erro ao carregar campanhas: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/save_campanhas', methods=['POST'])
+def save_campanhas():
+    """Salva as campanhas"""
+    try:
+        data = request.get_json()
+        campanhas_path = os.path.join(app.static_folder, 'data', 'campanhas.json')
+        with open(campanhas_path, 'w', encoding='utf-8') as f:
+            json.dump(data, f, ensure_ascii=False, indent=4)
+        return jsonify({"success": True}), 200
+    except Exception as e:
+        print(f"Erro ao salvar campanhas: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/upload_campanha_image', methods=['POST'])
+def upload_campanha_image():
+    """Upload de imagem para campanha"""
+    try:
+        if 'file' not in request.files:
+            return jsonify({"error": "Nenhum arquivo enviado"}), 400
+        
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({"error": "Nenhum arquivo selecionado"}), 400
+        
+        # Criar pasta se não existir
+        campanhas_folder = os.path.join(app.static_folder, 'img', 'campanhas')
+        os.makedirs(campanhas_folder, exist_ok=True)
+        
+        # Gerar nome único para o arquivo
+        filename = secure_filename(file.filename)
+        timestamp = str(int(time.time()))
+        name, ext = os.path.splitext(filename)
+        unique_filename = f"{name}_{timestamp}{ext}"
+        
+        filepath = os.path.join(campanhas_folder, unique_filename)
+        file.save(filepath)
+        
+        return jsonify({"success": True, "filename": f"img/campanhas/{unique_filename}"}), 200
+    except Exception as e:
+        print(f"Erro ao fazer upload de imagem de campanha: {e}")
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/get_json', methods=['GET'])
 def get_json():
@@ -1191,11 +1279,13 @@ def upload_files():
 
         # Subir los archivos
         files = request.files.getlist('files')
+        uploaded_files = []
         for file in files:
             filename = secure_filename(file.filename)
             file.save(os.path.join(full_path, filename))
+            uploaded_files.append(filename)
 
-        return jsonify({"success": "Archivos subidos con éxito"}), 200
+        return jsonify({"success": "Archivos subidos com sucesso", "files": uploaded_files}), 200
 
     except Exception as e:
         print(f"Error al subir archivos: {e}")

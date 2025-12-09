@@ -1,0 +1,362 @@
+/* ============================================
+   POPUP DE CAMPANHAS - DESKTOP
+   ============================================ */
+
+.campanhas-popup-desktop {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.7);
+    width: 90%;
+    max-width: 700px;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    overflow: hidden;
+}
+
+.campanhas-popup-desktop.show {
+    display: block;
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.campanhas-popup-desktop::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(41, 128, 185, 0.05) 0%, rgba(142, 68, 173, 0.05) 100%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.campanhas-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    border-radius: 50%;
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 10;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+}
+
+.campanhas-close:hover {
+    background: #e74c3c;
+    color: white;
+    transform: rotate(90deg) scale(1.05);
+}
+
+.campanhas-slider-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.campanhas-slides {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    overflow: hidden;
+}
+
+.campanha-slide {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transform: translateX(0);
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    z-index: 1;
+}
+
+.campanha-slide.active {
+    opacity: 1;
+    transform: translateX(0);
+    z-index: 2;
+}
+
+.campanha-slide img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 20px;
+}
+
+.campanhas-prev,
+.campanhas-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 38px;
+    height: 38px;
+    background: rgba(255, 255, 255, 0.95);
+    border: none;
+    border-radius: 50%;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 10;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    opacity: 0.9;
+}
+
+.campanhas-prev {
+    left: 15px;
+}
+
+.campanhas-next {
+    right: 15px;
+}
+
+.campanhas-prev:hover,
+.campanhas-next:hover {
+    background: #3498db;
+    color: white;
+    transform: translateY(-50%) scale(1.08);
+    opacity: 1;
+}
+
+.campanhas-dots {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    z-index: 10;
+}
+
+.campanha-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid rgba(255, 255, 255, 0.8);
+}
+
+.campanha-dot.active {
+    background: white;
+    transform: scale(1.3);
+}
+
+/* ============================================
+   NOTIFICAÇÃO MOBILE - BOTTOM SHEET
+   ============================================ */
+
+.campanhas-mobile {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: white;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.4), 0 -10px 30px rgba(0, 0, 0, 0.3);
+    z-index: 10000;
+    transform: translateY(100%);
+    max-height: 40vh;
+    overflow: visible;
+    padding: 0;
+    padding-bottom: 50px;
+    margin: 0;
+    opacity: 0;
+    transition: none;
+}
+
+.campanhas-mobile.show {
+    display: block;
+    transform: translateY(0) !important;
+    opacity: 1 !important;
+    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+.campanhas-mobile.hiding {
+    display: block !important;
+    transform: translateY(100%) !important;
+    opacity: 0 !important;
+    transition: transform 0.5s cubic-bezier(0.55, 0.055, 0.675, 0.19), opacity 0.5s cubic-bezier(0.55, 0.055, 0.675, 0.19) !important;
+}
+
+.campanhas-mobile::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 2px;
+    z-index: 11;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.campanhas-close-mobile {
+    display: none;
+}
+
+.campanhas-mobile-slider {
+    position: relative;
+    width: 100%;
+    height: 40vh;
+    overflow: visible;
+    margin-top: 0;
+    touch-action: pan-x;
+    padding: 0;
+    border-radius: 20px 20px 0 0;
+    transform: translateY(0);
+}
+
+.campanha-slide-mobile {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transform: translate3d(0, 0, 0);
+    transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    will-change: opacity;
+    z-index: 1;
+}
+
+.campanha-slide-mobile.active {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    z-index: 2;
+}
+
+.campanha-slide-mobile img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 20px 20px 0 0;
+    display: block;
+}
+
+.campanhas-dots-mobile {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex !important;
+    justify-content: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 20px;
+    backdrop-filter: blur(4px);
+    z-index: 20;
+    pointer-events: auto;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.campanha-dot-mobile {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.campanha-dot-mobile.active {
+    background: white;
+    transform: scale(1.4);
+}
+
+/* Overlay para fechar ao clicar fora */
+.campanhas-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 9999;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+
+.campanhas-overlay.show {
+    display: block;
+    opacity: 1;
+}
+
+@media (max-width: 768px) {
+    .campanhas-overlay {
+        background: rgba(0, 0, 0, 0.2);
+    }
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .campanhas-popup-desktop {
+        display: none !important;
+    }
+    
+    .campanhas-slides {
+        height: 400px;
+    }
+}
+
+@media (min-width: 769px) {
+    .campanhas-mobile {
+        display: none !important;
+    }
+}
+
+/* Animações suaves */
+@keyframes slideInUp {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
