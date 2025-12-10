@@ -1,1 +1,532 @@
-[]
+[
+  {
+    "sessionId": "visitor_1765385708659_n18v41qkv",
+    "deviceType": "desktop",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36",
+    "screenWidth": 1280,
+    "screenHeight": 720,
+    "viewportWidth": 1270,
+    "viewportHeight": 543,
+    "entryTime": "2025-12-10T16:55:08.659Z",
+    "exitTime": "2025-12-10T17:23:46.441Z",
+    "pages": [
+      {
+        "url": "/",
+        "title": "Costamatoso",
+        "timeSpent": 133866,
+        "loadTime": 1586,
+        "visits": 17
+      },
+      {
+        "url": "/categoria/Arquitetonicos",
+        "title": "Arquitetonicos - Costamatoso",
+        "timeSpent": 52848,
+        "loadTime": 1201,
+        "visits": 20
+      },
+      {
+        "url": "/categoria/Arquitetonicos/Centro_Comercial_Plazza",
+        "title": "Centro_Comercial_Plazza - Costamatoso",
+        "timeSpent": 1695179,
+        "loadTime": 314,
+        "visits": 59
+      },
+      {
+        "url": "/categoria/Interiores",
+        "title": "Interiores - Costamatoso",
+        "timeSpent": 1498436,
+        "loadTime": 224,
+        "visits": 31
+      },
+      {
+        "url": "/categoria/Interiores/Familia_Mota",
+        "title": "Familia_Mota - Costamatoso",
+        "timeSpent": 256359,
+        "loadTime": 397,
+        "visits": 25
+      },
+      {
+        "url": "/categoria/Arquitetonicos/Familia_Bragion",
+        "title": "Familia_Bragion - Costamatoso",
+        "timeSpent": 23052,
+        "loadTime": 129,
+        "visits": 4
+      },
+      {
+        "url": "/categoria/Interiores/Familia_Zucato",
+        "title": "Familia_Zucato - Costamatoso",
+        "timeSpent": 313977,
+        "loadTime": 126,
+        "visits": 14
+      },
+      {
+        "url": "/categoria/Lares_Entregues",
+        "title": "Lares Entregues - Costamatoso",
+        "timeSpent": 20249,
+        "loadTime": 476,
+        "visits": 3
+      }
+    ],
+    "clicks": [
+      {
+        "timestamp": "2025-12-10T16:55:16.096Z",
+        "url": "/",
+        "element": {
+          "tag": "a",
+          "id": null,
+          "className": "cc-btn cc-ALLOW",
+          "text": "Aceitar Cookies",
+          "href": ""
+        },
+        "position": {
+          "x": 709,
+          "y": 489
+        }
+      },
+      {
+        "timestamp": "2025-12-10T16:55:30.043Z",
+        "url": "/categoria/Arquitetonicos",
+        "element": {
+          "tag": "img",
+          "id": null,
+          "className": "imagem-animada aparecer",
+          "text": null,
+          "href": "http://127.0.0.1:5000/categoria/Arquitetonicos/Centro_Comercial_Plazza"
+        },
+        "position": {
+          "x": 595,
+          "y": 294
+        }
+      },
+      {
+        "timestamp": "2025-12-10T16:55:31.516Z",
+        "url": "/categoria/Arquitetonicos/Centro_Comercial_Plazza",
+        "element": {
+          "tag": "a",
+          "id": null,
+          "className": "cc-btn cc-ALLOW",
+          "text": "Aceitar Cookies",
+          "href": ""
+        },
+        "position": {
+          "x": 687,
+          "y": 484
+        }
+      },
+      {
+        "timestamp": "2025-12-10T17:03:57.918Z",
+        "url": "/categoria/Interiores",
+        "element": {
+          "tag": "img",
+          "id": null,
+          "className": "imagem-animada aparecer",
+          "text": null,
+          "href": "http://127.0.0.1:5000/categoria/Interiores/Familia_Mota"
+        },
+        "position": {
+          "x": 925,
+          "y": 228
+        }
+      },
+      {
+        "timestamp": "2025-12-10T17:04:05.736Z",
+        "url": "/categoria/Interiores/Familia_Mota",
+        "element": {
+          "tag": "a",
+          "id": null,
+          "className": "cc-btn cc-ALLOW",
+          "text": "Aceitar Cookies",
+          "href": ""
+        },
+        "position": {
+          "x": 726,
+          "y": 486
+        }
+      },
+      {
+        "timestamp": "2025-12-10T17:04:42.999Z",
+        "url": "/categoria/Interiores/Familia_Mota",
+        "element": {
+          "tag": "a",
+          "id": null,
+          "className": "cc-btn cc-ALLOW",
+          "text": "Aceitar Cookies",
+          "href": ""
+        },
+        "position": {
+          "x": 681,
+          "y": 485
+        }
+      },
+      {
+        "timestamp": "2025-12-10T17:04:56.134Z",
+        "url": "/categoria/Interiores/Familia_Mota",
+        "element": {
+          "tag": "a",
+          "id": null,
+          "className": "cc-btn cc-ALLOW",
+          "text": "Aceitar Cookies",
+          "href": ""
+        },
+        "position": {
+          "x": 687,
+          "y": 492
+        }
+      },
+      {
+        "timestamp": "2025-12-10T17:05:09.842Z",
+        "url": "/categoria/Arquitetonicos",
+        "element": {
+          "tag": "img",
+          "id": null,
+          "className": "imagem-animada aparecer",
+          "text": null,
+          "href": "http://127.0.0.1:5000/categoria/Arquitetonicos/Familia_Bragion"
+        },
+        "position": {
+          "x": 675,
+          "y": 198
+        }
+      },
+      {
+        "timestamp": "2025-12-10T17:05:11.681Z",
+        "url": "/categoria/Arquitetonicos/Familia_Bragion",
+        "element": {
+          "tag": "a",
+          "id": null,
+          "className": "cc-btn cc-ALLOW",
+          "text": "Aceitar Cookies",
+          "href": ""
+        },
+        "position": {
+          "x": 721,
+          "y": 479
+        }
+      },
+      {
+        "timestamp": "2025-12-10T17:05:26.390Z",
+        "url": "/categoria/Interiores",
+        "element": {
+          "tag": "img",
+          "id": null,
+          "className": "imagem-animada aparecer",
+          "text": null,
+          "href": "http://127.0.0.1:5000/categoria/Interiores/Familia_Zucato"
+        },
+        "position": {
+          "x": 686,
+          "y": 218
+        }
+      },
+      {
+        "timestamp": "2025-12-10T17:05:32.048Z",
+        "url": "/categoria/Interiores/Familia_Zucato",
+        "element": {
+          "tag": "a",
+          "id": null,
+          "className": "cc-btn cc-ALLOW",
+          "text": "Aceitar Cookies",
+          "href": ""
+        },
+        "position": {
+          "x": 704,
+          "y": 491
+        }
+      },
+      {
+        "timestamp": "2025-12-10T17:09:25.076Z",
+        "url": "/categoria/Arquitetonicos",
+        "element": {
+          "tag": "a",
+          "id": null,
+          "className": "cc-btn cc-ALLOW",
+          "text": "Aceitar Cookies",
+          "href": ""
+        },
+        "position": {
+          "x": 661,
+          "y": 489
+        }
+      },
+      {
+        "timestamp": "2025-12-10T17:09:34.942Z",
+        "url": "/categoria/Interiores",
+        "element": {
+          "tag": "a",
+          "id": null,
+          "className": "cc-btn cc-ALLOW",
+          "text": "Aceitar Cookies",
+          "href": ""
+        },
+        "position": {
+          "x": 718,
+          "y": 490
+        }
+      },
+      {
+        "timestamp": "2025-12-10T17:09:43.585Z",
+        "url": "/categoria/Lares_Entregues",
+        "element": {
+          "tag": "a",
+          "id": null,
+          "className": "cc-btn cc-ALLOW",
+          "text": "Aceitar Cookies",
+          "href": ""
+        },
+        "position": {
+          "x": 710,
+          "y": 482
+        }
+      },
+      {
+        "timestamp": "2025-12-10T17:09:50.095Z",
+        "url": "/categoria/Interiores",
+        "element": {
+          "tag": "a",
+          "id": null,
+          "className": "cc-btn cc-ALLOW",
+          "text": "Aceitar Cookies",
+          "href": ""
+        },
+        "position": {
+          "x": 729,
+          "y": 487
+        }
+      },
+      {
+        "timestamp": "2025-12-10T17:15:23.335Z",
+        "url": "/categoria/Interiores",
+        "element": {
+          "tag": "a",
+          "id": null,
+          "className": "cc-btn cc-ALLOW",
+          "text": "Aceitar Cookies",
+          "href": ""
+        },
+        "position": {
+          "x": 729,
+          "y": 478
+        }
+      },
+      {
+        "timestamp": "2025-12-10T17:15:49.103Z",
+        "url": "/categoria/Arquitetonicos",
+        "element": {
+          "tag": "img",
+          "id": null,
+          "className": "imagem-animada aparecer",
+          "text": null,
+          "href": "http://127.0.0.1:5000/categoria/Arquitetonicos/Centro_Comercial_Plazza"
+        },
+        "position": {
+          "x": 715,
+          "y": 284
+        }
+      },
+      {
+        "timestamp": "2025-12-10T17:15:51.756Z",
+        "url": "/categoria/Arquitetonicos/Centro_Comercial_Plazza",
+        "element": {
+          "tag": "a",
+          "id": null,
+          "className": "cc-btn cc-ALLOW",
+          "text": "Aceitar Cookies",
+          "href": ""
+        },
+        "position": {
+          "x": 708,
+          "y": 478
+        }
+      },
+      {
+        "timestamp": "2025-12-10T17:16:09.571Z",
+        "url": "/categoria/Arquitetonicos/Centro_Comercial_Plazza",
+        "element": {
+          "tag": "a",
+          "id": null,
+          "className": "cc-btn cc-ALLOW",
+          "text": "Aceitar Cookies",
+          "href": ""
+        },
+        "position": {
+          "x": 716,
+          "y": 482
+        }
+      },
+      {
+        "timestamp": "2025-12-10T17:18:59.844Z",
+        "url": "/categoria/Arquitetonicos/Centro_Comercial_Plazza",
+        "element": {
+          "tag": "a",
+          "id": null,
+          "className": "cc-btn cc-ALLOW",
+          "text": "Aceitar Cookies",
+          "href": ""
+        },
+        "position": {
+          "x": 685,
+          "y": 492
+        }
+      },
+      {
+        "timestamp": "2025-12-10T17:19:06.647Z",
+        "url": "/categoria/Arquitetonicos/Centro_Comercial_Plazza",
+        "element": {
+          "tag": "div",
+          "id": null,
+          "className": "cabecalho cabecalho-desktop zoom-in",
+          "text": "\n      \n      \n      \n        Centro Comercial Pla",
+          "href": null
+        },
+        "position": {
+          "x": 833,
+          "y": 191
+        }
+      },
+      {
+        "timestamp": "2025-12-10T17:19:07.415Z",
+        "url": "/categoria/Arquitetonicos/Centro_Comercial_Plazza",
+        "element": {
+          "tag": "div",
+          "id": null,
+          "className": "overlay-cabecalho",
+          "text": null,
+          "href": null
+        },
+        "position": {
+          "x": 828,
+          "y": 182
+        }
+      },
+      {
+        "timestamp": "2025-12-10T17:19:52.362Z",
+        "url": "/categoria/Arquitetonicos/Centro_Comercial_Plazza",
+        "element": {
+          "tag": "a",
+          "id": null,
+          "className": "cc-btn cc-ALLOW",
+          "text": "Aceitar Cookies",
+          "href": ""
+        },
+        "position": {
+          "x": 740,
+          "y": 476
+        }
+      },
+      {
+        "timestamp": "2025-12-10T17:20:34.894Z",
+        "url": "/categoria/Arquitetonicos",
+        "element": {
+          "tag": "img",
+          "id": null,
+          "className": "imagem-animada aparecer",
+          "text": null,
+          "href": "http://127.0.0.1:5000/categoria/Arquitetonicos/Centro_Comercial_Plazza"
+        },
+        "position": {
+          "x": 707,
+          "y": 300
+        }
+      },
+      {
+        "timestamp": "2025-12-10T17:20:39.209Z",
+        "url": "/categoria/Interiores",
+        "element": {
+          "tag": "img",
+          "id": null,
+          "className": "imagem-animada aparecer",
+          "text": null,
+          "href": "http://127.0.0.1:5000/categoria/Interiores/Familia_Mota"
+        },
+        "position": {
+          "x": 971,
+          "y": 286
+        }
+      },
+      {
+        "timestamp": "2025-12-10T17:20:42.343Z",
+        "url": "/categoria/Interiores/Familia_Mota",
+        "element": {
+          "tag": "a",
+          "id": null,
+          "className": "cc-btn cc-ALLOW",
+          "text": "Aceitar Cookies",
+          "href": ""
+        },
+        "position": {
+          "x": 698,
+          "y": 483
+        }
+      },
+      {
+        "timestamp": "2025-12-10T17:23:26.376Z",
+        "url": "/categoria/Interiores/Familia_Mota",
+        "element": {
+          "tag": "a",
+          "id": null,
+          "className": null,
+          "text": "Início",
+          "href": "http://127.0.0.1:5000/"
+        },
+        "position": {
+          "x": 648,
+          "y": 52
+        }
+      },
+      {
+        "timestamp": "2025-12-10T17:23:29.613Z",
+        "url": "/",
+        "element": {
+          "tag": "a",
+          "id": null,
+          "className": "cc-btn cc-ALLOW",
+          "text": "Aceitar Cookies",
+          "href": ""
+        },
+        "position": {
+          "x": 693,
+          "y": 478
+        }
+      },
+      {
+        "timestamp": "2025-12-10T17:23:30.890Z",
+        "url": "/",
+        "element": {
+          "tag": "a",
+          "id": null,
+          "className": "slider-button",
+          "text": "EXPLORE!",
+          "href": "http://127.0.0.1:5000/categoria/Nossas_Entregas"
+        },
+        "position": {
+          "x": 639,
+          "y": 477
+        }
+      },
+      {
+        "timestamp": "2025-12-10T17:23:45.955Z",
+        "url": "/",
+        "element": {
+          "tag": "a",
+          "id": null,
+          "className": "slider-button",
+          "text": "EXPLORE!",
+          "href": "http://127.0.0.1:5000/categoria/Nossas_Entregas"
+        },
+        "position": {
+          "x": 641,
+          "y": 480
+        }
+      }
+    ],
+    "currentPage": {
+      "url": "/",
+      "title": "Costamatoso",
+      "entryTime": 1765387437891,
+      "exitTime": 1765387498687,
+      "loadTime": 1586,
+      "timeSpent": 60796
+    },
+    "totalTimeSpent": 1790029
+  }
+]
