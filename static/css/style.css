@@ -691,6 +691,10 @@ body:has(.campanhas-overlay.show) .slideshow .slide {
         width: 14px;
         height: 14px;
     }
+
+    .projeto-info-cabecalho .info-item-camera {
+        display: none;
+    }
 }
 
 /* Seção de conteúdo */
@@ -795,9 +799,34 @@ body:has(.campanhas-overlay.show) .slideshow .slide {
     margin: 10px auto;
 }
 
+.footer-social {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 25px;
+    margin: 15px 0;
+}
+
+.footer-social a {
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.footer-social svg {
+    width: 16px;
+    height: 16px;
+}
+
+.footer-logo {
+    margin-top: 15px;
+}
+
 .footer-logo img {
-    height: 60px;
-    margin-top: 20px;
+    height: 50px;
+    max-width: 100%;
+    object-fit: contain;
 }
 
 /* Estilos para la galería en columnas */
@@ -922,71 +951,226 @@ body:has(.campanhas-overlay.show) .slideshow .slide {
 
 /* Sección "Descubra mais projetos" */
 .descubra-projetos {
-    padding: 40px 20px; /* Padding para los lados (20px) y arriba/abajo (40px) */
+    padding: 60px 20px;
+    background-color: #f9f9f9;
+}
+
+.descubra-projetos .container {
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 .descubra-projetos h2 {
     text-align: left;
-    font-size: 1.4em; /* Tamaño de fuente un poco más pequeño */
+    font-size: 1.8em;
     margin-bottom: 10px;
     font-weight: 300;
+    color: #333;
 }
 
 .linea-horizontal {
     width: 50px;
     height: 2px;
     background-color: #333;
-    margin-bottom: 20px;
+    margin-bottom: 30px;
+    border: none;
 }
 
-/* Contenedor de los proyectos relacionados en 2 columnas */
-.projetos-relacionados {
-    display: grid;
-    grid-template-columns: 1fr 1fr; /* Dos columnas */
-    gap: 20px; /* Espacio entre columnas */
-    align-items: start; /* Alineación de las imágenes en la parte superior */
+/* Container do slider */
+.projetos-slider-container {
+    position: relative;
+    overflow: hidden;
+    padding: 0 50px;
+    touch-action: pan-y pinch-zoom;
 }
 
-/* Estilo de cada proyecto relacionado */
+.projetos-slider {
+    display: flex;
+    gap: 20px;
+    will-change: transform;
+    cursor: grab;
+}
+
+.projetos-slider:active {
+    cursor: grabbing;
+}
+
+.projeto-slide {
+    flex: 0 0 calc(33.333% - 14px);
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.projeto-slide .projeto-relacionado {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.projeto-slide .projeto-caja {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Estilo de cada projeto relacionado */
 .projeto-relacionado {
     text-decoration: none;
     color: inherit;
-    display: block; /* Asegura que el proyecto sea un bloque completo */
+    display: block;
 }
 
 /* Caja que contiene la imagen y el título */
 .projeto-caja {
     position: relative;
     width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+    display: flex;
+    flex-direction: column;
+}
+
+.projeto-relacionado:hover .projeto-caja {
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
 }
 
 .projeto-caja img {
     width: 100%;
-    height: auto;
-    border-radius: 8px;
+    height: 300px;
+    min-height: 300px;
+    max-height: 300px;
+    object-fit: cover;
+    display: block;
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
+}
+
+.projeto-relacionado:hover .projeto-caja img {
+    transform: scale(1.05);
 }
 
 /* Cajita para el título dentro de la imagen */
 .titulo-caja {
     position: absolute;
-    bottom: 10px;
-    left: 10px;
-    background-color: rgba(0, 0, 0, 0.7);
-    padding: 5px 10px;
-    border-radius: 5px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0));
+    padding: 20px 15px 15px;
 }
 
 .titulo-caja p {
     margin: 0;
     color: #fff;
-    font-size: 0.9em; /* Tamaño de texto reducido */
-    font-weight: normal; /* Cambiado para un estilo más ligero */
+    font-size: 1em;
+    font-weight: 400;
 }
 
-/* Ajuste para pantallas pequeñas */
-@media (max-width: 300px) {
-    .projetos-relacionados {
-        grid-template-columns: 1fr; /* Una sola columna en pantallas pequeñas */
+/* Botões de navegação do slider */
+.slider-projeto-prev,
+.slider-projeto-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 24px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.slider-projeto-prev:hover,
+.slider-projeto-next:hover {
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.slider-projeto-prev {
+    left: 0;
+}
+
+.slider-projeto-next {
+    right: 0;
+}
+
+/* Dots do slider */
+.slider-projeto-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.slider-projeto-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #ccc;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.slider-projeto-dot.active {
+    background: #333;
+    width: 24px;
+    border-radius: 4px;
+}
+
+/* Ajuste para tablets */
+@media (max-width: 768px) {
+    .projeto-slide {
+        flex: 0 0 calc(50% - 10px);
+    }
+    
+    .projetos-slider-container {
+        padding: 0 40px;
+    }
+    
+    .slider-projeto-prev,
+    .slider-projeto-next {
+        width: 35px;
+        height: 35px;
+        font-size: 20px;
+    }
+    
+    .projeto-caja img {
+        height: 250px;
+    }
+}
+
+/* Ajuste para mobile */
+@media (max-width: 480px) {
+    .descubra-projetos {
+        padding: 40px 15px;
+    }
+    
+    .descubra-projetos h2 {
+        font-size: 1.4em;
+    }
+    
+    .projeto-slide {
+        flex: 0 0 100%;
+    }
+    
+    .projetos-slider-container {
+        padding: 0 30px;
+    }
+    
+    .projeto-caja img {
+        height: 200px;
     }
 }
 

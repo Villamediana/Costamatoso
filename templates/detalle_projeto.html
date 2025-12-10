@@ -59,7 +59,7 @@
               </span>
             {% endif %}
             {% if total_media > 0 %}
-              <span class="info-item">
+              <span class="info-item info-item-camera">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16" fill="currentColor">
                   <path d="M149.1 64.8L138.7 96H64C28.7 96 0 124.7 0 160V416c0 35.3 28.7 64 64 64H448c35.3 0 64-28.7 64-64V160c0-35.3-28.7-64-64-64H373.3L362.9 64.8C356.4 45.2 338.1 32 317.4 32H194.6c-20.7 0-39 13.2-45.5 32.8zM256 192a96 96 0 1 1 0 192 96 96 0 1 1 0-192z"/>
                 </svg>
@@ -115,6 +115,35 @@
       {% endfor %}
     </div>
   </section>
+
+  <!-- Seção "Descubra mais projetos" -->
+  {% if projetos_relacionados and projetos_relacionados|length > 0 %}
+  <section class="seccion descubra-projetos">
+    <div class="container">
+      <h2>Descubra mais projetos</h2>
+      <hr class="linea-horizontal">
+      <div class="projetos-slider-container">
+        <div class="projetos-slider">
+          {% for projeto in projetos_relacionados %}
+            <div class="projeto-slide">
+              <a href="{{ url_for('detalhe_projeto', nome_categoria=nome_categoria, nome_projeto=projeto.nome) }}" class="projeto-relacionado">
+                <div class="projeto-caja">
+                  <img src="{{ url_for('static', filename=projeto.capa) }}" alt="{{ projeto.nome.replace('_', ' ') }}" loading="lazy">
+                  <div class="titulo-caja">
+                    <p>{{ projeto.nome.replace('_', ' ') }}</p>
+                  </div>
+                </div>
+              </a>
+            </div>
+          {% endfor %}
+        </div>
+        <button class="slider-projeto-prev" aria-label="Anterior">‹</button>
+        <button class="slider-projeto-next" aria-label="Próximo">›</button>
+        <div class="slider-projeto-dots"></div>
+      </div>
+    </div>
+  </section>
+  {% endif %}
 
   {% include 'fixed/footer.html' %}
 
@@ -196,6 +225,280 @@
 
       lazy.forEach(img => io.observe(img));
     });
+
+    // Slider de projetos relacionados com autoplay
+    const projetosSlider = document.querySelector('.projetos-slider');
+    const projetosSlides = document.querySelectorAll('.projeto-slide');
+    const prevBtn = document.querySelector('.slider-projeto-prev');
+    const nextBtn = document.querySelector('.slider-projeto-next');
+    const dotsContainer = document.querySelector('.slider-projeto-dots');
+    
+    if (projetosSlider && projetosSlides.length > 0) {
+      let currentIndex = 0;
+      let autoplayInterval = null;
+      let slidesToShow = window.innerWidth <= 480 ? 1 : window.innerWidth <= 768 ? 2 : 3;
+      const totalSlides = projetosSlides.length;
+      
+      function isMobileDevice() {
+        return window.innerWidth <= 768;
+      }
+      
+      // Variáveis para drag/touch suave
+      let isDragging = false;
+      let startPos = 0;
+      let currentTranslate = 0;
+      let prevTranslate = 0;
+      let animationID = 0;
+      
+      // Criar dots baseado no número de páginas
+      const totalPages = Math.ceil(totalSlides / slidesToShow);
+      for (let i = 0; i < totalPages; i++) {
+        const dot = document.createElement('div');
+        dot.classList.add('slider-projeto-dot');
+        if (i === 0) dot.classList.add('active');
+        dot.addEventListener('click', () => goToSlide(i));
+        dotsContainer.appendChild(dot);
+      }
+      
+      function getPositionX(event) {
+        return event.type.includes('mouse') ? event.clientX : event.touches[0].clientX;
+      }
+      
+      function setSliderPosition() {
+        projetosSlider.style.transform = `translateX(${currentTranslate}px)`;
+      }
+      
+      function animation() {
+        setSliderPosition();
+        if (isDragging) requestAnimationFrame(animation);
+      }
+      
+      function updateSlider() {
+        const slideWidth = projetosSlider.offsetWidth / slidesToShow;
+        const translateX = -(currentIndex * slideWidth);
+        projetosSlider.style.transition = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+        projetosSlider.style.transform = `translateX(${translateX}px)`;
+        currentTranslate = translateX;
+        prevTranslate = currentTranslate;
+        
+        // Atualizar dots
+        const dots = dotsContainer.querySelectorAll('.slider-projeto-dot');
+        dots.forEach((dot, index) => {
+          dot.classList.toggle('active', Math.floor(currentIndex / slidesToShow) === index);
+        });
+      }
+      
+      function nextSlide() {
+        const totalPages = Math.ceil(totalSlides / slidesToShow);
+        const maxIndex = Math.max(0, (totalPages - 1) * slidesToShow);
+        currentIndex = (currentIndex + slidesToShow);
+        if (currentIndex > maxIndex) currentIndex = 0;
+        updateSlider();
+      }
+      
+      function prevSlide() {
+        const totalPages = Math.ceil(totalSlides / slidesToShow);
+        const maxIndex = Math.max(0, (totalPages - 1) * slidesToShow);
+        currentIndex = (currentIndex - slidesToShow);
+        if (currentIndex < 0) currentIndex = maxIndex;
+        updateSlider();
+      }
+      
+      function goToSlide(pageIndex) {
+        const totalPages = Math.ceil(totalSlides / slidesToShow);
+        const targetPage = Math.min(pageIndex, totalPages - 1);
+        currentIndex = targetPage * slidesToShow;
+        updateSlider();
+      }
+      
+      function setPositionByIndex() {
+        const slideWidth = projetosSlider.offsetWidth / slidesToShow;
+        currentTranslate = -(currentIndex * slideWidth);
+        prevTranslate = currentTranslate;
+        projetosSlider.style.transition = 'none';
+        setSliderPosition();
+      }
+      
+      // Inicializar posição
+      setTimeout(() => {
+        setPositionByIndex();
+      }, 100);
+      
+      function dragStart(event) {
+        startPos = getPositionX(event);
+        isDragging = true;
+        projetosSlider.style.transition = 'none';
+        animationID = requestAnimationFrame(animation);
+        projetosSlider.style.cursor = 'grabbing';
+      }
+      
+      function dragMove(event) {
+        if (!isDragging) return;
+        const currentPosition = getPositionX(event);
+        const moved = currentPosition - startPos;
+        const slideWidth = projetosSlider.offsetWidth / slidesToShow;
+        const maxTranslate = 0;
+        const minTranslate = -(totalSlides - slidesToShow) * slideWidth;
+        
+        currentTranslate = prevTranslate + moved;
+        
+        // Limitar o movimento
+        if (currentTranslate > maxTranslate) {
+          currentTranslate = maxTranslate;
+        } else if (currentTranslate < minTranslate) {
+          currentTranslate = minTranslate;
+        }
+      }
+      
+      function dragEnd() {
+        if (!isDragging) return;
+        cancelAnimationFrame(animationID);
+        isDragging = false;
+        projetosSlider.style.cursor = 'grab';
+        
+        const slideWidth = projetosSlider.offsetWidth / slidesToShow;
+        const movedBy = currentTranslate - prevTranslate;
+        
+        // Calcular qual slide está mais próximo baseado na posição atual
+        const currentPosition = -currentTranslate;
+        const nearestIndex = Math.round(currentPosition / slideWidth);
+        
+        // Limitar o índice aos limites válidos
+        const maxIndex = Math.max(0, totalSlides - slidesToShow);
+        const clampedIndex = Math.max(0, Math.min(nearestIndex, maxIndex));
+        
+        // Atualizar currentIndex para o slide mais próximo
+        currentIndex = clampedIndex;
+        
+        // Animar suavemente até a posição correta
+        updateSlider();
+      }
+      
+      function startAutoplay() {
+        // Só inicia autoplay se não for mobile
+        if (!isMobileDevice() && autoplayInterval === null) {
+          autoplayInterval = setInterval(nextSlide, 5000); // 5 segundos
+        }
+      }
+      
+      function stopAutoplay() {
+        if (autoplayInterval !== null) {
+          clearInterval(autoplayInterval);
+          autoplayInterval = null;
+        }
+      }
+      
+      if (prevBtn) prevBtn.addEventListener('click', () => { 
+        if (!isMobileDevice()) {
+          stopAutoplay(); 
+          prevSlide(); 
+          startAutoplay(); 
+        } else {
+          prevSlide();
+        }
+      });
+      
+      if (nextBtn) nextBtn.addEventListener('click', () => { 
+        if (!isMobileDevice()) {
+          stopAutoplay(); 
+          nextSlide(); 
+          startAutoplay(); 
+        } else {
+          nextSlide();
+        }
+      });
+      
+      // Pausar autoplay ao passar o mouse (apenas desktop)
+      const sliderContainer = document.querySelector('.projetos-slider-container');
+      if (sliderContainer) {
+        sliderContainer.addEventListener('mouseenter', () => {
+          if (!isMobileDevice()) {
+            stopAutoplay();
+          }
+        });
+        sliderContainer.addEventListener('mouseleave', () => {
+          if (!isMobileDevice()) {
+            startAutoplay();
+          }
+        });
+      }
+      
+      // Touch events para drag suave apenas no mobile
+      if (projetosSlider) {
+        // Touch events (apenas mobile)
+        projetosSlider.addEventListener('touchstart', (e) => {
+          if (isMobileDevice()) {
+            dragStart(e);
+          }
+        }, { passive: true });
+        
+        projetosSlider.addEventListener('touchmove', (e) => {
+          if (isMobileDevice() && isDragging) {
+            dragMove(e);
+          }
+        }, { passive: false });
+        
+        projetosSlider.addEventListener('touchend', () => {
+          if (isMobileDevice() && isDragging) {
+            dragEnd();
+          }
+        });
+        
+        projetosSlider.addEventListener('touchcancel', () => {
+          if (isMobileDevice() && isDragging) {
+            dragEnd();
+          }
+        });
+        
+        // Prevenir seleção de texto durante drag
+        projetosSlider.addEventListener('selectstart', (e) => {
+          if (isDragging && isMobileDevice()) {
+            e.preventDefault();
+          }
+        });
+      }
+      
+      // Iniciar autoplay apenas se não for mobile
+      if (!isMobileDevice()) {
+        startAutoplay();
+      }
+      
+      // Atualizar ao redimensionar
+      let resizeTimeout;
+      window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+          const newSlidesToShow = window.innerWidth <= 480 ? 1 : window.innerWidth <= 768 ? 2 : 3;
+          const wasMobile = isMobileDevice();
+          
+          if (newSlidesToShow !== slidesToShow) {
+            slidesToShow = newSlidesToShow;
+            currentIndex = 0;
+            // Recriar dots
+            dotsContainer.innerHTML = '';
+            const newTotalPages = Math.ceil(totalSlides / slidesToShow);
+            for (let i = 0; i < newTotalPages; i++) {
+              const dot = document.createElement('div');
+              dot.classList.add('slider-projeto-dot');
+              if (i === 0) dot.classList.add('active');
+              dot.addEventListener('click', () => goToSlide(i));
+              dotsContainer.appendChild(dot);
+            }
+            updateSlider();
+          }
+          
+          // Ajustar autoplay baseado no tamanho da tela
+          const nowMobile = isMobileDevice();
+          if (wasMobile !== nowMobile) {
+            if (nowMobile) {
+              stopAutoplay();
+            } else {
+              startAutoplay();
+            }
+          }
+        }, 250);
+      });
+    }
   </script>
 </body>
 </html>
