@@ -234,10 +234,11 @@
     const dotsContainer = document.querySelector('.slider-projeto-dots');
     
     if (projetosSlider && projetosSlides.length > 0) {
-      let currentIndex = 0;
       let autoplayInterval = null;
       let slidesToShow = window.innerWidth <= 480 ? 1 : window.innerWidth <= 768 ? 2 : 3;
       const totalSlides = projetosSlides.length;
+      let isTransitioning = false;
+      let currentIndex = slidesToShow; // Começar após os clones
       
       function isMobileDevice() {
         return window.innerWidth <= 768;
@@ -250,7 +251,30 @@
       let prevTranslate = 0;
       let animationID = 0;
       
-      // Criar dots baseado no número de páginas
+      // Duplicar slides para carrossel infinito
+      function cloneSlides() {
+        const firstSlides = [];
+        const lastSlides = [];
+        
+        for (let i = 0; i < slidesToShow; i++) {
+          firstSlides.push(projetosSlides[projetosSlides.length - slidesToShow + i].cloneNode(true));
+          lastSlides.push(projetosSlides[i].cloneNode(true));
+        }
+        
+        // Adicionar clones no final
+        lastSlides.forEach(slide => projetosSlider.appendChild(slide));
+        
+        // Adicionar clones no início
+        firstSlides.reverse().forEach(slide => projetosSlider.insertBefore(slide, projetosSlider.firstChild));
+        
+        // Atualizar referência aos slides
+        const allSlides = projetosSlider.querySelectorAll('.projeto-slide');
+        currentIndex = slidesToShow; // Começar após os clones iniciais
+      }
+      
+      cloneSlides();
+      
+      // Criar dots baseado no número de páginas (sem contar clones)
       const totalPages = Math.ceil(totalSlides / slidesToShow);
       for (let i = 0; i < totalPages; i++) {
         const dot = document.createElement('div');
@@ -273,41 +297,92 @@
         if (isDragging) requestAnimationFrame(animation);
       }
       
-      function updateSlider() {
+      function getRealIndex() {
+        // Converter índice com clones para índice real
+        const allSlides = projetosSlider.querySelectorAll('.projeto-slide');
+        const realTotal = totalSlides;
+        let realIndex = currentIndex - slidesToShow; // Subtrair clones iniciais
+        
+        if (realIndex < 0) {
+          realIndex = realTotal + realIndex;
+        } else if (realIndex >= realTotal) {
+          realIndex = realIndex - realTotal;
+        }
+        
+        return realIndex;
+      }
+      
+      function updateSlider(withoutTransition = false) {
+        if (isTransitioning) return;
+        
         const slideWidth = projetosSlider.offsetWidth / slidesToShow;
         const translateX = -(currentIndex * slideWidth);
-        projetosSlider.style.transition = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+        
+        if (withoutTransition) {
+          projetosSlider.style.transition = 'none';
+        } else {
+          projetosSlider.style.transition = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+        }
+        
         projetosSlider.style.transform = `translateX(${translateX}px)`;
         currentTranslate = translateX;
         prevTranslate = currentTranslate;
         
-        // Atualizar dots
+        // Atualizar dots baseado no índice real
+        const realIndex = getRealIndex();
         const dots = dotsContainer.querySelectorAll('.slider-projeto-dot');
+        const activeDotIndex = Math.floor(realIndex / slidesToShow);
         dots.forEach((dot, index) => {
-          dot.classList.toggle('active', Math.floor(currentIndex / slidesToShow) === index);
+          dot.classList.toggle('active', index === activeDotIndex);
         });
       }
       
+      function checkAndResetPosition() {
+        const allSlides = projetosSlider.querySelectorAll('.projeto-slide');
+        const slideWidth = projetosSlider.offsetWidth / slidesToShow;
+        
+        // Se chegou no final (clones finais)
+        if (currentIndex >= allSlides.length - slidesToShow) {
+          isTransitioning = true;
+          projetosSlider.style.transition = 'none';
+          currentIndex = slidesToShow; // Voltar para o início real
+          updateSlider(true);
+          setTimeout(() => {
+            isTransitioning = false;
+            projetosSlider.style.transition = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+          }, 50);
+        }
+        // Se voltou ao início (clones iniciais)
+        else if (currentIndex < slidesToShow) {
+          isTransitioning = true;
+          projetosSlider.style.transition = 'none';
+          currentIndex = allSlides.length - (slidesToShow * 2); // Ir para o final real
+          updateSlider(true);
+          setTimeout(() => {
+            isTransitioning = false;
+            projetosSlider.style.transition = 'transform 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
+          }, 50);
+        }
+      }
+      
       function nextSlide() {
-        const totalPages = Math.ceil(totalSlides / slidesToShow);
-        const maxIndex = Math.max(0, (totalPages - 1) * slidesToShow);
-        currentIndex = (currentIndex + slidesToShow);
-        if (currentIndex > maxIndex) currentIndex = 0;
+        if (isTransitioning) return;
+        currentIndex += slidesToShow;
         updateSlider();
+        setTimeout(checkAndResetPosition, 600); // Após a transição
       }
       
       function prevSlide() {
-        const totalPages = Math.ceil(totalSlides / slidesToShow);
-        const maxIndex = Math.max(0, (totalPages - 1) * slidesToShow);
-        currentIndex = (currentIndex - slidesToShow);
-        if (currentIndex < 0) currentIndex = maxIndex;
+        if (isTransitioning) return;
+        currentIndex -= slidesToShow;
         updateSlider();
+        setTimeout(checkAndResetPosition, 600); // Após a transição
       }
       
       function goToSlide(pageIndex) {
-        const totalPages = Math.ceil(totalSlides / slidesToShow);
-        const targetPage = Math.min(pageIndex, totalPages - 1);
-        currentIndex = targetPage * slidesToShow;
+        if (isTransitioning) return;
+        const targetIndex = (pageIndex * slidesToShow) + slidesToShow; // +slidesToShow para pular clones iniciais
+        currentIndex = targetIndex;
         updateSlider();
       }
       
@@ -322,6 +397,7 @@
       // Inicializar posição
       setTimeout(() => {
         setPositionByIndex();
+        updateSlider(true);
       }, 100);
       
       function dragStart(event) {
@@ -337,16 +413,18 @@
         const currentPosition = getPositionX(event);
         const moved = currentPosition - startPos;
         const slideWidth = projetosSlider.offsetWidth / slidesToShow;
+        const allSlides = projetosSlider.querySelectorAll('.projeto-slide');
         const maxTranslate = 0;
-        const minTranslate = -(totalSlides - slidesToShow) * slideWidth;
+        const minTranslate = -(allSlides.length - slidesToShow) * slideWidth;
         
         currentTranslate = prevTranslate + moved;
         
-        // Limitar o movimento
+        // Permitir movimento livre durante o drag (sem limites rígidos para efeito infinito)
+        // Mas com resistência nas bordas
         if (currentTranslate > maxTranslate) {
-          currentTranslate = maxTranslate;
+          currentTranslate = maxTranslate + (moved * 0.2);
         } else if (currentTranslate < minTranslate) {
-          currentTranslate = minTranslate;
+          currentTranslate = minTranslate + (moved * 0.2);
         }
       }
       
@@ -357,21 +435,21 @@
         projetosSlider.style.cursor = 'grab';
         
         const slideWidth = projetosSlider.offsetWidth / slidesToShow;
-        const movedBy = currentTranslate - prevTranslate;
         
         // Calcular qual slide está mais próximo baseado na posição atual
         const currentPosition = -currentTranslate;
         const nearestIndex = Math.round(currentPosition / slideWidth);
         
-        // Limitar o índice aos limites válidos
-        const maxIndex = Math.max(0, totalSlides - slidesToShow);
-        const clampedIndex = Math.max(0, Math.min(nearestIndex, maxIndex));
-        
         // Atualizar currentIndex para o slide mais próximo
-        currentIndex = clampedIndex;
+        currentIndex = nearestIndex;
         
         // Animar suavemente até a posição correta
         updateSlider();
+        
+        // Verificar e resetar se necessário após a transição
+        setTimeout(() => {
+          checkAndResetPosition();
+        }, 600);
       }
       
       function startAutoplay() {
@@ -472,8 +550,20 @@
           const wasMobile = isMobileDevice();
           
           if (newSlidesToShow !== slidesToShow) {
+            // Remover clones antigos
+            const allSlides = projetosSlider.querySelectorAll('.projeto-slide');
+            const clonesToRemove = allSlides.length - totalSlides;
+            for (let i = 0; i < clonesToRemove; i++) {
+              if (allSlides[0]) allSlides[0].remove();
+              if (allSlides[allSlides.length - 1]) allSlides[allSlides.length - 1].remove();
+            }
+            
             slidesToShow = newSlidesToShow;
-            currentIndex = 0;
+            currentIndex = slidesToShow; // Resetar para após os clones
+            
+            // Recriar clones
+            cloneSlides();
+            
             // Recriar dots
             dotsContainer.innerHTML = '';
             const newTotalPages = Math.ceil(totalSlides / slidesToShow);
@@ -484,7 +574,9 @@
               dot.addEventListener('click', () => goToSlide(i));
               dotsContainer.appendChild(dot);
             }
-            updateSlider();
+            
+            setPositionByIndex();
+            updateSlider(true);
           }
           
           // Ajustar autoplay baseado no tamanho da tela
