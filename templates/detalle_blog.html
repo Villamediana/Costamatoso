@@ -20,7 +20,7 @@
     <section class="detalle-blog">
         <!-- Imagen de la capa -->
         <div class="blog-capa">
-            <img src="{{ url_for('static', filename='img/blog/' ~ imagen_folder ~ '/capa.jpg') }}" alt="{{ articulo['titulo'] }}">
+            <img src="{{ url_for('static', filename=get_blog_capa_url(imagen_folder)) }}" alt="{{ articulo['titulo'] }}">
         </div>
 
         <!-- Título del artículo -->
@@ -36,7 +36,7 @@
                 {% if item.tipo == 'parrafo' %}
                     <p>{{ item.valor|safe }}</p> <!-- Renderiza contenido HTML dentro de los párrafos -->
                 {% elif item.tipo == 'imagen' %}
-                    <img src="{{ url_for('static', filename='img/blog/' ~ imagen_folder ~ '/' ~ item.valor) }}" alt="{{ articulo['titulo'] }}">
+                    <img src="{{ url_for('static', filename=item.valor) }}" alt="{{ articulo['titulo'] }}">
                 {% endif %}
             {% endfor %}
         </div>

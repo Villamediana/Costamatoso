@@ -36,8 +36,8 @@
     <section class="seccion imagem-cabecalho">
         <div class="cabecalho">
             <picture>
-                <source media="(max-width: 767px)" srcset="{{ url_for('static', filename=header_images.blog.mobile) if header_images and header_images.blog else url_for('static', filename='img/slider_1.jpg') }}">
-                <img src="{{ url_for('static', filename=header_images.blog.desktop) if header_images and header_images.blog else url_for('static', filename='img/slider_1.jpg') }}" alt="BLOG">
+                <source media="(max-width: 767px)" srcset="{{ url_for('static', filename=header_images.blog.mobile) if header_images and header_images.blog else url_for('static', filename=get_image_url('img/slider_1.jpg')) }}">
+                <img src="{{ url_for('static', filename=header_images.blog.desktop) if header_images and header_images.blog else url_for('static', filename=get_image_url('img/slider_1.jpg')) }}" alt="BLOG">
             </picture>
             <div class="overlay-cabecalho"></div>
             <div class="texto-cabecalho">

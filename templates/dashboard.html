@@ -319,7 +319,7 @@
             <div class="slider-container" id="blog-container">
                 {% for blog in blogs %}
                     <div class="slider-item">
-                        <img src="{{ url_for('static', filename='img/blog/' ~ blog.folder ~ '/capa.jpg') }}" alt="Capa Blog {{ blog.titulo }}" class="slider-preview">
+                        <img src="{{ url_for('static', filename=blog.capa) }}" alt="Capa Blog {{ blog.titulo }}" class="slider-preview">
                         <div class="blog-info">
                             <h3>{{ blog.titulo }}</h3>
                             <p>{{ blog.autor }} - {{ blog.data }}</p>
