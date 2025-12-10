@@ -39,8 +39,9 @@
   <!-- capa da categoria -->
   <section class="seccion imagem-cabecalho">
     <div class="cabecalho">
-      <img src="{{ url_for('static', filename=get_categoria_capa_url(nome_categoria)) }}"
-           alt="{{ nome_categoria.replace('_', ' ') }}">
+      <img src="{{ url_for('static', filename='img/projetos/' ~ nome_categoria ~ '/capa.jpg') }}"
+           alt="{{ nome_categoria.replace('_', ' ') }}"
+           onerror="this.onerror=null; this.src='{{ url_for('static', filename='img/projetos/' ~ nome_categoria ~ '/capa.webp') }}';">
       <div class="overlay-cabecalho"></div>
       <div class="texto-cabecalho"><h1>{{ nome_categoria.replace('_', ' ') }}</h1></div>
     </div>

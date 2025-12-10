@@ -28,41 +28,6 @@ os.environ['GUNICORN_CMD_ARGS'] = '--limit-request-field_size 0 --limit-request-
 mail = Mail(app)
 
 # ---- Helper functions ----
-def get_image_url(image_path):
-    """
-    Retorna URL da imagem priorizando WebP se existir, senão retorna original.
-    Exemplo: 'img/slider_0.jpg' -> 'img/slider_0.webp' (se existir) ou 'img/slider_0.jpg'
-    """
-    if not image_path:
-        return image_path
-    
-    # Se já é WebP, retornar como está
-    if image_path.lower().endswith('.webp'):
-        return image_path
-    
-    # Tentar encontrar WebP correspondente
-    path_obj = Path(image_path)
-    webp_path = path_obj.parent / f"{path_obj.stem}.webp"
-    full_webp_path = os.path.join(app.static_folder, str(webp_path))
-    
-    if os.path.exists(full_webp_path):
-        # Retornar caminho WebP (usar forward slashes)
-        return str(webp_path).replace('\\', '/')
-    
-    # Se não tem WebP, verificar se original existe
-    full_original_path = os.path.join(app.static_folder, image_path)
-    if os.path.exists(full_original_path):
-        return image_path
-    
-    # Se original não existe, tentar _old
-    old_path = path_obj.parent / f"{path_obj.stem}_old{path_obj.suffix}"
-    full_old_path = os.path.join(app.static_folder, str(old_path))
-    if os.path.exists(full_old_path):
-        return str(old_path).replace('\\', '/')
-    
-    # Se nada existe, retornar original mesmo (pode dar 404, mas é melhor que quebrar)
-    return image_path
-
 def get_capa_url(categoria, projeto):
     """Retorna URL da capa (tenta .webp primeiro, depois .jpg)"""
     capa_webp = os.path.join(app.static_folder, 'img', 'projetos', categoria, projeto, 'capa.webp')
@@ -71,8 +36,7 @@ def get_capa_url(categoria, projeto):
         return f'img/projetos/{categoria}/{projeto}/capa.webp'
     elif os.path.exists(capa_jpg):
         return f'img/projetos/{categoria}/{projeto}/capa.jpg'
-    # Aplicar get_image_url no default também
-    return get_image_url('img/default_capa.jpg')
+    return 'img/default_capa.jpg'
 
 def get_blog_capa_url(folder):
     """Retorna URL da capa do blog (tenta .webp primeiro, depois .jpg)"""
@@ -84,20 +48,10 @@ def get_blog_capa_url(folder):
         return f'img/blog/{folder}/capa.jpg'
     return f'img/blog/{folder}/capa.jpg'  # Fallback
 
-def get_categoria_capa_url(categoria):
-    """Retorna URL da capa da categoria (tenta .webp primeiro, depois .jpg)"""
-    capa_path = f'img/projetos/{categoria}/capa.jpg'
-    return get_image_url(capa_path)
-
 # Adicionar função ao contexto do template
 @app.context_processor
 def utility_processor():
-    return dict(
-        get_capa_url=get_capa_url, 
-        get_blog_capa_url=get_blog_capa_url,
-        get_image_url=get_image_url,
-        get_categoria_capa_url=get_categoria_capa_url
-    )
+    return dict(get_capa_url=get_capa_url, get_blog_capa_url=get_blog_capa_url)
 
 # ---- Anti-spam utilities (simple, in-memory) ---------------------------------
 rate_limit_store = defaultdict(list)  # ip -> list[timestamps]
@@ -208,13 +162,9 @@ def index():
         data = {}
 
     # Obtener las imágenes del slider y el contenido de la segunda sección
-    # Aplicar get_image_url para priorizar WebP
-    slider_images = [get_image_url(img) for img in data.get('slider_images', [])]
-    slider_images_mobile = [get_image_url(img) for img in data.get('slider_images_mobile', [])]
-    second_section = data.get('second_section', {}).copy()
-    # Aplicar get_image_url na imagem da segunda seção se existir
-    if second_section.get('image'):
-        second_section['image'] = get_image_url(second_section['image'])
+    slider_images = data.get('slider_images', [])
+    slider_images_mobile = data.get('slider_images_mobile', [])
+    second_section = data.get('second_section', {})
 
     # Obtener los ítems del submenú dinámicamente (categorías)
     projetos_path = os.path.join(app.static_folder, 'img', 'projetos')
@@ -258,9 +208,17 @@ def categoria(nome_categoria):
     for projeto_name in os.listdir(categoria_path):
         projeto_path = os.path.join(categoria_path, projeto_name)
         if os.path.isdir(projeto_path):
-            # Ruta a la imagen de capa usando get_capa_url (já prioriza WebP)
-            capa_path = get_capa_url(nome_categoria, projeto_name)
-            capa_url = url_for('static', filename=capa_path)
+            # Ruta a la imagen de capa (tentar .webp primeiro, depois .jpg)
+            capa_webp = os.path.join(projeto_path, 'capa.webp')
+            capa_jpg = os.path.join(projeto_path, 'capa.jpg')
+            if os.path.exists(capa_webp):
+                relative_path = f'img/projetos/{nome_categoria}/{projeto_name}/capa.webp'
+                capa_url = url_for('static', filename=relative_path)
+            elif os.path.exists(capa_jpg):
+                relative_path = f'img/projetos/{nome_categoria}/{projeto_name}/capa.jpg'
+                capa_url = url_for('static', filename=relative_path)
+            else:
+                capa_url = url_for('static', filename='img/default_capa.jpg')  # Imagen por defecto si no hay capa
 
             # Leer el archivo info.json
             info_json_path = os.path.join(projeto_path, 'info.json')
@@ -327,16 +285,14 @@ def detalhe_projeto(nome_categoria, nome_projeto):
         if file_name.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp', '.mp4')) and file_name != 'capa.jpg' and not file_name.endswith('_old.jpg') and not file_name.endswith('_old.png') and not file_name.endswith('_old.jpeg'):
             # Construir la ruta relativa usando forward slashes
             relative_path = f'img/projetos/{nome_categoria}/{nome_projeto}/{file_name}'
-            
+            file_url = url_for('static', filename=relative_path)
+
             # Diferenciar imágenes y videos
             if file_name.lower().endswith(('.mp4')):
-                # Para videos, usar URL direta
-                file_url = url_for('static', filename=relative_path)
+                # Añadir un archivo de video
                 imagens.append({'url': file_url, 'tipo': 'video'})
             else:
-                # Para imagens, aplicar get_image_url para priorizar WebP
-                optimized_path = get_image_url(relative_path)
-                file_url = url_for('static', filename=optimized_path)
+                # Añadir un archivo de imagen con clase aleatoria
                 clase_aleatoria = random.choice(clases)
                 imagens.append({'url': file_url, 'tipo': 'imagen', 'clase': clase_aleatoria})
 
@@ -372,11 +328,16 @@ def detalhe_projeto(nome_categoria, nome_projeto):
             # pero puede que no haya tantos si estás muy al inicio o muy al final.
             # Ahora construimos la lista 'projetos_relacionados' con la misma lógica de 'capa'.
             for nome_relacionado in relacionados:
-                # Usar get_capa_url que já prioriza WebP
-                capa_relacionada = get_capa_url(nome_categoria, nome_relacionado)
-                if capa_relacionada == 'img/default_capa.jpg':
+                # Tentar .webp primeiro, depois .jpg
+                capa_webp = os.path.join(app.static_folder, 'img', 'projetos', nome_categoria, nome_relacionado, 'capa.webp')
+                capa_jpg = os.path.join(app.static_folder, 'img', 'projetos', nome_categoria, nome_relacionado, 'capa.jpg')
+                if os.path.exists(capa_webp):
+                    capa_relacionada = f'img/projetos/{nome_categoria}/{nome_relacionado}/capa.webp'
+                elif os.path.exists(capa_jpg):
+                    capa_relacionada = f'img/projetos/{nome_categoria}/{nome_relacionado}/capa.jpg'
+                else:
                     continue  # Pular se não tem capa
-                projetos_relacionados.append({
+                proyectos_relacionados.append({
                     'nome': nome_relacionado,
                     'capa': capa_relacionada
                 })
@@ -421,15 +382,8 @@ def contato():
         print(f"Erro ao carregar data.json: {e}")
         data = {}
 
-    contato_image = get_image_url(data.get('contato_image', 'img/default.jpg'))  # evita KeyError
-    header_images = data.get('header_images', {}).copy()
-    # Aplicar get_image_url em todos os headers
-    for key in header_images:
-        if isinstance(header_images[key], dict):
-            if 'desktop' in header_images[key]:
-                header_images[key]['desktop'] = get_image_url(header_images[key]['desktop'])
-            if 'mobile' in header_images[key]:
-                header_images[key]['mobile'] = get_image_url(header_images[key]['mobile'])
+    contato_image = data.get('contato_image', 'img/default.jpg')  # evita KeyError
+    header_images = data.get('header_images', {})
 
     projetos_path = os.path.join(app.static_folder, 'img', 'projetos')
     submenu_items = sorted(
@@ -543,14 +497,7 @@ def blog():
         print(f"Erro ao carregar data.json: {e}")
         data_json = {}
     
-    header_images = data_json.get('header_images', {}).copy()
-    # Aplicar get_image_url em todos os headers
-    for key in header_images:
-        if isinstance(header_images[key], dict):
-            if 'desktop' in header_images[key]:
-                header_images[key]['desktop'] = get_image_url(header_images[key]['desktop'])
-            if 'mobile' in header_images[key]:
-                header_images[key]['mobile'] = get_image_url(header_images[key]['mobile'])
+    header_images = data_json.get('header_images', {})
     
     # Ruta donde están los blogs
     blog_path = os.path.join(app.static_folder, 'img', 'blog')
@@ -574,12 +521,11 @@ def blog():
                     with open(json_path, 'r', encoding='utf-8') as json_file:
                         data = json.load(json_file)
                         # Agregar el artículo a la lista
-                        capa_path = f'img/blog/{articulo}/{data.get("capa", "capa.jpg")}'
                         articulos.append({
                             'nombre': articulo,
                             'titulo': data.get('titulo', 'Título no disponible'),
                             'descricao': data.get('descricao', 'Descrição não disponível'),
-                            'capa': get_image_url(capa_path)
+                            'capa': f'img/blog/{articulo}/{data.get("capa", "capa.jpg")}'
                         })
     
     # Obtener los ítems del submenú dinámicamente (categorías)
@@ -601,29 +547,17 @@ def detalle_blog(nombre_articulo):
     else:
         return "Artículo no encontrado", 404
 
-    # Procesar el contenido para calcular el tiempo de lectura e aplicar get_image_url
+    # Procesar el contenido para calcular el tiempo de lectura
     texto = ""
-    contenido_processado = []
-    imagen_folder = articulo.get('imagen_folder', nombre_articulo)
-    
     for item in articulo.get('contenido', []):
-        if item.get('tipo') == 'parrafo':
+        if item.get('tipo') == 'parrafo':  # Solo cuenta las palabras de los párrafos
             texto += item.get('texto', "") + " "
-            contenido_processado.append(item)
-        elif item.get('tipo') == 'imagen':
-            # Aplicar get_image_url na imagem do blog
-            imagem_path = f'img/blog/{imagen_folder}/{item.get("valor", "")}'
-            item_processed = item.copy()
-            item_processed['valor'] = get_image_url(imagem_path)
-            contenido_processado.append(item_processed)
-        else:
-            contenido_processado.append(item)
-    
-    # Atualizar conteúdo processado
-    articulo['contenido'] = contenido_processado
     
     palabras = texto.split()  # Dividir en palabras
     tiempo_lectura = max(1, len(palabras) // 200)  # Calcular tiempo de lectura a razón de 200 palabras por minuto
+
+    # Obtener el nombre de la carpeta de imágenes (si está en el JSON o usar el nombre del artículo por defecto)
+    imagen_folder = articulo.get('imagen_folder', nombre_articulo)
     
     # Formatear la fecha
     data = formatar_data(articulo.get('data'))
@@ -852,22 +786,9 @@ def depoimentos():
         print(f"Error al cargar el JSON: {e}")
         data = {}
 
-    second_section = data.get('second_section', {}).copy()
-    third_section = data.get('third_section', {}).copy()
-    header_images = data.get('header_images', {}).copy()
-    
-    # Aplicar get_image_url nas imagens
-    if second_section.get('image'):
-        second_section['image'] = get_image_url(second_section['image'])
-    if third_section.get('image'):
-        third_section['image'] = get_image_url(third_section['image'])
-    # Aplicar get_image_url em todos os headers
-    for key in header_images:
-        if isinstance(header_images[key], dict):
-            if 'desktop' in header_images[key]:
-                header_images[key]['desktop'] = get_image_url(header_images[key]['desktop'])
-            if 'mobile' in header_images[key]:
-                header_images[key]['mobile'] = get_image_url(header_images[key]['mobile'])
+    second_section = data.get('second_section', {})
+    third_section = data.get('third_section', {})
+    header_images = data.get('header_images', {})
 
     # carregar depoimentos dinâmicos
     testimonials = []
@@ -876,11 +797,6 @@ def depoimentos():
         if os.path.exists(depo_json):
             with open(depo_json, 'r', encoding='utf-8') as f:
                 testimonials = json.load(f)
-            
-            # Aplicar get_image_url nas imagens dos depoimentos
-            for testimonial in testimonials:
-                if 'image' in testimonial:
-                    testimonial['image'] = get_image_url(testimonial['image'])
             
             # Ordenar por ano (mais recente primeiro)
             def extract_year(title):
@@ -914,22 +830,9 @@ def nos():
         data = {}
 
     # Obtener las secciones del JSON
-    second_section = data.get('second_section', {}).copy()
-    third_section = data.get('third_section', {}).copy()
-    header_images = data.get('header_images', {}).copy()
-    
-    # Aplicar get_image_url nas imagens
-    if second_section.get('image'):
-        second_section['image'] = get_image_url(second_section['image'])
-    if third_section.get('image'):
-        third_section['image'] = get_image_url(third_section['image'])
-    # Aplicar get_image_url em todos os headers
-    for key in header_images:
-        if isinstance(header_images[key], dict):
-            if 'desktop' in header_images[key]:
-                header_images[key]['desktop'] = get_image_url(header_images[key]['desktop'])
-            if 'mobile' in header_images[key]:
-                header_images[key]['mobile'] = get_image_url(header_images[key]['mobile'])
+    second_section = data.get('second_section', {})
+    third_section = data.get('third_section', {})
+    header_images = data.get('header_images', {})
 
     # Obtener los ítems del submenú dinámicamente (categorías)
     projetos_path = os.path.join(app.static_folder, 'img', 'projetos')
@@ -1062,11 +965,9 @@ def dashboard():
 
         return redirect(url_for('dashboard'))
 
-    # Enumerar las imágenes para pasarlas a la plantilla (aplicar get_image_url)
-    slider_images_list = [get_image_url(img) for img in data.get('slider_images', [])]
-    slider_images_mobile_list = [get_image_url(img) for img in data.get('slider_images_mobile', [])]
-    enumerated_slider_images = list(enumerate(slider_images_list))
-    enumerated_slider_images_mobile = list(enumerate(slider_images_mobile_list))
+    # Enumerar las imágenes para pasarlas a la plantilla
+    enumerated_slider_images = list(enumerate(data.get('slider_images', [])))
+    enumerated_slider_images_mobile = list(enumerate(data.get('slider_images_mobile', [])))
 
     # Agregar la funcionalidad para cargar los blogs
     blogs_path = os.path.join(app.static_folder, 'img', 'blog')
@@ -1079,11 +980,10 @@ def dashboard():
                 if os.path.exists(blog_json_path):
                     with open(blog_json_path, 'r', encoding='utf-8') as f:
                         blog_data = json.load(f)
-                    capa_path = f'img/blog/{folder}/{blog_data.get("capa", "capa.jpg")}'
                     blogs.append({
                         'folder': folder,
                         'titulo': blog_data.get('titulo', 'Sem titulo'),
-                        'capa': get_image_url(capa_path),
+                        'capa': blog_data.get('capa', 'capa.jpg'),
                         'autor': blog_data.get('autor', '-'),
                         'data': blog_data.get('data', '-')
                     })
@@ -1128,38 +1028,12 @@ def dashboard():
         except Exception as e:
             print(f"Erro ao carregar campanhas.json no dashboard: {e}")
 
-    # Aplicar get_image_url nas imagens do dashboard
-    dashboard_second_section = data.get('second_section', {}).copy()
-    dashboard_third_section = data.get('third_section', {}).copy()
-    dashboard_header_images = data.get('header_images', {}).copy()
-    
-    if dashboard_second_section.get('image'):
-        dashboard_second_section['image'] = get_image_url(dashboard_second_section['image'])
-    if dashboard_third_section.get('image'):
-        dashboard_third_section['image'] = get_image_url(dashboard_third_section['image'])
-    for key in dashboard_header_images:
-        if isinstance(dashboard_header_images[key], dict):
-            if 'desktop' in dashboard_header_images[key]:
-                dashboard_header_images[key]['desktop'] = get_image_url(dashboard_header_images[key]['desktop'])
-            if 'mobile' in dashboard_header_images[key]:
-                dashboard_header_images[key]['mobile'] = get_image_url(dashboard_header_images[key]['mobile'])
-    
-    # Aplicar get_image_url nas imagens dos depoimentos
-    for testimonial in testimonials:
-        if 'image' in testimonial:
-            testimonial['image'] = get_image_url(testimonial['image'])
-    
-    # Aplicar get_image_url nas imagens das campanhas
-    for campanha in campanhas:
-        if 'image' in campanha:
-            campanha['image'] = get_image_url(campanha['image'])
-    
     return render_template('dashboard.html', 
                        slider_images=enumerated_slider_images,
                        slider_images_mobile=enumerated_slider_images_mobile,  # 👈 ahora sí explícito
-                       header_images=dashboard_header_images,
-                       second_section=dashboard_second_section,
-                       third_section=dashboard_third_section,
+                       header_images=data.get('header_images', {}),
+                       second_section=data.get('second_section', {}),
+                       third_section=data.get('third_section', {}),
                        blogs=blogs,
                        contact_data=contact_data,
                        testimonials=testimonials,
@@ -1592,15 +1466,13 @@ def residencias_242():
         for file_name in os.listdir(imagens_path):
             if file_name.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp', '.mp4')) and '_old' not in file_name:
                 relative_path = f'img/242/{file_name}'
+                file_url = url_for('static', filename=relative_path)
 
                 # Diferenciar imágenes y videos
                 if file_name.lower().endswith('.mp4'):
-                    file_url = url_for('static', filename=relative_path)
                     imagens.append({'url': file_url, 'tipo': 'video'})
                 else:
-                    # Para imagens, aplicar get_image_url para priorizar WebP
-                    optimized_path = get_image_url(relative_path)
-                    file_url = url_for('static', filename=optimized_path)
+                    # Clases aleatorias para la galería
                     clases = ['wide', 'tall', 'medium', '']
                     imagens.append({'url': file_url, 'tipo': 'imagen', 'clase': random.choice(clases)})
 
@@ -1629,69 +1501,59 @@ webp_transform_status = {
 }
 webp_lock = threading.Lock()  # Lock para thread safety
 
-def convert_to_webp(image_path, quality=75):
-    """Converte uma imagem para WebP"""
+def optimize_image(image_path, quality=75):
+    """Otimiza uma imagem mantendo a extensão original"""
     try:
+        original_size = os.path.getsize(image_path)
         img = Image.open(image_path)
         
-        # Converter RGBA para RGB se necessário
-        if img.mode in ('RGBA', 'LA', 'P'):
-            background = Image.new('RGB', img.size, (255, 255, 255))
+        # Determinar formato e extensão
+        ext = os.path.splitext(image_path)[1].lower()
+        format_map = {
+            '.jpg': 'JPEG',
+            '.jpeg': 'JPEG',
+            '.png': 'PNG'
+        }
+        img_format = format_map.get(ext, 'JPEG')
+        
+        # Para PNG, manter transparência se existir
+        if img_format == 'PNG' and img.mode in ('RGBA', 'LA', 'P'):
+            # PNG com transparência - manter como PNG
             if img.mode == 'P':
                 img = img.convert('RGBA')
-            if img.mode == 'RGBA':
-                background.paste(img, mask=img.split()[-1])
-            img = background
-        elif img.mode != 'RGB':
-            img = img.convert('RGB')
-        
-        # Criar caminho WebP
-        webp_path = str(image_path).rsplit('.', 1)[0] + '.webp'
-        
-        # Salvar como WebP com qualidade 75 (mais compressão, maior economia)
-        img.save(webp_path, 'WEBP', quality=quality, method=6)
+            # Salvar PNG otimizado
+            img.save(image_path, 'PNG', optimize=True, compress_level=9)
+        elif img_format == 'JPEG':
+            # JPEG - converter para RGB se necessário
+            if img.mode in ('RGBA', 'LA', 'P'):
+                background = Image.new('RGB', img.size, (255, 255, 255))
+                if img.mode == 'P':
+                    img = img.convert('RGBA')
+                if img.mode == 'RGBA':
+                    background.paste(img, mask=img.split()[-1])
+                img = background
+            elif img.mode != 'RGB':
+                img = img.convert('RGB')
+            
+            # Salvar JPEG otimizado
+            img.save(image_path, 'JPEG', quality=quality, optimize=True)
+        else:
+            # Outros formatos - apenas otimizar
+            img.save(image_path, img_format, optimize=True)
         
         # Calcular economia
-        original_size = os.path.getsize(image_path)
-        webp_size = os.path.getsize(webp_path)
-        saved = original_size - webp_size
+        new_size = os.path.getsize(image_path)
+        saved = original_size - new_size
         
-        return webp_path, saved
+        return saved
     except Exception as e:
-        raise Exception(f"Erro ao converter {image_path}: {str(e)}")
+        raise Exception(f"Erro ao otimizar {image_path}: {str(e)}")
 
 def process_single_image(image_path, idx, total):
-    """Processa uma única imagem (usado em paralelo)"""
+    """Processa uma única imagem (usado em paralelo) - otimiza in-place"""
     try:
-        path_obj = Path(image_path)
-        
-        # Se a imagem já é WebP, pular
-        if path_obj.suffix.lower() == '.webp':
-            return {'success': False, 'skipped': True, 'file': image_path, 'reason': 'Já é WebP'}
-        
-        # Se já existe WebP correspondente, pular
-        webp_path = path_obj.parent / f"{path_obj.stem}.webp"
-        if webp_path.exists():
-            return {'success': False, 'skipped': True, 'file': image_path, 'reason': 'WebP já existe'}
-        
-        old_path = path_obj.parent / f"{path_obj.stem}_old{path_obj.suffix}"
-        
-        # Se já existe _old, pular (já foi processado antes)
-        if old_path.exists():
-            return {'success': False, 'skipped': True, 'file': image_path, 'reason': 'Já processado'}
-        
-        # Renomear original para _old
-        os.rename(image_path, str(old_path))
-        
-        # Converter para WebP
-        webp_path, saved = convert_to_webp(str(old_path))
-        
-        # Renomear WebP para nome original (sem _old)
-        final_webp = path_obj.parent / f"{path_obj.stem}.webp"
-        if os.path.exists(webp_path):
-            if final_webp.exists():
-                os.remove(str(final_webp))
-            os.rename(webp_path, str(final_webp))
+        # Otimizar imagem mantendo extensão original
+        saved = optimize_image(image_path)
         
         return {
             'success': True,
@@ -1700,17 +1562,10 @@ def process_single_image(image_path, idx, total):
             'index': idx
         }
     except Exception as e:
-        # Tentar restaurar se deu erro
-        try:
-            old_path = Path(image_path).parent / f"{Path(image_path).stem}_old{Path(image_path).suffix}"
-            if old_path.exists():
-                os.rename(str(old_path), image_path)
-        except:
-            pass
         return {'success': False, 'error': str(e), 'file': image_path}
 
 def transform_images_worker():
-    """Worker thread para transformar imagens em paralelo (3 workers)"""
+    """Worker thread para otimizar imagens em paralelo (3 workers)"""
     global webp_transform_status
     
     try:
@@ -1723,14 +1578,7 @@ def transform_images_worker():
             for file in files:
                 ext = os.path.splitext(file)[1]
                 if ext in extensions:
-                    # Ignorar arquivos que já são _old ou já são WebP
-                    if '_old' not in file and ext.lower() != '.webp':
-                        file_path = os.path.join(root, file)
-                        # Verificar se já existe WebP correspondente
-                        path_obj = Path(file_path)
-                        webp_path = path_obj.parent / f"{path_obj.stem}.webp"
-                        if not webp_path.exists():
-                            images.append(file_path)
+                    images.append(os.path.join(root, file))
         
         total = len(images)
         
@@ -1783,11 +1631,11 @@ def transform_images_worker():
 
 @app.route('/transform_to_webp', methods=['POST'])
 def transform_to_webp():
-    """Inicia transformação para WebP"""
+    """Inicia otimização de imagens"""
     global webp_transform_status
     
     if webp_transform_status['status'] == 'processing':
-        return jsonify({'error': 'Transformação já em andamento'}), 400
+        return jsonify({'error': 'Otimização já em andamento'}), 400
     
     # Resetar status
     webp_transform_status = {
@@ -1811,7 +1659,7 @@ def transform_to_webp():
     total = 0
     for root, dirs, files in os.walk(img_folder):
         for file in files:
-            if os.path.splitext(file)[1] in extensions and '_old' not in file:
+            if os.path.splitext(file)[1] in extensions:
                 total += 1
     
     return jsonify({'success': True, 'total': total})
@@ -1822,51 +1670,10 @@ def transform_progress():
     global webp_transform_status
     return jsonify(webp_transform_status)
 
-@app.route('/revert_webp', methods=['POST'])
-def revert_webp():
-    """Reverte transformação WebP"""
-    try:
-        img_folder = os.path.join(app.static_folder, 'img')
-        processed = 0
-        
-        # Encontrar todos os arquivos _old
-        for root, dirs, files in os.walk(img_folder):
-            for file in files:
-                if '_old' in file:
-                    old_path = os.path.join(root, file)
-                    # Restaurar nome original
-                    original_name = file.replace('_old', '')
-                    original_path = os.path.join(root, original_name)
-                    
-                    # Remover WebP se existir
-                    webp_path = os.path.splitext(original_path)[0] + '.webp'
-                    if os.path.exists(webp_path):
-                        os.remove(webp_path)
-                    
-                    # Restaurar original
-                    if os.path.exists(old_path):
-                        os.rename(old_path, original_path)
-                        processed += 1
-        
-        return jsonify({'success': True, 'processed': processed})
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
-
 @app.route('/check_webp_status')
 def check_webp_status():
-    """Verifica se já existem arquivos WebP"""
-    img_folder = os.path.join(app.static_folder, 'img')
-    has_webp = False
-    
-    for root, dirs, files in os.walk(img_folder):
-        for file in files:
-            if file.lower().endswith('.webp'):
-                has_webp = True
-                break
-        if has_webp:
-            break
-    
-    return jsonify({'has_webp': has_webp})
+    """Verifica status (não usado mais, mas mantido para compatibilidade)"""
+    return jsonify({'has_webp': False})
 
 #----------------------------------------------
 #----------------------------------------------

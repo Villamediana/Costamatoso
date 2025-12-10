@@ -36,8 +36,8 @@
     <section class="seccion imagem-cabecalho">
         <div class="cabecalho">
             <picture>
-                <source media="(max-width: 767px)" srcset="{{ url_for('static', filename=header_images.sobre_nos.mobile) if header_images and header_images.sobre_nos else url_for('static', filename=get_image_url('img/time.jpg')) }}">
-                <img src="{{ url_for('static', filename=header_images.sobre_nos.desktop) if header_images and header_images.sobre_nos else url_for('static', filename=get_image_url('img/time.jpg')) }}" alt="Sobre nós">
+                <source media="(max-width: 767px)" srcset="{{ url_for('static', filename=header_images.sobre_nos.mobile) if header_images and header_images.sobre_nos else url_for('static', filename='img/time.jpg') }}">
+                <img src="{{ url_for('static', filename=header_images.sobre_nos.desktop) if header_images and header_images.sobre_nos else url_for('static', filename='img/time.jpg') }}" alt="Sobre nós">
             </picture>
             <div class="overlay-cabecalho"></div>
             <div class="texto-cabecalho">
@@ -55,7 +55,7 @@
 
         <!-- Seção de capa personalizada para sobre nós -->
         <section class="seccion-sobre-nos">
-            <div class="capa-imagem-sobre-nos" style="background-image: url('{{ url_for('static', filename=get_image_url('img/time2.jpg')) }}');">
+            <div class="capa-imagem-sobre-nos" style="background-image: url('{{ url_for('static', filename='img/time2.jpg') }}');">
             </div>
         </section>
     

@@ -1186,10 +1186,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     // ============================================
-    // Transformação WebP
+    // Otimização de Imagens
     // ============================================
     const transformBtn = document.getElementById('transform-webp-btn');
-    const revertBtn = document.getElementById('revert-webp-btn');
     const statusDiv = document.getElementById('webp-status');
     const statusText = document.getElementById('webp-status-text');
     const progressBar = document.getElementById('webp-progress-bar');
@@ -1224,14 +1223,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (transformBtn) {
         transformBtn.addEventListener('click', async () => {
-            if (!confirm('⚠️ Tem certeza que deseja transformar todas as imagens para WebP?\n\nIsso pode demorar alguns minutos.')) {
+            if (!confirm('⚠️ Tem certeza que deseja otimizar todas as imagens?\n\nIsso pode demorar alguns minutos e as imagens serão otimizadas diretamente.')) {
                 return;
             }
 
             transformBtn.disabled = true;
-            transformBtn.textContent = '⏳ Transformando...';
-            revertBtn.style.display = 'none';
-            showStatus('Iniciando transformação...');
+            transformBtn.textContent = '⏳ Otimizando...';
+            showStatus('Iniciando otimização...');
             updateProgress(0, 0, 0);
 
             try {
@@ -1247,9 +1245,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 const total = data.total || 0;
 
                 if (total === 0) {
-                    showStatus('Nenhuma imagem encontrada para transformar', true);
+                    showStatus('Nenhuma imagem encontrada para otimizar', true);
                     transformBtn.disabled = false;
-                    transformBtn.textContent = '🚀 Transformar para WebP';
+                    transformBtn.textContent = '🚀 Otimizar Imagens';
                     updateProgress(0, 0, 0);
                     return;
                 }
@@ -1269,10 +1267,9 @@ document.addEventListener("DOMContentLoaded", function () {
                             const current = progressData.current || 0;
                             const total = progressData.total || 0;
                             updateProgress(100, current, total);
-                            showStatus('✅ Transformação concluída com sucesso!');
+                            showStatus('✅ Otimização concluída com sucesso!');
                             transformBtn.disabled = false;
-                            transformBtn.textContent = '🚀 Transformar para WebP';
-                            revertBtn.style.display = 'inline-block';
+                            transformBtn.textContent = '🚀 Otimizar Imagens';
                             detailsDiv.innerHTML = `
                                 <div style="margin-top: 10px; padding: 10px; background: #d4edda; border-radius: 4px; color: #155724;">
                                     <strong>✅ Concluído!</strong><br>
@@ -1282,9 +1279,9 @@ document.addEventListener("DOMContentLoaded", function () {
                             `;
                         } else if (progressData.status === 'error') {
                             clearInterval(transformInterval);
-                            showStatus('❌ Erro durante transformação: ' + (progressData.error || 'Erro desconhecido'), true);
+                            showStatus('❌ Erro durante otimização: ' + (progressData.error || 'Erro desconhecido'), true);
                             transformBtn.disabled = false;
-                            transformBtn.textContent = '🚀 Transformar para WebP';
+                            transformBtn.textContent = '🚀 Otimizar Imagens';
                         } else if (progressData.status === 'processing') {
                             const current = progressData.current || 0;
                             const total = progressData.total || 0;
@@ -1301,60 +1298,9 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.error('Erro:', error);
                 showStatus('❌ Erro: ' + error.message, true);
                 transformBtn.disabled = false;
-                transformBtn.textContent = '🚀 Transformar para WebP';
+                transformBtn.textContent = '🚀 Otimizar Imagens';
                 if (transformInterval) clearInterval(transformInterval);
             }
         });
     }
-
-    if (revertBtn) {
-        revertBtn.addEventListener('click', async () => {
-            if (!confirm('⚠️ Tem certeza que deseja reverter a transformação?\n\nTodas as imagens WebP serão removidas e as originais serão restauradas.')) {
-                return;
-            }
-
-            revertBtn.disabled = true;
-            revertBtn.textContent = '⏳ Revertendo...';
-            showStatus('Revertendo transformação...');
-            updateProgress(0, 0, 0);
-
-            try {
-                const response = await fetch('/revert_webp', {
-                    method: 'POST'
-                });
-
-                const data = await response.json();
-
-                if (data.success) {
-                    updateProgress(100, data.processed, data.processed);
-                    showStatus('✅ Reversão concluída com sucesso!');
-                    revertBtn.style.display = 'none';
-                    detailsDiv.innerHTML = `
-                        <div style="margin-top: 10px; padding: 10px; background: #d4edda; border-radius: 4px; color: #155724;">
-                            <strong>✅ Revertido!</strong><br>
-                            ${data.processed} imagens restauradas
-                        </div>
-                    `;
-                } else {
-                    showStatus('❌ Erro: ' + (data.error || 'Erro desconhecido'), true);
-                }
-            } catch (error) {
-                console.error('Erro:', error);
-                showStatus('❌ Erro: ' + error.message, true);
-            } finally {
-                revertBtn.disabled = false;
-                revertBtn.textContent = '↩️ Voltar (Reverter)';
-            }
-        });
-    }
-
-    // Verificar se já existe transformação ao carregar a página
-    fetch('/check_webp_status')
-        .then(res => res.json())
-        .then(data => {
-            if (data.has_webp) {
-                revertBtn.style.display = 'inline-block';
-            }
-        })
-        .catch(err => console.error('Erro ao verificar status:', err));
 });

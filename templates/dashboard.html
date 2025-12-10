@@ -68,7 +68,7 @@
                 <li><a href="#" data-section="visitors-section">Visitantes</a></li>
                 <li><a href="#" data-section="file-browser-section">Navegar Projetos</a></li>
                 <li><a href="#" data-section="contact-submissions-section">Ver Contactos</a></li>
-                <li><a href="#" data-section="webp-transform-section">Transformar para WebP</a></li>
+                <li><a href="#" data-section="webp-transform-section">Otimizar Imagens</a></li>
             </ul>
         </nav>
     </aside>
@@ -319,7 +319,7 @@
             <div class="slider-container" id="blog-container">
                 {% for blog in blogs %}
                     <div class="slider-item">
-                        <img src="{{ url_for('static', filename=blog.capa) }}" alt="Capa Blog {{ blog.titulo }}" class="slider-preview">
+                        <img src="{{ url_for('static', filename='img/blog/' ~ blog.folder ~ '/capa.jpg') }}" alt="Capa Blog {{ blog.titulo }}" class="slider-preview">
                         <div class="blog-info">
                             <h3>{{ blog.titulo }}</h3>
                             <p>{{ blog.autor }} - {{ blog.data }}</p>
@@ -435,18 +435,18 @@
     </div>
 </section>
 
-        <!-- Sección Transformar para WebP -->
+        <!-- Sección Otimizar Imagens -->
         <section id="webp-transform-section" class="hidden-section">
-            <h1>Transformar Imagens para WebP</h1>
+            <h1>Otimizar Imagens</h1>
             
             <div style="background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); max-width: 800px; margin: 0 auto;">
                 <div style="margin-bottom: 30px;">
                     <h2 style="color: #2c3e50; margin-bottom: 15px;">O que faz esta ferramenta?</h2>
                     <ul style="line-height: 1.8; color: #555;">
-                        <li>✅ Converte todas as imagens (JPG/PNG) para WebP (formato mais leve)</li>
-                        <li>💾 Renomeia originais para <code>_old</code> (ex: <code>imagem.jpg</code> → <code>imagem_old.jpg</code>)</li>
-                        <li>🔄 Cria versão WebP com nome original (ex: <code>imagem.webp</code>)</li>
-                        <li>📊 Reduz tamanho em ~30-50% mantendo qualidade</li>
+                        <li>✅ Otimiza todas as imagens (JPG/PNG) mantendo a extensão original</li>
+                        <li>💾 Reduz o tamanho dos arquivos sem perder qualidade visível</li>
+                        <li>🔄 Processa as imagens diretamente (sem criar cópias)</li>
+                        <li>📊 Reduz tamanho em ~20-40% mantendo qualidade</li>
                     </ul>
                 </div>
 
@@ -463,10 +463,7 @@
 
                 <div style="display: flex; gap: 15px; justify-content: center;">
                     <button id="transform-webp-btn" class="btn" style="background-color: #27ae60; padding: 15px 30px; font-size: 1.1em;">
-                        🚀 Transformar para WebP
-                    </button>
-                    <button id="revert-webp-btn" class="btn" style="background-color: #e74c3c; padding: 15px 30px; font-size: 1.1em; display: none;">
-                        ↩️ Voltar (Reverter)
+                        🚀 Otimizar Imagens
                     </button>
                 </div>
 
@@ -474,9 +471,9 @@
                     <strong>⚠️ Importante:</strong>
                     <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
                         <li>O processo pode demorar alguns minutos dependendo da quantidade de imagens</li>
-                        <li>As imagens originais são mantidas com <code>_old</code> como backup</li>
-                        <li>Use "Voltar" apenas se não gostar do resultado</li>
-                        <li>Não feche a página durante a transformação</li>
+                        <li>As imagens são otimizadas diretamente (não há backup automático)</li>
+                        <li>Recomendamos fazer backup antes de otimizar</li>
+                        <li>Não feche a página durante a otimização</li>
                     </ul>
                 </div>
             </div>
