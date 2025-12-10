@@ -1516,13 +1516,40 @@ def optimize_image(image_path, quality=75):
         }
         img_format = format_map.get(ext, 'JPEG')
         
-        # Para PNG, manter transparência se existir
-        if img_format == 'PNG' and img.mode in ('RGBA', 'LA', 'P'):
-            # PNG com transparência - manter como PNG
-            if img.mode == 'P':
-                img = img.convert('RGBA')
-            # Salvar PNG otimizado
-            img.save(image_path, 'PNG', optimize=True, compress_level=9)
+        # Para PNG, verificar se tem transparência
+        if img_format == 'PNG':
+            has_transparency = img.mode in ('RGBA', 'LA', 'P') or 'transparency' in img.info
+            
+            if has_transparency:
+                # PNG com transparência - manter como PNG mas otimizar melhor
+                if img.mode == 'P':
+                    img = img.convert('RGBA')
+                # Para PNGs grandes, tentar quantizar cores se possível
+                if original_size > 5 * 1024 * 1024:  # > 5MB
+                    # Tentar reduzir paleta de cores para PNGs grandes
+                    try:
+                        # Converter para paleta se tiver muitas cores
+                        if img.mode == 'RGBA':
+                            # Quantizar mantendo transparência
+                            img = img.quantize(colors=256, method=Image.Quantize.MEDIANCUT)
+                            img = img.convert('RGBA')
+                    except:
+                        pass
+                # Salvar PNG otimizado com compressão máxima
+                img.save(image_path, 'PNG', optimize=True, compress_level=9)
+            else:
+                # PNG SEM transparência - converter para JPEG (muito mais eficiente!)
+                if img.mode != 'RGB':
+                    img = img.convert('RGB')
+                # Salvar como JPEG temporário
+                temp_jpg = image_path + '.tmp.jpg'
+                img.save(temp_jpg, 'JPEG', quality=quality, optimize=True)
+                # Substituir PNG por JPEG
+                os.remove(image_path)
+                os.rename(temp_jpg, image_path.rsplit('.', 1)[0] + '.jpg')
+                # Atualizar path para cálculo correto
+                image_path = image_path.rsplit('.', 1)[0] + '.jpg'
+                
         elif img_format == 'JPEG':
             # JPEG - converter para RGB se necessário
             if img.mode in ('RGBA', 'LA', 'P'):
@@ -1541,8 +1568,14 @@ def optimize_image(image_path, quality=75):
             # Outros formatos - apenas otimizar
             img.save(image_path, img_format, optimize=True)
         
-        # Calcular economia
-        new_size = os.path.getsize(image_path)
+        # Calcular economia (verificar se arquivo existe - pode ter mudado de extensão)
+        if not os.path.exists(image_path):
+            # Se não existe, pode ter sido convertido PNG->JPG
+            jpg_path = image_path.rsplit('.', 1)[0] + '.jpg'
+            if os.path.exists(jpg_path):
+                image_path = jpg_path
+        
+        new_size = os.path.getsize(image_path) if os.path.exists(image_path) else original_size
         saved = original_size - new_size
         
         return saved
