@@ -264,8 +264,10 @@ def detalhe_projeto(nome_categoria, nome_projeto):
                 imagens.append({'url': file_url, 'tipo': 'imagen', 'clase': clase_aleatoria})
 
 
-    # Contar el número total de fotos
-    total_fotos = len(imagens)
+    # Contar el número total de fotos y videos
+    total_fotos = len([img for img in imagens if img.get('tipo') == 'imagen'])
+    total_videos = len([img for img in imagens if img.get('tipo') == 'video'])
+    total_media = len(imagens)
 
     # Obtener las carpetas de proyectos dentro de la categoría actual, excluyendo el proyecto actual
     categoria_path = os.path.join(app.static_folder, 'img', 'projetos', nome_categoria)
@@ -321,8 +323,10 @@ def detalhe_projeto(nome_categoria, nome_projeto):
         ano=ano,
         endereco=endereco,
         total_fotos=total_fotos,
+        total_videos=total_videos,
+        total_media=total_media,
         projetos_relacionados=proyectos_relacionados,
-          submenu_items=submenu_items  # Proyectos relacionados pasados a la plantilla
+        submenu_items=submenu_items
     )
 
 

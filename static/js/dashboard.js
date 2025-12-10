@@ -11,18 +11,18 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Función para mostrar una sección específica
     function showSection(sectionId) {
-        // Remover la clase 'active' de todos los enlaces del menú
-        menuLinks.forEach(link => link.classList.remove("active"));
+            // Remover la clase 'active' de todos los enlaces del menú
+            menuLinks.forEach(link => link.classList.remove("active"));
 
-        // Ocultar todas las secciones
-        sections.forEach(section => section.classList.add("hidden-section"));
-        sections.forEach(section => section.classList.remove("active-section"));
+            // Ocultar todas las secciones
+            sections.forEach(section => section.classList.add("hidden-section"));
+            sections.forEach(section => section.classList.remove("active-section"));
 
-        // Mostrar la sección correspondiente
+            // Mostrar la sección correspondiente
         const targetSection = document.getElementById(sectionId);
-        if (targetSection) {
-            targetSection.classList.remove("hidden-section");
-            targetSection.classList.add("active-section");
+            if (targetSection) {
+                targetSection.classList.remove("hidden-section");
+                targetSection.classList.add("active-section");
             
             // Encontrar y activar el enlace correspondiente
             const activeLink = document.querySelector(`a[data-section="${sectionId}"]`);
