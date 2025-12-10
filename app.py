@@ -1,10 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, session, jsonify, flash
-import os, json, shutil, uuid, re, time
+import os, json, shutil, uuid, re, time, threading
 from datetime import datetime
 from collections import defaultdict
 from flask_mail import Mail, Message
 import smtplib
 from werkzeug.utils import secure_filename
+from PIL import Image
+from pathlib import Path
 
 app = Flask(__name__)
 
@@ -23,6 +25,32 @@ os.environ['GUNICORN_CMD_ARGS'] = '--limit-request-field_size 0 --limit-request-
 
 
 mail = Mail(app)
+
+# ---- Helper functions ----
+def get_capa_url(categoria, projeto):
+    """Retorna URL da capa (tenta .webp primeiro, depois .jpg)"""
+    capa_webp = os.path.join(app.static_folder, 'img', 'projetos', categoria, projeto, 'capa.webp')
+    capa_jpg = os.path.join(app.static_folder, 'img', 'projetos', categoria, projeto, 'capa.jpg')
+    if os.path.exists(capa_webp):
+        return f'img/projetos/{categoria}/{projeto}/capa.webp'
+    elif os.path.exists(capa_jpg):
+        return f'img/projetos/{categoria}/{projeto}/capa.jpg'
+    return 'img/default_capa.jpg'
+
+def get_blog_capa_url(folder):
+    """Retorna URL da capa do blog (tenta .webp primeiro, depois .jpg)"""
+    capa_webp = os.path.join(app.static_folder, 'img', 'blog', folder, 'capa.webp')
+    capa_jpg = os.path.join(app.static_folder, 'img', 'blog', folder, 'capa.jpg')
+    if os.path.exists(capa_webp):
+        return f'img/blog/{folder}/capa.webp'
+    elif os.path.exists(capa_jpg):
+        return f'img/blog/{folder}/capa.jpg'
+    return f'img/blog/{folder}/capa.jpg'  # Fallback
+
+# Adicionar função ao contexto do template
+@app.context_processor
+def utility_processor():
+    return dict(get_capa_url=get_capa_url, get_blog_capa_url=get_blog_capa_url)
 
 # ---- Anti-spam utilities (simple, in-memory) ---------------------------------
 rate_limit_store = defaultdict(list)  # ip -> list[timestamps]
@@ -179,9 +207,13 @@ def categoria(nome_categoria):
     for projeto_name in os.listdir(categoria_path):
         projeto_path = os.path.join(categoria_path, projeto_name)
         if os.path.isdir(projeto_path):
-            # Ruta a la imagen de capa
-            capa_path = os.path.join(projeto_path, 'capa.jpg')
-            if os.path.exists(capa_path):
+            # Ruta a la imagen de capa (tentar .webp primeiro, depois .jpg)
+            capa_webp = os.path.join(projeto_path, 'capa.webp')
+            capa_jpg = os.path.join(projeto_path, 'capa.jpg')
+            if os.path.exists(capa_webp):
+                relative_path = f'img/projetos/{nome_categoria}/{projeto_name}/capa.webp'
+                capa_url = url_for('static', filename=relative_path)
+            elif os.path.exists(capa_jpg):
                 relative_path = f'img/projetos/{nome_categoria}/{projeto_name}/capa.jpg'
                 capa_url = url_for('static', filename=relative_path)
             else:
@@ -249,7 +281,7 @@ def detalhe_projeto(nome_categoria, nome_projeto):
     clases = ['wide', 'tall', 'medium', '']  # Clases posibles para el layout
 
     for file_name in os.listdir(projeto_path):
-        if file_name.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.mp4')) and file_name != 'capa.jpg':
+        if file_name.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp', '.mp4')) and file_name != 'capa.jpg' and not file_name.endswith('_old.jpg') and not file_name.endswith('_old.png') and not file_name.endswith('_old.jpeg'):
             # Construir la ruta relativa usando forward slashes
             relative_path = f'img/projetos/{nome_categoria}/{nome_projeto}/{file_name}'
             file_url = url_for('static', filename=relative_path)
@@ -295,7 +327,15 @@ def detalhe_projeto(nome_categoria, nome_projeto):
             # pero puede que no haya tantos si estás muy al inicio o muy al final.
             # Ahora construimos la lista 'projetos_relacionados' con la misma lógica de 'capa'.
             for nome_relacionado in relacionados:
-                capa_relacionada = f'img/projetos/{nome_categoria}/{nome_relacionado}/capa.jpg'
+                # Tentar .webp primeiro, depois .jpg
+                capa_webp = os.path.join(app.static_folder, 'img', 'projetos', nome_categoria, nome_relacionado, 'capa.webp')
+                capa_jpg = os.path.join(app.static_folder, 'img', 'projetos', nome_categoria, nome_relacionado, 'capa.jpg')
+                if os.path.exists(capa_webp):
+                    capa_relacionada = f'img/projetos/{nome_categoria}/{nome_relacionado}/capa.webp'
+                elif os.path.exists(capa_jpg):
+                    capa_relacionada = f'img/projetos/{nome_categoria}/{nome_relacionado}/capa.jpg'
+                else:
+                    continue  # Pular se não tem capa
                 proyectos_relacionados.append({
                     'nome': nome_relacionado,
                     'capa': capa_relacionada
@@ -574,7 +614,7 @@ def upload_image():
             return jsonify({"error": "No se envió ninguna imagen"}), 400
 
         # Validar el archivo de imagen
-        allowed_extensions = {'.png', '.jpg', '.jpeg', '.gif'}
+        allowed_extensions = {'.png', '.jpg', '.jpeg', '.gif', '.webp'}
         extension = os.path.splitext(image.filename)[1].lower()
         if extension not in allowed_extensions:
             return jsonify({"error": "Formato de imagen no permitido"}), 400
@@ -1423,7 +1463,7 @@ def residencias_242():
     imagens = []
     if os.path.exists(imagens_path):
         for file_name in os.listdir(imagens_path):
-            if file_name.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.mp4')):
+            if file_name.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp', '.mp4')) and '_old' not in file_name:
                 relative_path = f'img/242/{file_name}'
                 file_url = url_for('static', filename=relative_path)
 
@@ -1443,6 +1483,207 @@ def residencias_242():
     )
 
 
+
+#----------------------------------------------
+# Transformação WebP
+#----------------------------------------------
+
+# Variáveis globais para progresso
+webp_transform_status = {
+    'status': 'idle',  # idle, processing, completed, error
+    'current': 0,
+    'total': 0,
+    'current_file': '',
+    'processed_files': [],
+    'saved_mb': 0,
+    'error': None
+}
+
+def convert_to_webp(image_path, quality=85):
+    """Converte uma imagem para WebP"""
+    try:
+        img = Image.open(image_path)
+        
+        # Converter RGBA para RGB se necessário
+        if img.mode in ('RGBA', 'LA', 'P'):
+            background = Image.new('RGB', img.size, (255, 255, 255))
+            if img.mode == 'P':
+                img = img.convert('RGBA')
+            if img.mode == 'RGBA':
+                background.paste(img, mask=img.split()[-1])
+            img = background
+        elif img.mode != 'RGB':
+            img = img.convert('RGB')
+        
+        # Criar caminho WebP
+        webp_path = str(image_path).rsplit('.', 1)[0] + '.webp'
+        
+        # Salvar como WebP
+        img.save(webp_path, 'WEBP', quality=quality, method=6)
+        
+        # Calcular economia
+        original_size = os.path.getsize(image_path)
+        webp_size = os.path.getsize(webp_path)
+        saved = original_size - webp_size
+        
+        return webp_path, saved
+    except Exception as e:
+        raise Exception(f"Erro ao converter {image_path}: {str(e)}")
+
+def transform_images_worker():
+    """Worker thread para transformar imagens"""
+    global webp_transform_status
+    
+    try:
+        img_folder = os.path.join(app.static_folder, 'img')
+        extensions = {'.jpg', '.jpeg', '.png', '.JPG', '.JPEG', '.PNG'}
+        
+        # Encontrar todas as imagens
+        images = []
+        for root, dirs, files in os.walk(img_folder):
+            for file in files:
+                ext = os.path.splitext(file)[1]
+                if ext in extensions:
+                    # Ignorar arquivos que já são _old
+                    if '_old' not in file:
+                        images.append(os.path.join(root, file))
+        
+        webp_transform_status['total'] = len(images)
+        webp_transform_status['status'] = 'processing'
+        webp_transform_status['current'] = 0
+        webp_transform_status['saved_mb'] = 0
+        
+        for idx, image_path in enumerate(images):
+            webp_transform_status['current'] = idx + 1
+            webp_transform_status['current_file'] = os.path.basename(image_path)
+            
+            try:
+                # Renomear original para _old
+                path_obj = Path(image_path)
+                old_path = path_obj.parent / f"{path_obj.stem}_old{path_obj.suffix}"
+                
+                # Se já existe _old, pular
+                if old_path.exists():
+                    continue
+                
+                # Renomear original
+                os.rename(image_path, str(old_path))
+                
+                # Converter para WebP com nome original
+                webp_path, saved = convert_to_webp(str(old_path))
+                
+                # Renomear WebP para nome original (sem _old)
+                final_webp = path_obj.parent / f"{path_obj.stem}.webp"
+                if os.path.exists(webp_path):
+                    if final_webp.exists():
+                        os.remove(str(final_webp))
+                    os.rename(webp_path, str(final_webp))
+                
+                webp_transform_status['saved_mb'] += saved / (1024 * 1024)
+                webp_transform_status['processed_files'].append(str(image_path))
+                
+            except Exception as e:
+                print(f"Erro ao processar {image_path}: {e}")
+                # Tentar restaurar se deu erro
+                try:
+                    old_path = Path(image_path).parent / f"{Path(image_path).stem}_old{Path(image_path).suffix}"
+                    if old_path.exists():
+                        os.rename(str(old_path), image_path)
+                except:
+                    pass
+        
+        webp_transform_status['status'] = 'completed'
+        
+    except Exception as e:
+        webp_transform_status['status'] = 'error'
+        webp_transform_status['error'] = str(e)
+
+@app.route('/transform_to_webp', methods=['POST'])
+def transform_to_webp():
+    """Inicia transformação para WebP"""
+    global webp_transform_status
+    
+    if webp_transform_status['status'] == 'processing':
+        return jsonify({'error': 'Transformação já em andamento'}), 400
+    
+    # Resetar status
+    webp_transform_status = {
+        'status': 'idle',
+        'current': 0,
+        'total': 0,
+        'current_file': '',
+        'processed_files': [],
+        'saved_mb': 0,
+        'error': None
+    }
+    
+    # Iniciar worker em thread separada
+    thread = threading.Thread(target=transform_images_worker)
+    thread.daemon = True
+    thread.start()
+    
+    # Contar total de imagens
+    img_folder = os.path.join(app.static_folder, 'img')
+    extensions = {'.jpg', '.jpeg', '.png', '.JPG', '.JPEG', '.PNG'}
+    total = 0
+    for root, dirs, files in os.walk(img_folder):
+        for file in files:
+            if os.path.splitext(file)[1] in extensions and '_old' not in file:
+                total += 1
+    
+    return jsonify({'success': True, 'total': total})
+
+@app.route('/transform_progress')
+def transform_progress():
+    """Retorna progresso da transformação"""
+    global webp_transform_status
+    return jsonify(webp_transform_status)
+
+@app.route('/revert_webp', methods=['POST'])
+def revert_webp():
+    """Reverte transformação WebP"""
+    try:
+        img_folder = os.path.join(app.static_folder, 'img')
+        processed = 0
+        
+        # Encontrar todos os arquivos _old
+        for root, dirs, files in os.walk(img_folder):
+            for file in files:
+                if '_old' in file:
+                    old_path = os.path.join(root, file)
+                    # Restaurar nome original
+                    original_name = file.replace('_old', '')
+                    original_path = os.path.join(root, original_name)
+                    
+                    # Remover WebP se existir
+                    webp_path = os.path.splitext(original_path)[0] + '.webp'
+                    if os.path.exists(webp_path):
+                        os.remove(webp_path)
+                    
+                    # Restaurar original
+                    if os.path.exists(old_path):
+                        os.rename(old_path, original_path)
+                        processed += 1
+        
+        return jsonify({'success': True, 'processed': processed})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/check_webp_status')
+def check_webp_status():
+    """Verifica se já existem arquivos WebP"""
+    img_folder = os.path.join(app.static_folder, 'img')
+    has_webp = False
+    
+    for root, dirs, files in os.walk(img_folder):
+        for file in files:
+            if file.lower().endswith('.webp'):
+                has_webp = True
+                break
+        if has_webp:
+            break
+    
+    return jsonify({'has_webp': has_webp})
 
 #----------------------------------------------
 #----------------------------------------------

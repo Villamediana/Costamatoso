@@ -35,7 +35,7 @@
   <section class="seccion imagem-cabecalho">
     <div class="cabecalho cabecalho-desktop">
       <img
-        src="{{ url_for('static', filename='img/projetos/' ~ nome_categoria ~ '/' ~ nome_projeto ~ '/capa.jpg') }}"
+        src="{{ url_for('static', filename=get_capa_url(nome_categoria, nome_projeto)) }}"
         alt="{{ nome_projeto.replace('_', ' ') }}">
       <div class="overlay-cabecalho"></div>
       <div class="texto-cabecalho">
@@ -307,16 +307,16 @@
         if (isTransitioning) return;
         const maxIndex = Math.max(0, totalSlides - slidesToShow);
         if (currentIndex < maxIndex) {
-          currentIndex += slidesToShow;
-          updateSlider();
+        currentIndex += slidesToShow;
+        updateSlider();
         }
       }
       
       function prevSlide() {
         if (isTransitioning) return;
         if (currentIndex > 0) {
-          currentIndex -= slidesToShow;
-          updateSlider();
+        currentIndex -= slidesToShow;
+        updateSlider();
         }
       }
       
