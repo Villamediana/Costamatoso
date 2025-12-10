@@ -29,23 +29,29 @@ mail = Mail(app)
 
 # ---- Helper functions ----
 def get_capa_url(categoria, projeto):
-    """Retorna URL da capa (tenta .webp primeiro, depois .jpg)"""
+    """Retorna URL da capa (tenta .webp primeiro, depois .jpg, depois .jpeg)"""
     capa_webp = os.path.join(app.static_folder, 'img', 'projetos', categoria, projeto, 'capa.webp')
     capa_jpg = os.path.join(app.static_folder, 'img', 'projetos', categoria, projeto, 'capa.jpg')
+    capa_jpeg = os.path.join(app.static_folder, 'img', 'projetos', categoria, projeto, 'capa.jpeg')
     if os.path.exists(capa_webp):
         return f'img/projetos/{categoria}/{projeto}/capa.webp'
     elif os.path.exists(capa_jpg):
         return f'img/projetos/{categoria}/{projeto}/capa.jpg'
+    elif os.path.exists(capa_jpeg):
+        return f'img/projetos/{categoria}/{projeto}/capa.jpeg'
     return 'img/default_capa.jpg'
 
 def get_blog_capa_url(folder):
-    """Retorna URL da capa do blog (tenta .webp primeiro, depois .jpg)"""
+    """Retorna URL da capa do blog (tenta .webp primeiro, depois .jpg, depois .jpeg)"""
     capa_webp = os.path.join(app.static_folder, 'img', 'blog', folder, 'capa.webp')
     capa_jpg = os.path.join(app.static_folder, 'img', 'blog', folder, 'capa.jpg')
+    capa_jpeg = os.path.join(app.static_folder, 'img', 'blog', folder, 'capa.jpeg')
     if os.path.exists(capa_webp):
         return f'img/blog/{folder}/capa.webp'
     elif os.path.exists(capa_jpg):
         return f'img/blog/{folder}/capa.jpg'
+    elif os.path.exists(capa_jpeg):
+        return f'img/blog/{folder}/capa.jpeg'
     return f'img/blog/{folder}/capa.jpg'  # Fallback
 
 # Adicionar função ao contexto do template
@@ -208,14 +214,18 @@ def categoria(nome_categoria):
     for projeto_name in os.listdir(categoria_path):
         projeto_path = os.path.join(categoria_path, projeto_name)
         if os.path.isdir(projeto_path):
-            # Ruta a la imagen de capa (tentar .webp primeiro, depois .jpg)
+            # Ruta a la imagen de capa (tentar .webp primeiro, depois .jpg, depois .jpeg)
             capa_webp = os.path.join(projeto_path, 'capa.webp')
             capa_jpg = os.path.join(projeto_path, 'capa.jpg')
+            capa_jpeg = os.path.join(projeto_path, 'capa.jpeg')
             if os.path.exists(capa_webp):
                 relative_path = f'img/projetos/{nome_categoria}/{projeto_name}/capa.webp'
                 capa_url = url_for('static', filename=relative_path)
             elif os.path.exists(capa_jpg):
                 relative_path = f'img/projetos/{nome_categoria}/{projeto_name}/capa.jpg'
+                capa_url = url_for('static', filename=relative_path)
+            elif os.path.exists(capa_jpeg):
+                relative_path = f'img/projetos/{nome_categoria}/{projeto_name}/capa.jpeg'
                 capa_url = url_for('static', filename=relative_path)
             else:
                 capa_url = url_for('static', filename='img/default_capa.jpg')  # Imagen por defecto si no hay capa
@@ -282,7 +292,7 @@ def detalhe_projeto(nome_categoria, nome_projeto):
     clases = ['wide', 'tall', 'medium', '']  # Clases posibles para el layout
 
     for file_name in os.listdir(projeto_path):
-        if file_name.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp', '.mp4')) and file_name != 'capa.jpg' and not file_name.endswith('_old.jpg') and not file_name.endswith('_old.png') and not file_name.endswith('_old.jpeg'):
+        if file_name.lower().endswith(('.jpg', '.jpeg', '.png', '.gif', '.webp', '.mp4')) and file_name.lower() not in ('capa.jpg', 'capa.jpeg') and not file_name.endswith('_old.jpg') and not file_name.endswith('_old.png') and not file_name.endswith('_old.jpeg'):
             # Construir la ruta relativa usando forward slashes
             relative_path = f'img/projetos/{nome_categoria}/{nome_projeto}/{file_name}'
             file_url = url_for('static', filename=relative_path)
@@ -328,13 +338,16 @@ def detalhe_projeto(nome_categoria, nome_projeto):
             # pero puede que no haya tantos si estás muy al inicio o muy al final.
             # Ahora construimos la lista 'projetos_relacionados' con la misma lógica de 'capa'.
             for nome_relacionado in relacionados:
-                # Tentar .webp primeiro, depois .jpg
+                # Tentar .webp primeiro, depois .jpg, depois .jpeg
                 capa_webp = os.path.join(app.static_folder, 'img', 'projetos', nome_categoria, nome_relacionado, 'capa.webp')
                 capa_jpg = os.path.join(app.static_folder, 'img', 'projetos', nome_categoria, nome_relacionado, 'capa.jpg')
+                capa_jpeg = os.path.join(app.static_folder, 'img', 'projetos', nome_categoria, nome_relacionado, 'capa.jpeg')
                 if os.path.exists(capa_webp):
                     capa_relacionada = f'img/projetos/{nome_categoria}/{nome_relacionado}/capa.webp'
                 elif os.path.exists(capa_jpg):
                     capa_relacionada = f'img/projetos/{nome_categoria}/{nome_relacionado}/capa.jpg'
+                elif os.path.exists(capa_jpeg):
+                    capa_relacionada = f'img/projetos/{nome_categoria}/{nome_relacionado}/capa.jpeg'
                 else:
                     continue  # Pular se não tem capa
                 proyectos_relacionados.append({
