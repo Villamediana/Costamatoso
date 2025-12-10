@@ -75,43 +75,35 @@
   <!-- seu JS -->
   <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
 
-  <!-- spinner via JS (não altera CSS existente) -->
+  <!-- Fade-in suave para imagens -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // cria @keyframes uma única vez
+      // Estilo para fade-in suave
       const style = document.createElement('style');
-      style.textContent = '@keyframes sp-spin{to{transform:rotate(360deg);}}';
+      style.textContent = `
+        .imagem-galeria img {
+          opacity: 0;
+          transition: opacity 0.5s ease-in-out;
+        }
+        .imagem-galeria img.loaded {
+          opacity: 1;
+        }
+      `;
       document.head.appendChild(style);
 
-      document.querySelectorAll('.imagem-galeria img').forEach((img, i) => {
-        // overlay
-        const overlay = document.createElement('div');
-        Object.assign(overlay.style, {
-          position: 'absolute', inset: '0', display: 'flex',
-          alignItems: 'center', justifyContent: 'center',
-          background: '#f3f3f3', pointerEvents: 'none'
-        });
+      // Aplicar fade-in quando carregar
+      document.querySelectorAll('.imagem-galeria img').forEach(img => {
+        const showImage = () => {
+          img.classList.add('loaded');
+        };
 
-        // bolinha
-        const spinner = document.createElement('div');
-        Object.assign(spinner.style, {
-          width: '20px', height: '20px',
-          border: '3px solid #aaa', borderTopColor: '#333',
-          borderRadius: '50%',
-          animation: 'sp-spin 1s linear infinite'
-        });
-        overlay.appendChild(spinner);
-
-        // garante que o contêiner seja relativo
-        const container = img.closest('.imagem-galeria');
-        container.style.position = 'relative';
-        container.prepend(overlay);
-
-        const finish = () => overlay.remove();
-        if (img.complete) finish();
-        else {
-          img.addEventListener('load', finish);
-          img.addEventListener('error', finish);
+        // Se já carregou
+        if (img.complete && img.naturalWidth !== 0) {
+          showImage();
+        } else {
+          // Quando carregar, mostrar com fade
+          img.addEventListener('load', showImage);
+          // Se der erro, não fazer nada (imagem fica invisível)
         }
       });
     });

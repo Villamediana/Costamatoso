@@ -949,15 +949,15 @@ body:has(.campanhas-overlay.show) .slideshow .slide {
 }
 
 
-/* Sección "Descubra mais projetos" */
+/* Sección "Veja mais" */
 .descubra-projetos {
-    padding: 60px 20px;
+    padding: 60px 0;
     background-color: #f9f9f9;
 }
 
 .descubra-projetos .container {
-    max-width: 1200px;
-    margin: 0 auto;
+    width: 100%;
+    padding: 0 40px;
 }
 
 .descubra-projetos h2 {
@@ -980,7 +980,7 @@ body:has(.campanhas-overlay.show) .slideshow .slide {
 .projetos-slider-container {
     position: relative;
     overflow: hidden;
-    padding: 0 50px;
+    padding: 0 60px;
     touch-action: pan-y pinch-zoom;
 }
 
@@ -1154,7 +1154,11 @@ body:has(.campanhas-overlay.show) .slideshow .slide {
 /* Ajuste para mobile */
 @media (max-width: 480px) {
     .descubra-projetos {
-        padding: 40px 15px;
+        padding: 40px 0;
+    }
+    
+    .descubra-projetos .container {
+        padding: 0 20px;
     }
     
     .descubra-projetos h2 {

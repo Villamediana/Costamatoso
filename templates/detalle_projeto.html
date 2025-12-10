@@ -116,11 +116,11 @@
     </div>
   </section>
 
-  <!-- Seção "Descubra mais projetos" -->
+  <!-- Seção "Veja mais" -->
   {% if projetos_relacionados and projetos_relacionados|length > 0 %}
   <section class="seccion descubra-projetos">
     <div class="container">
-      <h2>Descubra mais projetos</h2>
+      <h2>Veja mais</h2>
       <hr class="linea-horizontal">
       <div class="projetos-slider-container">
         <div class="projetos-slider">
@@ -150,61 +150,47 @@
   <!-- seu JS principal -->
   <script src="{{ url_for('static', filename='js/script.js') }}" defer></script>
 
-  <!-- spinner via JS (mesmo padrão de antes) -->
+  <!-- Fade-in suave para imagens -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
-      // insere keyframes uma vez
-      const sf = document.createElement('style');
-      sf.textContent = '@keyframes sp-spin{to{transform:rotate(360deg)}}';
-      document.head.appendChild(sf);
+      // Estilo para fade-in suave
+      const style = document.createElement('style');
+      style.textContent = `
+        img.lazy-img {
+          opacity: 0;
+          transition: opacity 0.6s ease-in-out;
+        }
+        img.lazy-img.loaded {
+          opacity: 1;
+        }
+      `;
+      document.head.appendChild(style);
 
       const imgs = document.querySelectorAll('img.lazy-img');
 
       imgs.forEach(img => {
-        // cria overlay transparente + spinner
-        const ov = document.createElement('div');
-        Object.assign(ov.style, {
-          position: 'absolute',
-          inset: '0',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          background: '#f3f3f3',
-          pointerEvents: 'none'
-        });
+        const showImage = () => {
+          img.classList.add('loaded');
+        };
 
-        const spinner = document.createElement('div');
-        Object.assign(spinner.style, {
-          width: '20px',
-          height: '20px',
-          border: '3px solid #aaa',
-          borderTopColor: '#333',
-          borderRadius: '50%',
-          animation: 'sp-spin 1s linear infinite'
-        });
-        ov.appendChild(spinner);
-
-        const parent = img.parentElement;
-        parent.style.position = 'relative';
-        parent.prepend(ov);
-
-        img._removeSpinner = () => ov.remove();
-
-        // se já carregou (4 primeiras)
-        if (img.complete && img.src) {
-          img._removeSpinner();
+        // Se já carregou (4 primeiras)
+        if (img.complete && img.naturalWidth !== 0 && img.src) {
+          showImage();
         } else {
-          img.addEventListener('load', img._removeSpinner);
-          img.addEventListener('error', img._removeSpinner);
+          // Quando carregar, mostrar com fade
+          img.addEventListener('load', showImage);
+          // Se der erro, não fazer nada (imagem fica invisível)
         }
       });
 
-      // lazy-load para o restante
+      // Lazy-load para o restante com IntersectionObserver
       const lazy = Array.from(imgs).filter(i => i.dataset.src);
+      
       if (!('IntersectionObserver' in window)) {
+        // Fallback para navegadores antigos
         lazy.forEach(img => {
           img.src = img.dataset.src;
-          img.onload = img.onerror = img._removeSpinner;
+          img.addEventListener('load', () => img.classList.add('loaded'));
           img.removeAttribute('data-src');
         });
         return;
@@ -215,10 +201,10 @@
           if (!e.isIntersecting) return;
           const img = e.target;
           img.src = img.dataset.src;
-          img.onload = img.onerror = () => {
-            img._removeSpinner();
+          img.addEventListener('load', () => {
+            img.classList.add('loaded');
             img.removeAttribute('data-src');
-          };
+          });
           obs.unobserve(img);
         });
       }, { rootMargin: '200px' });
