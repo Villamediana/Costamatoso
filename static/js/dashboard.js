@@ -1199,10 +1199,13 @@ document.addEventListener("DOMContentLoaded", function () {
     let transformInterval = null;
 
     function updateProgress(progress, current, total, currentFile = '') {
-        const percentage = Math.round(progress);
+        const percentage = Math.min(100, Math.max(0, Math.round(progress || 0)));
+        const currentNum = current || 0;
+        const totalNum = total || 0;
+        
         progressBar.style.width = percentage + '%';
         progressBar.textContent = percentage + '%';
-        progressText.textContent = `${current} / ${total}`;
+        progressText.textContent = `${currentNum} / ${totalNum}`;
         
         if (currentFile) {
             detailsDiv.innerHTML = `<small>Processando: ${currentFile}</small>`;
@@ -1247,8 +1250,12 @@ document.addEventListener("DOMContentLoaded", function () {
                     showStatus('Nenhuma imagem encontrada para transformar', true);
                     transformBtn.disabled = false;
                     transformBtn.textContent = '🚀 Transformar para WebP';
+                    updateProgress(0, 0, 0);
                     return;
                 }
+                
+                // Atualizar progresso inicial com o total correto
+                updateProgress(0, 0, total);
 
                 // Polling para atualizar progresso
                 let lastProgress = 0;
@@ -1259,7 +1266,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
                         if (progressData.status === 'completed') {
                             clearInterval(transformInterval);
-                            updateProgress(100, progressData.processed, progressData.total);
+                            const current = progressData.current || 0;
+                            const total = progressData.total || 0;
+                            updateProgress(100, current, total);
                             showStatus('✅ Transformação concluída com sucesso!');
                             transformBtn.disabled = false;
                             transformBtn.textContent = '🚀 Transformar para WebP';
@@ -1267,18 +1276,20 @@ document.addEventListener("DOMContentLoaded", function () {
                             detailsDiv.innerHTML = `
                                 <div style="margin-top: 10px; padding: 10px; background: #d4edda; border-radius: 4px; color: #155724;">
                                     <strong>✅ Concluído!</strong><br>
-                                    Processadas: ${progressData.processed} imagens<br>
+                                    Processadas: ${current} imagens<br>
                                     Economia estimada: ${progressData.saved_mb ? progressData.saved_mb.toFixed(2) : '0'} MB
                                 </div>
                             `;
                         } else if (progressData.status === 'error') {
                             clearInterval(transformInterval);
-                            showStatus('❌ Erro durante transformação: ' + progressData.error, true);
+                            showStatus('❌ Erro durante transformação: ' + (progressData.error || 'Erro desconhecido'), true);
                             transformBtn.disabled = false;
                             transformBtn.textContent = '🚀 Transformar para WebP';
                         } else if (progressData.status === 'processing') {
-                            const progress = progressData.processed / progressData.total * 100;
-                            updateProgress(progress, progressData.processed, progressData.total, progressData.current_file || '');
+                            const current = progressData.current || 0;
+                            const total = progressData.total || 0;
+                            const progress = total > 0 ? (current / total * 100) : 0;
+                            updateProgress(progress, current, total, progressData.current_file || '');
                             lastProgress = progress;
                         }
                     } catch (error) {

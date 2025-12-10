@@ -7,6 +7,7 @@ import smtplib
 from werkzeug.utils import secure_filename
 from PIL import Image
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 app = Flask(__name__)
 
@@ -1498,8 +1499,9 @@ webp_transform_status = {
     'saved_mb': 0,
     'error': None
 }
+webp_lock = threading.Lock()  # Lock para thread safety
 
-def convert_to_webp(image_path, quality=85):
+def convert_to_webp(image_path, quality=75):
     """Converte uma imagem para WebP"""
     try:
         img = Image.open(image_path)
@@ -1518,7 +1520,7 @@ def convert_to_webp(image_path, quality=85):
         # Criar caminho WebP
         webp_path = str(image_path).rsplit('.', 1)[0] + '.webp'
         
-        # Salvar como WebP
+        # Salvar como WebP com qualidade 75 (mais compressão, maior economia)
         img.save(webp_path, 'WEBP', quality=quality, method=6)
         
         # Calcular economia
@@ -1530,8 +1532,57 @@ def convert_to_webp(image_path, quality=85):
     except Exception as e:
         raise Exception(f"Erro ao converter {image_path}: {str(e)}")
 
+def process_single_image(image_path, idx, total):
+    """Processa uma única imagem (usado em paralelo)"""
+    try:
+        path_obj = Path(image_path)
+        
+        # Se a imagem já é WebP, pular
+        if path_obj.suffix.lower() == '.webp':
+            return {'success': False, 'skipped': True, 'file': image_path, 'reason': 'Já é WebP'}
+        
+        # Se já existe WebP correspondente, pular
+        webp_path = path_obj.parent / f"{path_obj.stem}.webp"
+        if webp_path.exists():
+            return {'success': False, 'skipped': True, 'file': image_path, 'reason': 'WebP já existe'}
+        
+        old_path = path_obj.parent / f"{path_obj.stem}_old{path_obj.suffix}"
+        
+        # Se já existe _old, pular (já foi processado antes)
+        if old_path.exists():
+            return {'success': False, 'skipped': True, 'file': image_path, 'reason': 'Já processado'}
+        
+        # Renomear original para _old
+        os.rename(image_path, str(old_path))
+        
+        # Converter para WebP
+        webp_path, saved = convert_to_webp(str(old_path))
+        
+        # Renomear WebP para nome original (sem _old)
+        final_webp = path_obj.parent / f"{path_obj.stem}.webp"
+        if os.path.exists(webp_path):
+            if final_webp.exists():
+                os.remove(str(final_webp))
+            os.rename(webp_path, str(final_webp))
+        
+        return {
+            'success': True,
+            'file': image_path,
+            'saved': saved,
+            'index': idx
+        }
+    except Exception as e:
+        # Tentar restaurar se deu erro
+        try:
+            old_path = Path(image_path).parent / f"{Path(image_path).stem}_old{Path(image_path).suffix}"
+            if old_path.exists():
+                os.rename(str(old_path), image_path)
+        except:
+            pass
+        return {'success': False, 'error': str(e), 'file': image_path}
+
 def transform_images_worker():
-    """Worker thread para transformar imagens"""
+    """Worker thread para transformar imagens em paralelo (3 workers)"""
     global webp_transform_status
     
     try:
@@ -1544,59 +1595,63 @@ def transform_images_worker():
             for file in files:
                 ext = os.path.splitext(file)[1]
                 if ext in extensions:
-                    # Ignorar arquivos que já são _old
-                    if '_old' not in file:
-                        images.append(os.path.join(root, file))
+                    # Ignorar arquivos que já são _old ou já são WebP
+                    if '_old' not in file and ext.lower() != '.webp':
+                        file_path = os.path.join(root, file)
+                        # Verificar se já existe WebP correspondente
+                        path_obj = Path(file_path)
+                        webp_path = path_obj.parent / f"{path_obj.stem}.webp"
+                        if not webp_path.exists():
+                            images.append(file_path)
         
-        webp_transform_status['total'] = len(images)
-        webp_transform_status['status'] = 'processing'
-        webp_transform_status['current'] = 0
-        webp_transform_status['saved_mb'] = 0
+        total = len(images)
         
-        for idx, image_path in enumerate(images):
-            webp_transform_status['current'] = idx + 1
-            webp_transform_status['current_file'] = os.path.basename(image_path)
+        with webp_lock:
+            webp_transform_status['total'] = total
+            webp_transform_status['status'] = 'processing'
+            webp_transform_status['current'] = 0
+            webp_transform_status['saved_mb'] = 0
+            webp_transform_status['processed_files'] = []
+            webp_transform_status['error'] = None
+        
+        # Processar em paralelo com 3 workers
+        processed_count = 0
+        saved_total = 0
+        
+        with ThreadPoolExecutor(max_workers=3) as executor:
+            # Submeter todas as tarefas
+            future_to_image = {
+                executor.submit(process_single_image, img, idx, total): (idx, img)
+                for idx, img in enumerate(images)
+            }
             
-            try:
-                # Renomear original para _old
-                path_obj = Path(image_path)
-                old_path = path_obj.parent / f"{path_obj.stem}_old{path_obj.suffix}"
-                
-                # Se já existe _old, pular
-                if old_path.exists():
-                    continue
-                
-                # Renomear original
-                os.rename(image_path, str(old_path))
-                
-                # Converter para WebP com nome original
-                webp_path, saved = convert_to_webp(str(old_path))
-                
-                # Renomear WebP para nome original (sem _old)
-                final_webp = path_obj.parent / f"{path_obj.stem}.webp"
-                if os.path.exists(webp_path):
-                    if final_webp.exists():
-                        os.remove(str(final_webp))
-                    os.rename(webp_path, str(final_webp))
-                
-                webp_transform_status['saved_mb'] += saved / (1024 * 1024)
-                webp_transform_status['processed_files'].append(str(image_path))
-                
-            except Exception as e:
-                print(f"Erro ao processar {image_path}: {e}")
-                # Tentar restaurar se deu erro
+            # Processar resultados conforme completam
+            for future in as_completed(future_to_image):
+                idx, image_path = future_to_image[future]
                 try:
-                    old_path = Path(image_path).parent / f"{Path(image_path).stem}_old{Path(image_path).suffix}"
-                    if old_path.exists():
-                        os.rename(str(old_path), image_path)
-                except:
-                    pass
+                    result = future.result()
+                    
+                    if result.get('success'):
+                        processed_count += 1
+                        saved_total += result.get('saved', 0)
+                        
+                        with webp_lock:
+                            webp_transform_status['current'] = processed_count
+                            webp_transform_status['current_file'] = os.path.basename(result['file'])
+                            webp_transform_status['saved_mb'] = saved_total / (1024 * 1024)
+                            webp_transform_status['processed_files'].append(str(result['file']))
+                    
+                except Exception as e:
+                    print(f"Erro ao processar {image_path}: {e}")
         
-        webp_transform_status['status'] = 'completed'
+        with webp_lock:
+            webp_transform_status['status'] = 'completed'
+            webp_transform_status['current'] = processed_count
         
     except Exception as e:
-        webp_transform_status['status'] = 'error'
-        webp_transform_status['error'] = str(e)
+        with webp_lock:
+            webp_transform_status['status'] = 'error'
+            webp_transform_status['error'] = str(e)
 
 @app.route('/transform_to_webp', methods=['POST'])
 def transform_to_webp():
