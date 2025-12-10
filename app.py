@@ -1721,6 +1721,41 @@ def check_webp_status():
     """Verifica status (não usado mais, mas mantido para compatibilidade)"""
     return jsonify({'has_webp': False})
 
+@app.route('/remove_old_files', methods=['POST'])
+def remove_old_files():
+    """Remove todos os arquivos com _old no nome"""
+    try:
+        img_folder = os.path.join(app.static_folder, 'img')
+        removed_count = 0
+        errors = []
+        
+        # Encontrar todos os arquivos com _old
+        for root, dirs, files in os.walk(img_folder):
+            for file in files:
+                if '_old' in file:
+                    file_path = os.path.join(root, file)
+                    try:
+                        os.remove(file_path)
+                        removed_count += 1
+                    except Exception as e:
+                        errors.append(f"Erro ao remover {file}: {str(e)}")
+        
+        if errors:
+            return jsonify({
+                'success': True,
+                'removed': removed_count,
+                'errors': errors,
+                'message': f'{removed_count} arquivo(s) removido(s), mas houve {len(errors)} erro(s)'
+            })
+        
+        return jsonify({
+            'success': True,
+            'removed': removed_count,
+            'message': f'{removed_count} arquivo(s) _old removido(s) com sucesso!'
+        })
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 #----------------------------------------------
 #----------------------------------------------
 #----------------------------------------------

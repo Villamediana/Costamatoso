@@ -1303,4 +1303,53 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
+
+    // ============================================
+    // Remover arquivos _old
+    // ============================================
+    const removeOldBtn = document.getElementById('remove-old-btn');
+    
+    if (removeOldBtn) {
+        removeOldBtn.addEventListener('click', async () => {
+            if (!confirm('⚠️ Tem certeza que deseja remover TODOS os arquivos com "_old" no nome?\n\nEsta ação não pode ser desfeita!')) {
+                return;
+            }
+
+            removeOldBtn.disabled = true;
+            removeOldBtn.textContent = '⏳ Removendo...';
+            showStatus('Removendo arquivos _old...');
+            updateProgress(0, 0, 0);
+
+            try {
+                const response = await fetch('/remove_old_files', {
+                    method: 'POST'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Erro ao remover arquivos');
+                }
+
+                const data = await response.json();
+
+                if (data.success) {
+                    updateProgress(100, data.removed, data.removed);
+                    showStatus('✅ Arquivos _old removidos com sucesso!');
+                    detailsDiv.innerHTML = `
+                        <div style="margin-top: 10px; padding: 10px; background: #d4edda; border-radius: 4px; color: #155724;">
+                            <strong>✅ Concluído!</strong><br>
+                            ${data.removed} arquivo(s) removido(s)
+                        </div>
+                    `;
+                } else {
+                    showStatus('❌ Erro: ' + (data.error || 'Erro desconhecido'), true);
+                }
+            } catch (error) {
+                console.error('Erro:', error);
+                showStatus('❌ Erro: ' + error.message, true);
+            } finally {
+                removeOldBtn.disabled = false;
+                removeOldBtn.textContent = '🗑️ Remover _old';
+            }
+        });
+    }
 });
