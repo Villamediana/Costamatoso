@@ -10,13 +10,13 @@
     transform: translate(-50%, -50%) scale(0.7);
     width: 90%;
     max-width: 700px;
-    background: transparent;
+    background: white;
     border-radius: 20px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     z-index: 10000;
     opacity: 0;
     transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    overflow: visible;
+    overflow: hidden;
 }
 
 .campanhas-popup-desktop.show {
@@ -26,7 +26,15 @@
 }
 
 .campanhas-popup-desktop::before {
-    display: none;
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(41, 128, 185, 0.05) 0%, rgba(142, 68, 173, 0.05) 100%);
+    pointer-events: none;
+    z-index: 1;
 }
 
 .campanhas-close {
@@ -92,6 +100,7 @@
     width: 100%;
     height: 100%;
     object-fit: contain;
+    border-radius: 20px;
 }
 
 .campanhas-prev,
@@ -256,7 +265,6 @@
     object-fit: contain;
     border-radius: 20px 20px 0 0;
     display: block;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .campanhas-dots-mobile {
