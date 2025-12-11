@@ -345,7 +345,7 @@ def detalhe_projeto(nome_categoria, nome_projeto):
                 if os.path.exists(capa_webp):
                     capa_relacionada = f'img/projetos/{nome_categoria}/{nome_relacionado}/capa.webp'
                 elif os.path.exists(capa_jpg):
-                capa_relacionada = f'img/projetos/{nome_categoria}/{nome_relacionado}/capa.jpg'
+                    capa_relacionada = f'img/projetos/{nome_categoria}/{nome_relacionado}/capa.jpg'
                 elif os.path.exists(capa_jpeg):
                     capa_relacionada = f'img/projetos/{nome_categoria}/{nome_relacionado}/capa.jpeg'
                 else:
