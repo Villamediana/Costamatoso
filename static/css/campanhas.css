@@ -8,15 +8,16 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%) scale(0.7);
-    width: 90%;
-    max-width: 700px;
-    background: white;
+    width: auto;
+    max-width: 90%;
+    max-height: 90vh;
+    background: transparent;
     border-radius: 20px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
     z-index: 10000;
     opacity: 0;
     transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-    overflow: hidden;
+    overflow: visible;
 }
 
 .campanhas-popup-desktop.show {
@@ -72,9 +73,12 @@
 
 .campanhas-slides {
     position: relative;
-    width: 100%;
-    height: 500px;
-    overflow: hidden;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .campanha-slide {
@@ -88,6 +92,9 @@
     transition: opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     cursor: pointer;
     z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .campanha-slide.active {
@@ -97,10 +104,13 @@
 }
 
 .campanha-slide img {
-    width: 100%;
-    height: 100%;
+    max-width: 100%;
+    max-height: 90vh;
+    width: auto;
+    height: auto;
     object-fit: contain;
     border-radius: 20px;
+    display: block;
 }
 
 .campanhas-prev,
@@ -177,12 +187,12 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: white;
+    background: transparent;
     border-radius: 20px 20px 0 0;
     box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.4), 0 -10px 30px rgba(0, 0, 0, 0.3);
     z-index: 10000;
     transform: translateY(100%);
-    max-height: 40vh;
+    max-height: 70vh;
     overflow: visible;
     padding: 0;
     padding-bottom: 50px;
@@ -226,13 +236,17 @@
 .campanhas-mobile-slider {
     position: relative;
     width: 100%;
-    height: 40vh;
+    height: auto;
+    min-height: 200px;
     overflow: visible;
     margin-top: 0;
     touch-action: pan-x;
     padding: 0;
     border-radius: 20px 20px 0 0;
     transform: translateY(0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .campanha-slide-mobile {
@@ -260,8 +274,10 @@
 }
 
 .campanha-slide-mobile img {
-    width: 100%;
-    height: 100%;
+    max-width: 100%;
+    max-height: 70vh;
+    width: auto;
+    height: auto;
     object-fit: contain;
     border-radius: 20px 20px 0 0;
     display: block;
@@ -328,10 +344,6 @@
 @media (max-width: 768px) {
     .campanhas-popup-desktop {
         display: none !important;
-    }
-    
-    .campanhas-slides {
-        height: 400px;
     }
 }
 
